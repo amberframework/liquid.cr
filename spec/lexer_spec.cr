@@ -6,45 +6,47 @@ describe Lexer do
 
   it "parses raw text" do
     lexer = Lexer.new
-    result = lexer.parse "raw content"
-    result.should eq(Template.new Raw.new("raw content"))
+    result = lexer.tokenize "raw content"
+    tokens = Array(Token).new
+    tokens << Raw.new("raw content")
+    result.should eq(tokens)
   end
 
   it "parses statement" do
     lexer = Lexer.new
-    result = lexer.parse "{% for x in 0..2 %}{% endfor %}"
+    result = lexer.tokenize "{% for x in 0..2 %}{% endfor %}"
 
-    template = Template.new
-    template << ForStatement.new(" for x in 0..2 ")
-    template << EndForStatement.new
+    tokens = Array(Token).new
+    tokens << ForStatement.new(" for x in 0..2 ")
+    tokens << EndForStatement.new
 
-    result.should eq( template )
+    result.should eq( tokens )
   end
 
   it "parses statement with raw content" do
     lexer = Lexer.new
-    result = lexer.parse "{% for x in 0..2 %}raw content{% endfor %}"
+    result = lexer.tokenize "{% for x in 0..2 %}raw content{% endfor %}"
 
-    template = Template.new
-    template << ForStatement.new("for x in 0..2")
-    template << Raw.new "raw content"
-    template << EndForStatement.new
+    tokens = Array(Token).new
+    tokens << ForStatement.new("for x in 0..2")
+    tokens << Raw.new "raw content"
+    tokens << EndForStatement.new
 
-    result.should eq( template )
+    result.should eq( tokens )
   end
 
   it "parses statement with raw content and newlines" do
     lexer = Lexer.new
-    result = lexer.parse "{% for x in 0..2 %}
+    result = lexer.tokenize "{% for x in 0..2 %}
       raw content
     {% endfor %}"
 
-    template = Template.new
-    template << ForStatement.new("for x in 0..2")
-    template << Raw.new "\n      raw content\n    "
-    template << EndForStatement.new
+    tokens = Array(Token).new
+    tokens << ForStatement.new("for x in 0..2")
+    tokens << Raw.new "\n      raw content\n    "
+    tokens << EndForStatement.new
 
-    result.should eq( template )
+    result.should eq( tokens )
   end
 
   it "parses if statement" do
@@ -58,30 +60,30 @@ describe Lexer do
     {% endif %}
     "
     lexer = Lexer.new
-    result = lexer.parse txt
+    result = lexer.tokenize txt
     
-    template = Template.new
-    template << Raw.new "\n    "
-    template << IfStatement.new("if kenny.sick")
-    template << Raw.new "\n      Kenny is sick.\n    "
-    template << ElsIfStatement.new("elif kenny.dead")
-    template << Raw.new "\n      You killed Kenny!  You bastard!!!\n    "
-    template << ElseStatement.new
-    template << Raw.new "\n      Kenny looks okay --- so far\n    "
-    template << EndIfStatement.new
-    template << Raw.new "\n    "
+    tokens = Array(Token).new
+    tokens << Raw.new "\n    "
+    tokens << IfStatement.new("if kenny.sick")
+    tokens << Raw.new "\n      Kenny is sick.\n    "
+    tokens << ElsIfStatement.new("elif kenny.dead")
+    tokens << Raw.new "\n      You killed Kenny!  You bastard!!!\n    "
+    tokens << ElseStatement.new
+    tokens << Raw.new "\n      Kenny looks okay --- so far\n    "
+    tokens << EndIfStatement.new
+    tokens << Raw.new "\n    "
 
-    result.should eq( template )
+    result.should eq( tokens )
   end
 
   it "parses expression" do
     lexer = Lexer.new
-    result = lexer.parse "{{ toto }}"
+    result = lexer.tokenize "{{ toto }}"
 
-    template = Template.new
-    template << Expression.new("toto")
+    tokens = Array(Token).new
+    tokens << Expression.new("toto")
 
-    result.should eq( template )
+    result.should eq( tokens )
   end
 
 end

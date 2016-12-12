@@ -1,4 +1,4 @@
-require "./nodes"
+require "./tokens"
 
 module Liquid
   class Lexer
@@ -6,12 +6,12 @@ module Liquid
     STATEMENT = /\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
     EXPRESSION = /\{{(?<expr>[^}]*)}}/
 
-    @template : Template
+    @template : Array(Token)
     @str : String
 
 
     def initialize
-      @template = Template.new
+      @template = Array(Token).new
       @str = ""
     end
 
@@ -22,7 +22,7 @@ module Liquid
       @str = @str[start..-1]
     end
 
-    def parse(@str : String)
+    def tokenize(@str : String)
       prev = nil
       while !@str.empty? && prev != @str
         prev = @str
