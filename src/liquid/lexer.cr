@@ -1,17 +1,18 @@
 require "./tokens"
 
+include Liquid
+
 module Liquid
   class Lexer
-    RAW = /^(?<raw>[^{]+)/
-    STATEMENT = /\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
+    RAW        = /^(?<raw>[^{]+)/
+    STATEMENT  = /\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
     EXPRESSION = /\{{(?<expr>[^}]*)}}/
 
-    @template : Array(Token)
+    @template : Array(Tokens::Token)
     @str : String
 
-
     def initialize
-      @template = Array(Token).new
+      @template = Array(Tokens::Token).new
       @str = ""
     end
 
@@ -27,7 +28,7 @@ module Liquid
       while !@str.empty? && prev != @str
         prev = @str
         if match = @str.match(RAW)
-          @template << Raw.new(match["raw"])
+          @template << Tokens::Raw.new(match["raw"])
           consume(match.end)
         elsif match = @str.match(STATEMENT)
           @template << statement(match)
@@ -41,21 +42,20 @@ module Liquid
     end
 
     def expression(match)
-      Expression.new match["expr"]
+      Tokens::Expression.new match["expr"]
     end
 
     def statement(match)
       case match["keyword"]
-      when "for" then ForStatement.new(match["full"])
-      when "endfor" then EndForStatement.new
-      when "if" then IfStatement.new match["full"]
-      when "elsif" then ElsIfStatement.new match["full"]
-      when "else" then ElseStatement.new
-      when "endif" then EndIfStatement.new
+      when "for"    then Tokens::ForStatement.new(match["full"])
+      when "endfor" then Tokens::EndForStatement.new
+      when "if"     then Tokens::IfStatement.new match["full"]
+      when "elsif"  then Tokens::ElsIfStatement.new match["full"]
+      when "else"   then Tokens::ElseStatement.new
+      when "endif"  then Tokens::EndIfStatement.new
       else
-        Statement.new(match["full"])
+        Tokens::Statement.new(match["full"])
       end
     end
-
   end
 end

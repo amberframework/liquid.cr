@@ -1,17 +1,17 @@
-module Liquid
+module Liquid::Tokens
   abstract class Token
     @class : String = {{@type.class.stringify}}
     def_equals @class
   end
 
   class Raw < Token
+    getter content
     @content : String
 
     def initialize(@content)
     end
 
     def_equals @content
-
   end
 
   class Statement < Raw
@@ -49,5 +49,4 @@ module Liquid
 
   class EndIfStatement < Token
   end
-
 end
