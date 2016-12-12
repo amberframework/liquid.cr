@@ -1,0 +1,10 @@
+name: liquid
+version: 0.1.0
+
+authors:
+  - Arnaud Fernandés <arnaud.fernandes@laposte.net>
+
+
+crystal: 0.20.1
+
+license: MIT
