@@ -1,9 +1,7 @@
 require "./spec_helper"
 
 describe Liquid::Nodes do
-
   describe For do
-
     it "should loop over array" do
       stmt = For.new Tokens::ForStatement.new "for x in myarray"
       stmt << Expression.new "x"
@@ -14,7 +12,6 @@ describe Liquid::Nodes do
       io.close
       io.to_s.should eq "apple12"
     end
-
   end
 
   describe Assign do

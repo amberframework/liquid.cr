@@ -12,8 +12,9 @@ module Liquid::Nodes
   # loop.last     	True if last iteration.
   # loop.length    	The number of items in the sequence.
   class For < Node
-    GLOBAL = /for (?<var>\w+) in (?<range>.+)/
-    RANGE  = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
+    GLOBAL  = /for (?<var>\w+) in (?<range>.+)/
+    RANGE   = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
+    VARNAME = /^\s*(?<varname>#{VAR})\s*$/
 
     @loop_var : String
     @loop_over : String?
@@ -26,13 +27,13 @@ module Liquid::Nodes
         if rmatch = gmatch["range"].match RANGE
           @begin = rmatch["start"].to_i
           @end = rmatch["end"].to_i
-        elsif (rmatch = gmatch["range"].match /^\s*(?<varname>#{VAR})\s*$/)
+        elsif (rmatch = gmatch["range"].match VARNAME)
           @loop_over = rmatch["varname"]
         else
           raise InvalidNode.new "Invalid for node : #{token.content}"
         end
       else
-          raise InvalidNode.new "Invalid for node : #{token.content}"
+        raise InvalidNode.new "Invalid for node : #{token.content}"
       end
     end
 
