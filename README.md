@@ -9,24 +9,53 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   liquid:
-    github: [your-github-name]/liquid
+    github: TechMagister/liquid.cr
 ```
 
 ## Usage
 
 ```crystal
 require "liquid"
-```
 
-TODO: Write usage instructions here
+txt = "
+    {% if kenny.sick %}
+      Kenny is sick.
+    {% elsif kenny.dead %}
+      You killed Kenny!  You ***!!!
+    {% else %}
+      Kenny looks okay --- so far
+    {% endif %}
+    "
+ctx = Context.new
+ctx.set "kenny.sick", false
+ctx.set "kenny.dead", true
+
+tpl = Parser.parse txt
+result = tpl.render ctx
+
+# result = "
+#      You killed Kenny!  You ***!!!
+#    
+#    "
+
+```
 
 ## Development
 
-TODO: Write development instructions here
+TODO:
+- [x] Basic For loops
+- [x] Basic If Elsif Else
+- [ ] Improve For loops
+- [ ] Add syntax checking
+- [ ] Improve expression parsing
+- [ ] Improve data interface
+- [ ] Add filters
+- [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
+
 
 ## Contributing
 
-1. Fork it ( https://github.com/[your-github-name]/liquid/fork )
+1. Fork it ( https://github.com/TechMagister/liquid.cr/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
@@ -34,4 +63,4 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [[your-github-name]](https://github.com/[your-github-name]) Arnaud Fernandés - creator, maintainer
+- [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer
