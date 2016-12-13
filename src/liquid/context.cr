@@ -6,14 +6,12 @@ module Liquid
       ctx.dup
     end
 
-    def set(key, value)
+    def set(key, value : DataType)
       @inner[key] = value
     end
 
     def set(key, value : Array)
-      tmp = Array(DataType).new
-      value.each { |e| tmp << e }
-      @inner[key] = tmp
+      @inner[key] = value.map { |e| e.as(DataType) }
     end
 
     def get(key) : DataType
