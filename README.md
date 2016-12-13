@@ -46,7 +46,15 @@ TODO:
 - [x] Basic For loops
 - [x] Basic If Elsif Else
 - [x] Add variable assignment ( {% assign var = "Hello World" %} )
-- [ ] Improve For loops
+- [ ] Add increment
+- [ ] Add decrement
+- [ ] Add capture
+- [ ] Add support for multiple operator ( {% if test == true or something = another %} )
+- [ ] Add "contains" keyword
+- [ ] Add support for Array
+- [ ] Add support for Float
+- [ ] Add case/when
+- [ ] Add iteration over Arrays
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
 - [ ] Improve data interface
