@@ -15,7 +15,7 @@ describe Liquid::Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Nodes::Node
-    expected << Nodes::For.new(Tokens::ForStatement.new "")
+    expected << Nodes::For.new(Tokens::ForStatement.new "for x in 0..2")
     expected.last << Nodes::Raw.new(Tokens::Raw.new " shown 2 times ")
 
     template.root.children.should eq expected
@@ -26,7 +26,7 @@ describe Liquid::Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Nodes::Node
-    expected << Nodes::If.new(Tokens::IfStatement.new "")
+    expected << Nodes::If.new(Tokens::IfStatement.new "if a == true")
     expected.last << Nodes::Raw.new(Tokens::Raw.new " shown ")
 
     template.root.children.should eq expected
@@ -37,7 +37,7 @@ describe Liquid::Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Nodes::Node
-    if_node = Nodes::If.new(Tokens::IfStatement.new "")
+    if_node = Nodes::If.new(Tokens::IfStatement.new "if a == true")
     if_node << Nodes::Raw.new(Tokens::Raw.new " shown ")
     else_node = Nodes::Else.new(Tokens::ElseStatement.new)
     else_node << Nodes::Raw.new(Tokens::Raw.new " not shown ")

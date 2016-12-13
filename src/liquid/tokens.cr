@@ -15,8 +15,8 @@ module Liquid::Tokens
   end
 
   class Statement < Raw
-    def initialize(@content : String)
-      @content = @content.strip
+    def initialize(content : String)
+      @content = content.strip
     end
   end
 

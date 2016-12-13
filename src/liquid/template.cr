@@ -37,6 +37,9 @@ module Liquid
           if stack.last.is_a? If
             elsenode = stack.last.as(If).set_else token
             stack << elsenode
+          elsif (s = stack[-2]?) && s.is_a?(If)
+            elsenode = stack[-2].as(If).set_else token
+            stack << elsenode
           end
         when Tokens::EndIfStatement
           stack.size.times do

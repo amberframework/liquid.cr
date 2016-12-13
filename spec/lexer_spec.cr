@@ -64,7 +64,7 @@ describe Lexer do
     txt = "
     {% if kenny.sick %}
       Kenny is sick.
-    {% elif kenny.dead %}
+    {% elsif kenny.dead %}
       You killed Kenny!  You bastard!!!
     {% else %}
       Kenny looks okay --- so far
@@ -76,7 +76,7 @@ describe Lexer do
     tokens << Tokens::Raw.new "\n    "
     tokens << Tokens::IfStatement.new("if kenny.sick")
     tokens << Tokens::Raw.new "\n      Kenny is sick.\n    "
-    tokens << Tokens::ElsIfStatement.new("elif kenny.dead")
+    tokens << Tokens::ElsIfStatement.new("elsif kenny.dead")
     tokens << Tokens::Raw.new "\n      You killed Kenny!  You bastard!!!\n    "
     tokens << Tokens::ElseStatement.new
     tokens << Tokens::Raw.new "\n      Kenny looks okay --- so far\n    "

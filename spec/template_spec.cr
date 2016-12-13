@@ -33,4 +33,35 @@ describe Template do
     ctx.set("var", false)
     tpl.render(ctx).should eq ""
   end
+  
+  it "render if else statement" do
+    tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")
+    ctx = Context.new
+    ctx.set("var", true)
+    tpl.render(ctx).should eq "true"
+    ctx.set("var", false)
+    tpl.render(ctx).should eq "false"
+  end
+
+  it "render if elsif else statement" do
+    txt = "
+    {% if kenny.sick %}
+      Kenny is sick.
+    {% elsif kenny.dead %}
+      You killed Kenny!  You bastard!!!
+    {% else %}
+      Kenny looks okay --- so far
+    {% endif %}
+    "
+    ctx = Context.new
+    ctx.set "kenny.sick", false
+    ctx.set "kenny.dead", true
+
+    tpl = Parser.parse txt
+    result = tpl.render ctx
+    result.should eq "\n    \n      You killed Kenny!  You bastard!!!\n    \n    "
+
+
+  end
+
 end

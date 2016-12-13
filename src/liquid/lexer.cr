@@ -54,7 +54,7 @@ module Liquid
       when "else"   then Tokens::ElseStatement.new
       when "endif"  then Tokens::EndIfStatement.new
       else
-        Tokens::Statement.new(match["full"])
+        raise "Invalid statement : #{match}"
       end
     end
   end
