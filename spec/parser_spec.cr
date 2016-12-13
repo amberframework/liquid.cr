@@ -3,7 +3,6 @@ require "./spec_helper"
 include Liquid
 
 describe Liquid::Parser do
-
   it "parses raw text" do
     txt = "raw text"
     template = Parser.parse txt
@@ -20,7 +19,6 @@ describe Liquid::Parser do
     expected.last << Nodes::Raw.new(Tokens::Raw.new " shown 2 times ")
 
     template.root.children.should eq expected
-
   end
 
   it "parses if statement" do
@@ -32,7 +30,6 @@ describe Liquid::Parser do
     expected.last << Nodes::Raw.new(Tokens::Raw.new " shown ")
 
     template.root.children.should eq expected
-
   end
 
   it "parses if else statement" do
@@ -48,7 +45,5 @@ describe Liquid::Parser do
     expected << if_node
 
     template.root.children.should eq expected
-
   end
-
 end

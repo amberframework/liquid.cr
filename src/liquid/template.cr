@@ -5,7 +5,6 @@ include Liquid::Nodes
 
 module Liquid
   class Template
-
     getter root
 
     @root : Root

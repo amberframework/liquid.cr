@@ -3,7 +3,6 @@ require "./spec_helper"
 include Liquid
 
 describe Template do
-
   it "render raw text" do
     tpl = Parser.parse("raw text")
     tpl.render(Context.new).should eq "raw text"
@@ -26,7 +25,7 @@ describe Template do
     tpl.render(Context.new).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
   end
 
-  it "render if statement" do 
+  it "render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new
     ctx.set("var", true)
@@ -34,5 +33,4 @@ describe Template do
     ctx.set("var", false)
     tpl.render(ctx).should eq ""
   end
-
 end

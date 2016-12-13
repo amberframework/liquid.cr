@@ -19,8 +19,10 @@ module Liquid::Nodes
   class Root < Node
     def initialize
     end
+
     def initialize(token : Tokens::Token)
     end
+
     def render(data, io)
       @children.each &.render(data, io)
     end
@@ -29,22 +31,88 @@ module Liquid::Nodes
   class Unknow < Node
     def initialize(token : Tokens::Token)
     end
+
     def render(data, io)
     end
   end
 
-  class Expression < Node
-    @var : String
-    def initialize(token : Tokens::Expression)
-      @var = token.content
+  class BinOperator
+    macro responds_to(l, o, r)
+      if {{l.id}}.responds_to?(:{{o.id}})
+        {{l.id}} {{o.id}} {{r.id}}
+      else
+        false
+      end
     end
+
+    EQ  = BinProc.new { |left, right| left == right }
+    NE  = BinProc.new { |left, right| left != right }
+    LE  = BinProc.new { |left, right| responds_to(left, :<=, right) }
+    GE  = BinProc.new { |left, right| responds_to(left, :>=, right) }
+    LT  = BinProc.new { |left, right| responds_to(left, :<, right) }
+    GT  = BinProc.new { |left, right| responds_to(left, :>, right) }
+    NOP = BinProc.new { false }
+
+    @inner : BinProc
+
+    def initialize(str : String)
+      @inner = case str
+               when "==" then EQ
+               when "!=" then NE
+               when "<=" then LE
+               when ">=" then GE
+               when "<"  then LT
+               when ">"  then GT
+               else
+                 NOP
+               end
+    end
+
+    def call(left : Context::DataType, right : Context::DataType)
+      @inner.call left.as(Context::DataType), right.as(Context::DataType)
+    end
+
+    alias BinProc = Proc(Context::DataType, Context::DataType, Bool)
+  end
+
+  class Expression < Node
+    VAR      = /\w+(\.\w+)*/
+    OPERATOR = /==|!=|<=|>=|<|>/
+    EXPR     = /^(?<left>#{VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{VAR})$/
+
+    @var : String
+
+    def initialize(token : Tokens::Expression)
+      @var = token.content.strip
+    end
+
+    def initialize(var)
+      @var = var.strip
+    end
+
+    def eval(data) : Context::DataType
+      if @var == "true"
+        true
+      elsif @var == "false"
+        false
+      elsif @var.match /^#{VAR}$/
+        data.get(@var)
+      elsif m = @var.match EXPR
+        op = BinOperator.new m["op"]
+        le = Expression.new m["left"]
+        re = Expression.new m["right"]
+        op.call le.eval(data), re.eval(data)
+      end
+    end
+
     def render(data, io)
-      io << data.get(@var)
+      io << eval(data)
     end
   end
 
   class Raw < Node
     @content : String
+
     def initialize(token : Tokens::Raw)
       @content = token.content
     end
@@ -54,7 +122,6 @@ module Liquid::Nodes
     end
 
     def_equals @children, @content
-
   end
 
   # Inside of a for-loop block, you can access some special variables:
@@ -68,7 +135,7 @@ module Liquid::Nodes
   # loop.length    	The number of items in the sequence.
   class For < Node
     GLOBAL = /for (?<var>\w+) in (?<range>.+)/
-    RANGE = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
+    RANGE  = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
 
     @loop_var : String
     @begin : Int32 | Iterator(Context::DataType)
@@ -93,7 +160,7 @@ module Liquid::Nodes
       stop = @end.as(Int32)
       start.upto stop do |x|
         data.set(@loop_var, x)
-        data.set("loop.index", i+1)
+        data.set("loop.index", i + 1)
         data.set("loop.index0", i)
         data.set("loop.revindex", stop - start - i + 1)
         data.set("loop.revindex0", stop - start - i)
@@ -101,7 +168,7 @@ module Liquid::Nodes
         data.set("loop.last", x == stop)
         data.set("loop.length", stop - start)
         children.each &.render(data, io)
-        i +=1
+        i += 1
       end
     end
 
@@ -109,18 +176,19 @@ module Liquid::Nodes
       if @begin.is_a?(Int32) && @end.is_a?(Int32)
         render_with_range data, io
       else
-
       end
     end
   end
 
   class If < Node
+    SIMPLE_EXP = /if (?<left>.+) ?(?<operator>==|!=) ?(?<right>.+)/
 
     @elsif : Array(ElsIf)?
     @else : Else?
 
     def initialize(token : Tokens::IfStatement)
     end
+
     def render(data, io)
     end
 
@@ -134,7 +202,7 @@ module Liquid::Nodes
       @else = Else.new token
     end
 
-     def set_else(node : Else) : Else
+    def set_else(node : Else) : Else
       @else = node
     end
 
@@ -144,6 +212,7 @@ module Liquid::Nodes
   class Else < Node
     def initialize(token : Tokens::ElseStatement)
     end
+
     def render(data, io)
     end
   end
@@ -151,8 +220,8 @@ module Liquid::Nodes
   class ElsIf < Node
     def initialize(token : Tokens::ElsIfStatement)
     end
+
     def render(data, io)
     end
   end
-
 end

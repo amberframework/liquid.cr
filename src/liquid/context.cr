@@ -10,10 +10,10 @@ module Liquid
       @inner[key] = value
     end
 
-    def get(key)
+    def get(key) : DataType
       @inner[key]
     end
-    
+
     def [](key)
       get(key)
     end
