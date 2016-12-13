@@ -2,6 +2,21 @@ require "./spec_helper"
 
 describe Liquid::Nodes do
 
+  describe For do
+
+    it "should loop over array" do
+      stmt = For.new Tokens::ForStatement.new "for x in myarray"
+      stmt << Expression.new "x"
+      ctx = Context.new
+      ctx.set("myarray", ["apple", 12])
+      io = IO::Memory.new
+      stmt.render(ctx, io)
+      io.close
+      io.to_s.should eq "apple12"
+    end
+
+  end
+
   describe Assign do
     it "should assign a value" do
       expr = Assign.new "assign bool = true"

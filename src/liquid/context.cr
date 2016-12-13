@@ -10,6 +10,12 @@ module Liquid
       @inner[key] = value
     end
 
+    def set(key, value : Array)
+      tmp = Array(DataType).new
+      value.each { |e| tmp << e }
+      @inner[key] = tmp
+    end
+
     def get(key) : DataType
       @inner[key]?
     end
@@ -22,6 +28,6 @@ module Liquid
       @inner.delete key
     end
 
-    alias DataType = Nil | String | Float32 | Int32 | Bool | Array(DataType) | Hash(DataType, DataType)
+    alias DataType = Nil | String | Float32 | Float64 | Int32 | Bool | Array(DataType) | Hash(DataType, DataType)
   end
 end

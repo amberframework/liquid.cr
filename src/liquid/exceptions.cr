@@ -4,4 +4,7 @@ module Liquid
 
   class InvalidNode < Exception
   end
+
+  class InvalidStatement < Exception
+  end
 end

@@ -25,6 +25,15 @@ describe Template do
     tpl.render(Context.new).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
   end
 
+  it "render for loop when iterating over an array" do
+    tpl = Parser.parse("{% for x in myarray %}
+    Got : {{x}}
+    {% endfor %}")
+    ctx = Context.new
+    ctx.set("myarray", [1, 12.2, "here"])
+    tpl.render(ctx).should eq "\n    Got : 1\n    \n    Got : 12.2\n    \n    Got : here\n    "
+  end
+
   it "render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new

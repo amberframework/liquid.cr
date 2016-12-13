@@ -16,23 +16,27 @@ module Liquid::Nodes
     RANGE  = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
 
     @loop_var : String
-    @begin : Int32 | Iterator(Context::DataType)
-    @end : Int32 | Iterator(Context::DataType)
+    @loop_over : String?
+    @begin : Int32?
+    @end : Int32?
 
     def initialize(token : Tokens::ForStatement)
-      @loop_var = ""
-      @begin = @end = 0
       if gmatch = token.content.match GLOBAL
         @loop_var = gmatch["var"]
         if rmatch = gmatch["range"].match RANGE
           @begin = rmatch["start"].to_i
           @end = rmatch["end"].to_i
+        elsif (rmatch = gmatch["range"].match /^\s*(?<varname>#{VAR})\s*$/)
+          @loop_over = rmatch["varname"]
+        else
+          raise InvalidNode.new "Invalid for node : #{token.content}"
         end
+      else
+          raise InvalidNode.new "Invalid for node : #{token.content}"
       end
     end
 
     def render_with_range(data, io)
-      data = Context.new data
       i = 0
       start = @begin.as(Int32)
       stop = @end.as(Int32)
@@ -50,10 +54,36 @@ module Liquid::Nodes
       end
     end
 
+    def render_with_var(data, io)
+      val = Expression.new @loop_over.not_nil!
+      if (arr = val.eval(data)) && arr.is_a? Array
+        i = 0
+        stop = arr.size
+        arr.each do |val|
+          data.set(@loop_var, val)
+          data.set("loop.index", i + 1)
+          data.set("loop.index0", i)
+          data.set("loop.revindex", stop - i + 1)
+          data.set("loop.revindex0", stop - i)
+          data.set("loop.first", i == 0)
+          data.set("loop.last", i == stop)
+          data.set("loop.length", stop)
+          children.each &.render(data, io)
+          i += 1
+        end
+      else
+        raise InvalidStatement.new "Can't iterate over #{@loop_over}"
+      end
+    end
+
     def render(data, io)
+      data = Context.new data
       if @begin.is_a?(Int32) && @end.is_a?(Int32)
         render_with_range data, io
+      elsif @loop_over.is_a?(String)
+        render_with_var data, io
       else
+        raise InvalidStatement.new "Can't iterate over #{@loop_over}"
       end
     end
   end
