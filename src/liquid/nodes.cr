@@ -1,21 +1,8 @@
 require "./context"
 
+require "./nodes/*"
+
 module Liquid::Nodes
-  abstract class Node
-    getter children
-    @children = Array(Node).new
-
-    abstract def initialize(token)
-
-    abstract def render(data, io)
-
-    def <<(node : Node)
-      @children << node
-    end
-
-    def_equals @children
-  end
-
   class Root < Node
     def initialize
     end
@@ -25,41 +12,6 @@ module Liquid::Nodes
 
     def render(data, io)
       @children.each &.render(data, io)
-    end
-  end
-
-  class Expression < Node
-    VAR      = /\w+(\.\w+)*/
-    OPERATOR = /==|!=|<=|>=|<|>/
-    EXPR     = /^\s*(?<left>#{VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{VAR})\s*$/
-
-    @var : String
-
-    def initialize(token : Tokens::Expression)
-      @var = token.content.strip
-    end
-
-    def initialize(var)
-      @var = var.strip
-    end
-
-    def eval(data) : Context::DataType
-      if @var == "true"
-        true
-      elsif @var == "false"
-        false
-      elsif @var.match /^#{VAR}$/
-        data.get(@var)
-      elsif m = @var.match EXPR
-        op = BinOperator.new m["op"]
-        le = Expression.new m["left"]
-        re = Expression.new m["right"]
-        op.call le.eval(data), re.eval(data)
-      end
-    end
-
-    def render(data, io)
-      io << eval(data)
     end
   end
 

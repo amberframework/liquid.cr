@@ -45,6 +45,7 @@ result = tpl.render ctx
 TODO:
 - [x] Basic For loops
 - [x] Basic If Elsif Else
+- [x] Add variable assignment ( {{ assign var = "Hello World" }} )
 - [ ] Improve For loops
 - [ ] Add syntax checking
 - [ ] Improve expression parsing

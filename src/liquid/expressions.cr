@@ -1,6 +1,14 @@
 require "./context"
 
 module Liquid
+  enum ExpressionType
+    BOOL,
+    STRING,
+    INT,
+    VAR,
+    ASSIGN
+  end
+
   class BinOperator
     macro responds_to(l, o, r)
       if {{l.id}}.responds_to?(:{{o.id}})

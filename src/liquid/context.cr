@@ -11,7 +11,7 @@ module Liquid
     end
 
     def get(key) : DataType
-      @inner[key]
+      @inner[key]?
     end
 
     def [](key)

@@ -33,7 +33,7 @@ describe Template do
     ctx.set("var", false)
     tpl.render(ctx).should eq ""
   end
-  
+
   it "render if else statement" do
     tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")
     ctx = Context.new
@@ -60,8 +60,10 @@ describe Template do
     tpl = Parser.parse txt
     result = tpl.render ctx
     result.should eq "\n    \n      You killed Kenny!  You bastard!!!\n    \n    "
-
-
   end
 
+  it "render assigned variable" do
+    tpl = Parser.parse "{{ assign var = \"Hello World\"}}{{var}}"
+    tpl.render(Context.new).should eq "Hello World"
+  end
 end
