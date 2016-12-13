@@ -1,6 +1,24 @@
 require "./spec_helper"
 
 describe Liquid::Nodes do
+
+  describe Assign do
+    it "should assign a value" do
+      expr = Assign.new "assign bool = true"
+      expr2 = Assign.new "assign str = \"test\""
+      expr3 = Assign.new "assign int = 12"
+      ctx = Context.new
+
+      expr.render(ctx, IO::Memory.new)
+      expr2.render(ctx, IO::Memory.new)
+      expr3.render(ctx, IO::Memory.new)
+
+      ctx.get("bool").should be_true
+      ctx.get("str").should eq "test"
+      ctx.get("int").should eq 12
+    end
+  end
+
   describe Expression do
     it "should eval true" do
       expr = Expression.new Tokens::Expression.new("true")
@@ -30,21 +48,6 @@ describe Liquid::Nodes do
     it "should eval an operation" do
       expr = Expression.new Tokens::Expression.new("true == false")
       expr.eval(Context.new).should be_false
-    end
-
-    it "should assign a value" do
-      expr = Expression.new "assign bool = true"
-      expr2 = Expression.new "assign str = \"test\""
-      expr3 = Expression.new "assign int = 12"
-      ctx = Context.new
-
-      expr.eval(ctx)
-      expr2.eval(ctx)
-      expr3.eval(ctx)
-
-      ctx.get("bool").should be_true
-      ctx.get("str").should eq "test"
-      ctx.get("int").should eq 12
     end
   end
 end

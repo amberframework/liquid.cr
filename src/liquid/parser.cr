@@ -2,9 +2,7 @@ require "./tokens"
 require "./template"
 
 module Liquid
-
   class Parser
-
     # Parse a String
     # Run Lexer
     # validate
@@ -56,6 +54,8 @@ module Liquid
           stack.pop
         when Tokens::Expression
           stack.last << Expression.new token
+        when Tokens::AssignStatement
+          stack.last << Assign.new token
         when Tokens::Raw
           stack.last << Raw.new token
         end

@@ -53,6 +53,7 @@ module Liquid
       when "elsif"  then Tokens::ElsIfStatement.new match["full"]
       when "else"   then Tokens::ElseStatement.new
       when "endif"  then Tokens::EndIfStatement.new
+      when "assign" then Tokens::AssignStatement.new match["full"]
       else
         raise "Invalid statement : #{match}"
       end

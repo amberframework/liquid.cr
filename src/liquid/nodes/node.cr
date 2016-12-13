@@ -1,4 +1,6 @@
 module Liquid::Nodes
+  VAR = /\w+(\.\w+)*/
+
   abstract class Node
     getter children
     @children = Array(Node).new

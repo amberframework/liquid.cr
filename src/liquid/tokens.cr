@@ -53,4 +53,7 @@ module Liquid::Tokens
 
   class EndIfStatement < Token
   end
+
+  class AssignStatement < Raw
+  end
 end

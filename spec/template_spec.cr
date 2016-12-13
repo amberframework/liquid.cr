@@ -63,7 +63,7 @@ describe Template do
   end
 
   it "render assigned variable" do
-    tpl = Parser.parse "{{ assign var = \"Hello World\"}}{{var}}"
+    tpl = Parser.parse "{% assign var = \"Hello World\"%}{{var}}"
     tpl.render(Context.new).should eq "Hello World"
   end
 end
