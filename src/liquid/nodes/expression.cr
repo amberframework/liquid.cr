@@ -6,7 +6,8 @@ module Liquid::Nodes
     EXPR     = /^\s*(?<left>#{VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{VAR})\s*$/
 
     STRING = /^\s*"(?<str>[^"]*)"\s*$/
-    INT    = /^\s*(?<intval>[1-9][0-9]*)\s*$/
+    INT    = /\s*(?<intval>[1-9][0-9]*)\s*/
+    FLOAT  = /\s*(?<floatval>#{INT}\.[0-9]+)\s*/
 
     @var : String
 
@@ -25,8 +26,10 @@ module Liquid::Nodes
         false
       elsif m = @var.match STRING
         m["str"]
-      elsif m = @var.match INT
+      elsif m = @var.match /^#{INT}$/
         m["intval"].to_i
+      elsif m = @var.match /^#{FLOAT}$/
+        m["floatval"].to_f32
       elsif @var.match /^#{VAR}$/
         data.get(@var)
       elsif m = @var.match EXPR

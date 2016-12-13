@@ -52,7 +52,7 @@ TODO:
 - [ ] Add support for multiple operator ( {% if test == true or something = another %} )
 - [ ] Add "contains" keyword
 - [ ] Add support for Array
-- [ ] Add support for Float
+- [x] Add support for Float
 - [ ] Add case/when
 - [ ] Add iteration over Arrays
 - [ ] Add syntax checking

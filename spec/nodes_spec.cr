@@ -30,6 +30,11 @@ describe Liquid::Nodes do
       expr.eval(Context.new).should be_false
     end
 
+    it "should eval float" do
+      expr = Expression.new "12.5"
+      expr.eval(Context.new).should eq 12.5
+    end
+
     it "should eval a var" do
       expr = Expression.new Tokens::Expression.new("myvar")
       expr2 = Expression.new Tokens::Expression.new("myvar.inner")
