@@ -15,6 +15,12 @@ module Liquid
       build tokens
     end
 
+    def render(data, io = IO::Memory.new)
+      @root.render(data, io)
+      io.close
+      io.to_s
+    end
+
     private def build(tokens : Array(Tokens::Token))
       stack = [@root] of Node
       tokens.each do |token|
@@ -44,6 +50,8 @@ module Liquid
           stack << node
         when Tokens::EndForStatement
           stack.pop
+        when Tokens::Expression
+          stack.last << Expression.new token
         when Tokens::Raw
           stack.last << Raw.new token
         else

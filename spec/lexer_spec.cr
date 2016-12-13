@@ -22,6 +22,18 @@ describe Lexer do
     result.should eq(tokens)
   end
 
+  it "parses statement with expression inside" do
+    lexer = Lexer.new
+    result = lexer.tokenize "{% for x in 0..2 %}{{x}}{% endfor %}"
+
+    tokens = Array(Tokens::Token).new
+    tokens << Tokens::ForStatement.new(" for x in 0..2 ")
+    tokens << Tokens::Expression.new "x"
+    tokens << Tokens::EndForStatement.new
+
+    result.should eq(tokens)
+  end
+
   it "parses statement with raw content" do
     lexer = Lexer.new
     result = lexer.tokenize "{% for x in 0..2 %}raw content{% endfor %}"

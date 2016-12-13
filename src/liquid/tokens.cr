@@ -21,6 +21,9 @@ module Liquid::Tokens
   end
 
   class ForStatement < Statement
+
+    getter content
+
     def initialize(@content : String)
       @content = @content.strip
     end
@@ -30,6 +33,7 @@ module Liquid::Tokens
   end
 
   class Expression < Raw
+    getter content
     def initialize(@content)
       @content = @content.strip
     end

@@ -5,8 +5,8 @@ include Liquid
 module Liquid
   class Lexer
     RAW        = /^(?<raw>[^{]+)/
-    STATEMENT  = /\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
-    EXPRESSION = /\{{(?<expr>[^}]*)}}/
+    STATEMENT  = /^\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
+    EXPRESSION = /^\{{(?<expr>[^}]*)}}/
 
     @template : Array(Tokens::Token)
     @str : String
