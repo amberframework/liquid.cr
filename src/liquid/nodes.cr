@@ -28,53 +28,6 @@ module Liquid::Nodes
     end
   end
 
-  class Unknow < Node
-    def initialize(token : Tokens::Token)
-    end
-
-    def render(data, io)
-    end
-  end
-
-  class BinOperator
-    macro responds_to(l, o, r)
-      if {{l.id}}.responds_to?(:{{o.id}})
-        {{l.id}} {{o.id}} {{r.id}}
-      else
-        false
-      end
-    end
-
-    EQ  = BinProc.new { |left, right| left == right }
-    NE  = BinProc.new { |left, right| left != right }
-    LE  = BinProc.new { |left, right| responds_to(left, :<=, right) }
-    GE  = BinProc.new { |left, right| responds_to(left, :>=, right) }
-    LT  = BinProc.new { |left, right| responds_to(left, :<, right) }
-    GT  = BinProc.new { |left, right| responds_to(left, :>, right) }
-    NOP = BinProc.new { false }
-
-    @inner : BinProc
-
-    def initialize(str : String)
-      @inner = case str
-               when "==" then EQ
-               when "!=" then NE
-               when "<=" then LE
-               when ">=" then GE
-               when "<"  then LT
-               when ">"  then GT
-               else
-                 NOP
-               end
-    end
-
-    def call(left : Context::DataType, right : Context::DataType)
-      @inner.call left.as(Context::DataType), right.as(Context::DataType)
-    end
-
-    alias BinProc = Proc(Context::DataType, Context::DataType, Bool)
-  end
-
   class Expression < Node
     VAR      = /\w+(\.\w+)*/
     OPERATOR = /==|!=|<=|>=|<|>/
@@ -243,7 +196,6 @@ module Liquid::Nodes
   end
 
   class ElsIf < Node
-
     SIMPLE_EXP = /^\s*elsif (?<expr>.+)\s*$/
     @if_expression : Expression
 

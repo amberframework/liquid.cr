@@ -56,8 +56,6 @@ module Liquid
           stack.last << Expression.new token
         when Tokens::Raw
           stack.last << Raw.new token
-        else
-          stack.last << Unknow.new token
         end
       end
     end
