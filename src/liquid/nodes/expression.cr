@@ -63,6 +63,8 @@ module Liquid::Nodes
 
     @var : String
 
+    # Improve template rendering time by adding leaf node when possible
+    # instead of evaluating at render time
     def initialize(token : Tokens::Expression)
       @var = token.content.strip
       @children << Boolean.new @var if @var == "true" || @var == "false"

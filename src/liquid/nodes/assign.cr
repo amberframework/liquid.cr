@@ -12,6 +12,7 @@ module Liquid::Nodes
       if match = tok.content.strip.match ASSIGN
         @varname = match["varname"]
         @value = Expression.new match["value"]
+        raise InvalidNode.new "Invalid variable name" if @varname.match /true|false/
       else
         raise InvalidNode.new "Invalid assignment Node"
       end
