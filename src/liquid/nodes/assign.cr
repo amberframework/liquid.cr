@@ -3,13 +3,13 @@ require "./expression"
 
 module Liquid::Nodes
   class Assign < Node
-    ASSIGN = /^\s*assign (?<varname>#{VAR}) ?= ?(?<value>.+)\s*$/
+    ASSIGN = /^assign (?<varname>#{VAR}) ?= ?(?<value>#{TYPE_OR_VAR})$/
 
     @varname : String
     @value : Expression
 
     def initialize(tok : Tokens::AssignStatement)
-      if match = tok.content.match ASSIGN
+      if match = tok.content.strip.match ASSIGN
         @varname = match["varname"]
         @value = Expression.new match["value"]
       else
@@ -18,7 +18,7 @@ module Liquid::Nodes
     end
 
     def initialize(str : String)
-      if match = str.match ASSIGN
+      if match = str.strip.match ASSIGN
         @varname = match["varname"]
         @value = Expression.new match["value"]
       else

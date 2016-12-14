@@ -95,4 +95,15 @@ describe Lexer do
 
     result.should eq(tokens)
   end
+
+  it "parses assignment" do
+    lexer = Lexer.new
+    res = lexer.tokenize "{% assign tovar = 21 %}"
+
+    tokens = Array(Tokens::Token).new
+    tokens << Tokens::AssignStatement.new " assign tovar = 21 "
+
+    res.should eq tokens
+
+  end
 end

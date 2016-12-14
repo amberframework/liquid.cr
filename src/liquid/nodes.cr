@@ -22,6 +22,9 @@ module Liquid::Nodes
       @content = token.content
     end
 
+    def initialize(@content)
+    end
+
     def render(data, io)
       io << @content
     end
