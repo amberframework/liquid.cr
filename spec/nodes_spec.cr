@@ -62,19 +62,37 @@ describe Liquid::Nodes do
       expr3.eval(ctx).should eq "good"
     end
 
-    it "should eval an operation" do
+    it "should eval an comparison" do
       expr = Expression.new Tokens::Expression.new("true == false")
-      expr.eval(Context.new).should be_false
-    end
+      expr2 = Expression.new Tokens::Expression.new("true != false")
+      expr3 = Expression.new Tokens::Expression.new("var != 15")
 
+      ctx = Context.new
+      ctx.set "var", 16
+
+      expr.eval(ctx).should be_false
+      expr2.eval(ctx).should be_true
+      expr3.eval(ctx).should be_true
+    end
+    
+   # it "should eval an operation with contains keyword" do
+   #   expr = Expression.new "myarr contains another"
+   #   ctx = Context.new
+   #   ctx.set "myarr", [12,15,13]
+   #   ctx.set "another", 12
+   #   expr.eval(ctx).should be_true
+   # end
+    
     it "should eval an multiple operation" do
       expr = Expression.new "test == false or some == true or another == 10"
       expr2 = Expression.new "test != false or some == false or another == 10"
       expr3 = Expression.new "test != false and some != false and another == 15"
+
       ctx = Context.new
       ctx.set "test", true
       ctx.set "some", true
       ctx.set "another", 15
+
       expr.eval(ctx).should be_true
       expr2.eval(ctx).should be_true
       expr3.eval(ctx).should be_true

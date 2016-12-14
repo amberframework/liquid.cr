@@ -1,6 +1,6 @@
 # liquid
 
-TODO: Write a description here
+Kind of liquid template engine for Crystal
 
 ## Installation
 

@@ -1,13 +1,7 @@
 require "./context"
 
 module Liquid
-  enum ExpressionType
-    BOOL,
-    STRING,
-    INT,
-    VAR,
-    ASSIGN
-  end
+
 
   class BoolOperator
 
@@ -17,34 +11,30 @@ module Liquid
     @inner : BoolProc
 
     def self.process(arr : Array(Expression | BoolOperator), data) : Bool
-      left : Bool
-      right : Bool
+      left : Bool?
+      right : Bool?
       proc : BoolOperator
 
-      exp = Exception.new "Invalid Boolean operation"
-      raise exp if arr.first.is_a? BoolOperator
+      exp = Exception.new "Invalid Boolean operation "
+      raise exp if arr.size < 3 || arr.first.is_a? BoolOperator
       arr.each_index do |i|
         raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) || (i % 2 == 1 && arr[i].is_a? Expression)
       end
+     
+      left = nil
+      i = 1
+      while i < arr.size
+        left ||= arr[i-1].as(Expression).eval(data).as?(Bool)
+        right = arr[i+1].as(Expression).eval(data).as?(Bool)
+
+        raise exp if left.nil? || right.nil?
+
+        op = arr[i].as BoolOperator
+        left = op.call left, right
+        i += 2
+      end
       
-      l = arr.pop.as(Expression).eval(data)
-      if l.is_a? Bool
-        left = l
-        right = false
-      else
-        raise exp
-      end
-
-      arr.each do |a|
-        case a
-        when Expression
-          right = a.eval(data).as Bool
-        when BoolOperator
-          left = a.call left, right
-        end
-      end
-
-      left
+      left.not_nil!
     end
 
     def initialize(str : String)
@@ -79,7 +69,6 @@ module Liquid
     GE  = BinProc.new { |left, right| responds_to(left, :>=, right) }
     LT  = BinProc.new { |left, right| responds_to(left, :<, right) }
     GT  = BinProc.new { |left, right| responds_to(left, :>, right) }
-    NOP = BinProc.new { false }
 
     @inner : BinProc
 
@@ -92,7 +81,7 @@ module Liquid
                when "<"  then LT
                when ">"  then GT
                else
-                 NOP
+                 raise Exception.new "Invalid comparison operator : #{str}" 
                end
     end
 
