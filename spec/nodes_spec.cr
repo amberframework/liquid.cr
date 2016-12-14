@@ -66,5 +66,18 @@ describe Liquid::Nodes do
       expr = Expression.new Tokens::Expression.new("true == false")
       expr.eval(Context.new).should be_false
     end
+
+    it "should eval an multiple operation" do
+      expr = Expression.new "test == false or some == true or another == 10"
+      expr2 = Expression.new "test != false or some == false or another == 10"
+      expr3 = Expression.new "test != false and some != false and another == 15"
+      ctx = Context.new
+      ctx.set "test", true
+      ctx.set "some", true
+      ctx.set "another", 15
+      expr.eval(ctx).should be_true
+      expr2.eval(ctx).should be_true
+      expr3.eval(ctx).should be_true
+    end
   end
 end

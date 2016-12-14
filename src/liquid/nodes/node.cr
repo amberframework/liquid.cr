@@ -1,5 +1,6 @@
 module Liquid::Nodes
-  VAR = /\w+(\.\w+)*/
+  VAR = /[a-z]\w*(\.[a-z]\w*)*/
+  UVAR = /[a-z]\w*(?:\.[a-z]\w*)*/
 
   abstract class Node
     getter children

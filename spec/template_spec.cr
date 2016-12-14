@@ -42,6 +42,16 @@ describe Template do
     ctx.set("var", false)
     tpl.render(ctx).should eq ""
   end
+  
+  it "render if statement with multiple operation" do
+    tpl = Parser.parse("{% if var == true and another == \"dat string\" %}true{% endif %}")
+    ctx = Context.new
+    ctx.set("var", true)
+    ctx.set "another", "dat string"
+    tpl.render(ctx).should eq "true"
+    ctx.set("another", "something")
+    tpl.render(ctx).should eq ""
+  end
 
   it "render if else statement" do
     tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")

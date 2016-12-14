@@ -49,7 +49,7 @@ TODO:
 - [ ] Add increment
 - [ ] Add decrement
 - [ ] Add capture
-- [ ] Add support for multiple operator ( {% if test == true or something = another %} )
+- [x] Add support for multiple operator ( no operator precedence support ( for now )) 
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions
 - [x] Add support for Array into for loop
