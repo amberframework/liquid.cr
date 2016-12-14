@@ -55,7 +55,7 @@ TODO:
 - [x] Add support for Array into for loop
 - [x] Add support for Float
 - [ ] Add case/when
-- [ ] Add iteration over Arrays
+- [x] Add iteration over Arrays
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
 - [ ] Improve data interface
