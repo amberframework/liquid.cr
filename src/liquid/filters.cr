@@ -1,8 +1,20 @@
 require "./filters/*"
-require "./context" 
+require "./context"
 
 module Liquid::Filters
+  class FilterRegister
+    @@register = Hash(String, Filter).new
 
+    def self.get(str : String)
+      @@register[str]?
+    end
+
+    def self.register(name, filter)
+      @@register[name] = filter
+    end
+  end
+
+  FilterRegister.register "abs", Abs
 
   module Filter
     abstract def filter(data : Context::DataType) : Context::DataType
@@ -18,7 +30,5 @@ module Liquid::Filters
         data
       end
     end
-
   end
-
 end

@@ -1,10 +1,8 @@
 require "./spec_helper"
 
 describe Liquid::Nodes do
-
   describe "Match Regex" do
-
-    it "should match vars" do 
+    it "should match vars" do
       ok = ["mavar", "ma_var", "mavar2", "m646_dfd54"]
       err = ["2var", "Unexpected-", "not-me", "rage$"]
       ok.each &.match(/^#{VAR}$/).should_not be_nil
@@ -25,13 +23,19 @@ describe Liquid::Nodes do
       err.each &.match(/^#{TYPE_OR_VAR}$/).should be_nil
     end
 
-    it "should match a comparison" do 
+    it "should match a comparison" do
       ok = ["a == b", "sdf != fds", "dd < 12", "true > false", "hh==hh", "12 <= var"]
-      err = ["a = b", "dfs ! fff",  "ddd=ddd", "12>"]
+      err = ["a = b", "dfs ! fff", "ddd=ddd", "12>"]
       ok.each &.match(/^#{CMP}$/).should_not be_nil
       err.each &.match(/^#{CMP}$/).should be_nil
     end
 
+    it "should match filters" do
+      ok = ["a | b", "a | b | v", "-12 | abs", "\"toto\" | abs"]
+      err = ["a ||", "dfs |", "|ddd=ddd", "1|2", "dd | 12"]
+      ok.each &.match(/^#{FILTERED}$/).should_not be_nil
+      err.each &.match(/^#{FILTERED}$/).should be_nil
+    end
   end
 
   describe For do
@@ -61,6 +65,45 @@ describe Liquid::Nodes do
       ctx.get("bool").should be_true
       ctx.get("str").should eq "test"
       ctx.get("int").should eq 12
+    end
+  end
+
+  describe Filtered do
+    it "should filter a string" do
+      node = Filtered.new " \"whatever\" | abs"
+      ctx = Context.new
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "whatever"
+    end
+
+    it "should filter a int" do
+      node = Filtered.new "-12 | abs"
+      ctx = Context.new
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "12"
+    end
+
+    it "should filter a float" do
+      node = Filtered.new "-12.25 | abs"
+      ctx = Context.new
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "12.25"
+    end
+
+    it "should filter a var" do
+      node = Filtered.new "var | abs"
+      ctx = Context.new
+      ctx.set "var", -12
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "12"
     end
   end
 
@@ -109,15 +152,13 @@ describe Liquid::Nodes do
       expr2.eval(ctx).should be_true
       expr3.eval(ctx).should be_true
     end
-    
-   # it "should eval an operation with contains keyword" do
-   #   expr = Expression.new "myarr contains another"
-   #   ctx = Context.new
-   #   ctx.set "myarr", [12,15,13]
-   #   ctx.set "another", 12
-   #   expr.eval(ctx).should be_true
-   # end
-    
+    # it "should eval an operation with contains keyword" do
+    #   expr = Expression.new "myarr contains another"
+    #   ctx = Context.new
+    #   ctx.set "myarr", [12,15,13]
+    #   ctx.set "another", 12
+    #   expr.eval(ctx).should be_true
+    # end
     it "should eval an multiple operation" do
       expr = Expression.new "test == false or some == true or another == 10"
       expr2 = Expression.new "test != false or some == false or another == 10"

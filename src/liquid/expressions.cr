@@ -1,12 +1,9 @@
 require "./context"
 
 module Liquid
-
-
   class BoolOperator
-
     AND = BoolProc.new { |l, r| l && r }
-    OR = BoolProc.new { |l, r| l || r }
+    OR  = BoolProc.new { |l, r| l || r }
 
     @inner : BoolProc
 
@@ -20,12 +17,11 @@ module Liquid
       arr.each_index do |i|
         raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) || (i % 2 == 1 && arr[i].is_a? Expression)
       end
-     
       left = nil
       i = 1
       while i < arr.size
-        left ||= arr[i-1].as(Expression).eval(data).as?(Bool)
-        right = arr[i+1].as(Expression).eval(data).as?(Bool)
+        left ||= arr[i - 1].as(Expression).eval(data).as?(Bool)
+        right = arr[i + 1].as(Expression).eval(data).as?(Bool)
 
         raise exp if left.nil? || right.nil?
 
@@ -33,14 +29,13 @@ module Liquid
         left = op.call left, right
         i += 2
       end
-      
       left.not_nil!
     end
 
     def initialize(str : String)
       @inner = case str
                when "and" then AND
-               when "or" then OR
+               when "or"  then OR
                else
                  raise Exception.new "Invalid Boolean operation"
                end
@@ -51,7 +46,6 @@ module Liquid
     end
 
     alias BoolProc = Proc(Bool, Bool, Bool)
-
   end
 
   class BinOperator
@@ -63,12 +57,12 @@ module Liquid
       end
     end
 
-    EQ  = BinProc.new { |left, right| left == right }
-    NE  = BinProc.new { |left, right| left != right }
-    LE  = BinProc.new { |left, right| responds_to(left, :<=, right) }
-    GE  = BinProc.new { |left, right| responds_to(left, :>=, right) }
-    LT  = BinProc.new { |left, right| responds_to(left, :<, right) }
-    GT  = BinProc.new { |left, right| responds_to(left, :>, right) }
+    EQ = BinProc.new { |left, right| left == right }
+    NE = BinProc.new { |left, right| left != right }
+    LE = BinProc.new { |left, right| responds_to(left, :<=, right) }
+    GE = BinProc.new { |left, right| responds_to(left, :>=, right) }
+    LT = BinProc.new { |left, right| responds_to(left, :<, right) }
+    GT = BinProc.new { |left, right| responds_to(left, :>, right) }
 
     @inner : BinProc
 
@@ -81,7 +75,7 @@ module Liquid
                when "<"  then LT
                when ">"  then GT
                else
-                 raise Exception.new "Invalid comparison operator : #{str}" 
+                 raise Exception.new "Invalid comparison operator : #{str}"
                end
     end
 

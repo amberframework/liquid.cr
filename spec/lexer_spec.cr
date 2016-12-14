@@ -104,6 +104,5 @@ describe Lexer do
     tokens << Tokens::AssignStatement.new " assign tovar = 21 "
 
     res.should eq tokens
-
   end
 end

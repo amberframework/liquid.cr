@@ -1,5 +1,4 @@
 module Liquid::Nodes
-  
   abstract class Node
     getter children
     @children = Array(Node).new

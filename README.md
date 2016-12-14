@@ -40,6 +40,49 @@ result = tpl.render ctx
 
 ```
 
+# Filters
+- [x] abs
+- [ ] append
+- [ ] capitalize
+- [ ] ceil
+- [ ] compact
+- [ ] date
+- [ ] default
+- [ ] divided_by
+- [ ] downcase
+- [ ] escape
+- [ ] escape_once
+- [ ] first
+- [ ] floor
+- [ ] join
+- [ ] last
+- [ ] lstrip
+- [ ] map
+- [ ] minus
+- [ ] modulo
+- [ ] newline_to_br
+- [ ] plus
+- [ ] prepend
+- [ ] remove
+- [ ] remove_first
+- [ ] replace
+- [ ] replace_first
+- [ ] reverse
+- [ ] round
+- [ ] rstrip
+- [ ] size
+- [ ] slice
+- [ ] sort
+- [ ] sort_natural
+- [ ] split
+- [ ] strip
+- [ ] strip_html
+- [ ] strip_newlines
+- [ ] times
+- [ ] truncate
+- [ ] truncatewords
+- [ ] uniq
+
 ## Development
 
 TODO:
@@ -53,13 +96,14 @@ TODO:
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions
 - [x] Add support for Array into for loop
+- [x] Add support for Hash into for loop ( {% for key, val in myhash %} )
 - [x] Add support for Float
 - [ ] Add case/when
 - [x] Add iteration over Arrays
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
 - [ ] Improve data interface
-- [ ] Add filters
+- [x] Add Filter support
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
 
