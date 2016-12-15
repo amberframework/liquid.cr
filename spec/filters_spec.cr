@@ -11,4 +11,13 @@ describe Liquid::Filters do
       Abs.filter("-21.25").should eq 21.25
     end
   end
+
+
+  describe Append do
+    it "should append a string at the end of another" do
+      args = Array(Context::DataType).new
+      args << " world"
+      Append.filter("hello", args).should eq "hello world"
+    end
+  end
 end

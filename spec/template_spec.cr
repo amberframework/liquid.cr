@@ -89,10 +89,17 @@ describe Template do
     tpl.render(Context.new).should eq "12.5"
   end
 
-  it "should render filters" do
+  it "should render abs filters" do
     tpl = Parser.parse "{{var | abs }}"
     ctx = Context.new
     ctx.set "var", -12
     tpl.render(ctx).should eq "12"
+  end
+
+  it "should render append filter" do
+    tpl = Parser.parse "{{var | append: \" World\" }}"
+    ctx = Context.new
+    ctx.set "var", "Hello"
+    tpl.render(ctx).should eq "Hello World"
   end
 end

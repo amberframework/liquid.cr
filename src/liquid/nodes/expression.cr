@@ -1,5 +1,6 @@
 require "./node"
 require "../filters"
+require "../context"
 
 module Liquid::Nodes
   OPERATOR = /==|!=|<=|>=|<|>/
@@ -18,8 +19,10 @@ module Liquid::Nodes
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 
-  FILTERED  = /#{TYPE_OR_VAR} ?\| ?#{VAR}(?: ?\| ?#{VAR})*/
-  GFILTERED = /(?<first>#{TYPE_OR_VAR}) ?\| ?(#{VAR})(?: ?\| ?(#{VAR}))*/
+  FILTER    = /#{VAR}(?:: ?#{TYPE_OR_VAR})?/
+  GFILTER   = /(?<filter>#{VAR})(?:: ?(?<arg>#{TYPE_OR_VAR}))?/
+  FILTERED  = /#{TYPE_OR_VAR}(?:\s?\|\s?#{FILTER})+/
+  GFILTERED = /(?<first>#{TYPE_OR_VAR})(\s?\|\s?(#{FILTER}))+/
 
   EXPR = /\s*(?<left>#{VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{TYPE})\s*/
 
@@ -29,32 +32,44 @@ module Liquid::Nodes
   end
 
   class Filtered < AbstractExpression
+
+    getter filters
+    
     @first : Expression
-    @filters : Array(Filters::Filter)
+    @filters : Array(Tuple(Filters::Filter, Array(Expression)?))
 
     def initialize(str)
       if match = str.match GFILTERED
         @first = Expression.new match["first"]
-        @filters = Array(Filters::Filter).new
-        2.upto match.size do |i|
-          if m = match[i]?
-            if filter = Filters::FilterRegister.get m
-              @filters << filter
-            else
-              raise InvalidExpression.new "Filter #{m} is not registered."
+        @filters = Array(Tuple(Filters::Filter, Array(Expression)?)).new
+        matches = str.scan GFILTER
+        if matches.first["filter"] == match["first"] || "\"#{matches.first["filter"]}\"" == match["first"]
+          matches.shift
+        end
+
+        matches.each do |fm|
+          if filter = Filters::FilterRegister.get fm["filter"]
+            args = nil
+            if arg = fm["arg"]?
+              args = Array(Expression).new
+              args << Expression.new arg
             end
+            @filters << {filter, args}
+          else
+            raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
           end
         end
       else
-        raise InvalidExpression.new "Invalid filter use"
+        raise InvalidExpression.new "Invalid filter use :#{str}"
       end
     end
 
     def render(data, io)
       result : Context::DataType
       result = @first.eval(data)
-      @filters.each do |filter|
-        result = filter.filter(result)
+      @filters.each do |tuple|
+        args = tuple[1].not_nil!.map &.eval(data) if tuple[1]
+        result = tuple[0].filter(result, args)
       end
       io << result
     end

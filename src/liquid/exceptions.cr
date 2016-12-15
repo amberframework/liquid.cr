@@ -1,10 +1,18 @@
+# exceptions.cr
+
 module Liquid
-  class InvalidExpression < Exception
+  class LiquidException < Exception
   end
 
-  class InvalidNode < Exception
+  class InvalidExpression < LiquidException
   end
 
-  class InvalidStatement < Exception
+  class InvalidNode < LiquidException
+  end
+
+  class InvalidStatement < LiquidException
+  end
+
+  class FilterArgumentException < LiquidException
   end
 end

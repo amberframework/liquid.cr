@@ -1,42 +1,6 @@
 require "./spec_helper"
 
 describe Liquid::Nodes do
-  describe "Match Regex" do
-    it "should match vars" do
-      ok = ["mavar", "ma_var", "mavar2", "m646_dfd54"]
-      err = ["2var", "Unexpected-", "not-me", "rage$"]
-      ok.each &.match(/^#{VAR}$/).should_not be_nil
-      err.each &.match(/^#{VAR}$/).should be_nil
-    end
-
-    it "should match String, int and float" do
-      ok = ["\"\"", "\"not empty string\"", "12", "-12", "15.68", "-20.36"]
-      err = ["\"\"\"", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-"]
-      ok.each &.match(/^#{TYPE}$/).should_not be_nil
-      err.each &.match(/^#{TYPE}$/).should be_nil
-    end
-
-    it "should match a type or a var" do
-      ok = ["\"\"", "\"not empty string\"", "12", "-12", "15.68", "-20.36", "ma_var"]
-      err = ["\"\"\"", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-", "not-me", "-troll"]
-      ok.each &.match(/^#{TYPE_OR_VAR}$/).should_not be_nil
-      err.each &.match(/^#{TYPE_OR_VAR}$/).should be_nil
-    end
-
-    it "should match a comparison" do
-      ok = ["a == b", "sdf != fds", "dd < 12", "true > false", "hh==hh", "12 <= var"]
-      err = ["a = b", "dfs ! fff", "ddd=ddd", "12>"]
-      ok.each &.match(/^#{CMP}$/).should_not be_nil
-      err.each &.match(/^#{CMP}$/).should be_nil
-    end
-
-    it "should match filters" do
-      ok = ["a | b", "a | b | v", "-12 | abs", "\"toto\" | abs"]
-      err = ["a ||", "dfs |", "|ddd=ddd", "1|2", "dd | 12"]
-      ok.each &.match(/^#{FILTERED}$/).should_not be_nil
-      err.each &.match(/^#{FILTERED}$/).should be_nil
-    end
-  end
 
   describe For do
     it "should loop over array" do
@@ -105,6 +69,28 @@ describe Liquid::Nodes do
       io.close
       io.to_s.should eq "12"
     end
+
+    it "should use multiple filters" do
+      node = Filtered.new "var | append: \"Hello \" | append: \"World !\""
+      ctx = Context.new
+      ctx.set "var", ""
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "Hello World !"
+    end
+
+    it "should filter with an argument" do
+      node = Filtered.new "var | append: var2"
+      ctx = Context.new
+      ctx.set "var", "Hello"
+      ctx.set "var2", " World !"
+      io = IO::Memory.new
+      node.render(ctx, io)
+      io.close
+      io.to_s.should eq "Hello World !"
+    end
+    
   end
 
   describe Expression do
