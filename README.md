@@ -42,7 +42,7 @@ result = tpl.render ctx
 
 # Filters
 - [x] abs
-- [ ] append
+- [x] append
 - [ ] capitalize
 - [ ] ceil
 - [ ] compact
