@@ -43,4 +43,14 @@ describe Liquid::Filters do
       Date.filter("now", Array{"%Y-%m-%d %H:%M"}).should eq Time.now.to_s "%Y-%m-%d %H:%M"
     end
   end
+
+  describe Default do
+    it "should return default value if false, nil or empty" do
+      Default.filter(nil, Array{2.99}).should eq 2.99
+      Default.filter(4.99, Array{2.99}).should eq 4.99
+      Default.filter("", Array{2.99}).should eq 2.99
+      Default.filter(false, Array{true}).should be_true
+    end
+  end
+  
 end
