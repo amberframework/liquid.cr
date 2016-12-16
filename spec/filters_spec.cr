@@ -13,6 +13,7 @@ describe Liquid::Filters do
       FilterRegister.get("ceil").should eq Ceil
       FilterRegister.get("default").should eq Default
       FilterRegister.get("escape").should eq Escape
+      FilterRegister.get("newline_to_br").should eq NewLineToBr
     end
     
   end
@@ -71,6 +72,12 @@ describe Liquid::Filters do
     it "should escape specials chars" do
       Escape.filter("Have you read 'James & the Giant Peach'?").should eq "Have you read &#39;James &amp; the Giant Peach&#39;?"
       Escape.filter("Tetsuro Takara").should eq "Tetsuro Takara"
+    end
+  end
+
+  describe NewLineToBr do
+    it "should replace newline \\n by <br />" do
+      NewLineToBr.filter("Hello\nWorld").should eq "Hello<br />World"
     end
   end
   

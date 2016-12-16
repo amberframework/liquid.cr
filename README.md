@@ -50,7 +50,7 @@ result = tpl.render ctx
 - [ ] default
 - [ ] divided_by
 - [ ] downcase
-- [ ] escape
+- [x] escape
 - [ ] escape_once
 - [ ] first
 - [ ] floor
@@ -60,7 +60,7 @@ result = tpl.render ctx
 - [ ] map
 - [ ] minus
 - [ ] modulo
-- [ ] newline_to_br
+- [x] newline_to_br
 - [ ] plus
 - [ ] prepend
 - [ ] remove
