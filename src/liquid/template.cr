@@ -9,6 +9,10 @@ module Liquid
 
     @root : Root
 
+    def self.parse(str : String) : Template
+      Parser.parse(str)
+    end
+
     def initialize(@root : Root)
     end
 

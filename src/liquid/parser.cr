@@ -12,14 +12,14 @@ module Liquid
       lexer = Lexer.new
       tokens = lexer.tokenize str
       self.validate tokens
-      root = self.build tokens
+      root = self.build_tree tokens
       Template.new root
     end
 
     def self.validate(tokens : Array(Tokens::Token))
     end
 
-    def self.build(tokens : Array(Tokens::Token))
+    def self.build_tree(tokens : Array(Tokens::Token))
       root = Root.new
       stack = [root] of Node
       tokens.each do |token|

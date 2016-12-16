@@ -30,12 +30,12 @@ ctx = Context.new
 ctx.set "kenny.sick", false
 ctx.set "kenny.dead", true
 
-tpl = Parser.parse txt
+tpl = Template.parse txt
 result = tpl.render ctx
 
 # result = "
 #      You killed Kenny!  You ***!!!
-#    
+#
 #    "
 
 ```
@@ -45,12 +45,14 @@ result = tpl.render ctx
 - [x] append
 - [x] capitalize
 - [x] ceil
-- [ ] compact
 - [x] date
 - [x] default
+- [x] escape
+- [x] newline_to_br
+- [x] split
+- [ ] compact
 - [ ] divided_by
 - [ ] downcase
-- [x] escape
 - [ ] escape_once
 - [ ] first
 - [ ] floor
@@ -60,7 +62,6 @@ result = tpl.render ctx
 - [ ] map
 - [ ] minus
 - [ ] modulo
-- [x] newline_to_br
 - [ ] plus
 - [ ] prepend
 - [ ] remove
@@ -74,7 +75,6 @@ result = tpl.render ctx
 - [ ] slice
 - [ ] sort
 - [ ] sort_natural
-- [x] split
 - [ ] strip
 - [ ] strip_html
 - [ ] strip_newlines
@@ -89,21 +89,21 @@ TODO:
 - [x] Basic For loops
 - [x] Basic If Elsif Else
 - [x] Add variable assignment ( {% assign var = "Hello World" %} )
-- [ ] Add increment
-- [ ] Add decrement
-- [ ] Add capture
-- [x] Add support for multiple operator ( no operator precedence support ( for now )) 
-- [ ] Add "contains" keyword
-- [ ] Add support for Array into expressions
+- [x] Add support for multiple operator ( no operator precedence support ( for now ))
 - [x] Add support for Array into for loop
 - [x] Add support for Hash into for loop ( {% for key, val in myhash %} )
 - [x] Add support for Float
-- [ ] Add case/when
 - [x] Add iteration over Arrays
-- [ ] Add syntax checking
-- [ ] Improve expression parsing
 - [x] Improve data interface
 - [x] Add Filter support
+- [ ] Add increment block
+- [ ] Add decrement block
+- [ ] Add capture block
+- [ ] Add "contains" keyword
+- [ ] Add support for Array into expressions
+- [ ] Add case/when
+- [ ] Add syntax checking
+- [ ] Improve expression parsing
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
 
