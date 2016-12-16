@@ -14,6 +14,7 @@ describe Liquid::Filters do
       FilterRegister.get("default").should eq Default
       FilterRegister.get("escape").should eq Escape
       FilterRegister.get("newline_to_br").should eq NewLineToBr
+      FilterRegister.get("join").should eq Join
     end
     
   end
@@ -78,6 +79,12 @@ describe Liquid::Filters do
   describe NewLineToBr do
     it "should replace newline \\n by <br />" do
       NewLineToBr.filter("Hello\nWorld").should eq "Hello<br />World"
+    end
+  end
+
+  describe Join do
+    it "join (yes)" do
+      Join.filter(["John", "Paul", "George", "Ringo"], [" and "]).should eq "John and Paul and George and Ringo"
     end
   end
   

@@ -3,6 +3,7 @@ require "./filters/date"
 require "./filters/default"
 require "./filters/escape"
 require "./filters/new_line_to_br"
+require "./filters/join"
 require "./context"
 
 module Liquid::Filters
