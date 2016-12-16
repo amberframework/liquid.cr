@@ -15,6 +15,7 @@ describe Liquid::Filters do
       FilterRegister.get("escape").should eq Escape
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
+      FilterRegister.get("split").should eq Split
     end
     
   end
@@ -85,6 +86,12 @@ describe Liquid::Filters do
   describe Join do
     it "join (yes)" do
       Join.filter(["John", "Paul", "George", "Ringo"], [" and "]).should eq "John and Paul and George and Ringo"
+    end
+  end
+
+  describe Split do
+    it "split a string into an array" do
+      Split.filter("John, Paul, George, Ringo", [", "]).should eq ["John", "Paul", "George", "Ringo"]
     end
   end
   
