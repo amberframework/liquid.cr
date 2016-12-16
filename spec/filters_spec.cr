@@ -25,4 +25,13 @@ describe Liquid::Filters do
       Capitalize.filter("my great title").should eq "My great title"
     end
   end
+
+  describe Ceil do
+    it "should ceil a number" do
+      Ceil.filter(1.2).should eq 2
+      Ceil.filter(2.0).should eq 2
+      Ceil.filter(183.357).should eq 184
+      Ceil.filter("3.5").should eq 4
+    end
+  end
 end

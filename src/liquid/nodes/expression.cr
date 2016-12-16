@@ -32,9 +32,7 @@ module Liquid::Nodes
   end
 
   class Filtered < AbstractExpression
-
     getter filters
-    
     @first : Expression
     @filters : Array(Tuple(Filters::Filter, Array(Expression)?))
 

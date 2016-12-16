@@ -17,26 +17,75 @@ module Liquid::Filters
   FilterRegister.register "abs", Abs
   FilterRegister.register "append", Append
   FilterRegister.register "capitalize", Capitalize
+  FilterRegister.register "ceil", Ceil
+  
 
   module Filter
     abstract def filter(data : Context::DataType, arguments : Array(Context::DataType)?) : DataType
   end
 
+  # ceil
+  # Rounds the input up to the nearest whole number.
+  # Liquid tries to convert the input to a number before the filter is applied.
+  # Input
+  # {{ 1.2 | ceil }}
+  #
+  # Output
+  # 2
+  #
+  # Input
+  # {{ 2.0 | ceil }}
+  #
+  # Output
+  # 2
+  #
+  # Input
+  # {{ 183.357 | ceil }}
+  #
+  # Output
+  # 184
+  #
+  # Here the input value is a string:
+  #
+  # Input
+  # {{ "3.5" | ceil }}
+  #
+  # Output
+  # 4
+  class Ceil
+    extend Filter
+
+    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
+      case data
+      when Number
+        data.ceil
+      when String
+        if fl = data.to_f32?
+          fl.ceil
+        else
+          data
+        end
+      else
+        data
+      end
+    end
+  end
+
   # capitalize
   #
   # Makes the first character of a string capitalized.
-  #  
+  #
   # Input
   # {{ "title" | capitalize }}
-  #  
+  #
   # Output
   # Title
-  #  
+  #
   # capitalize only capitalizes the first character of the string, so later words are not affected:
-  #  
+  #
   # Input
   # {{ "my great title" | capitalize }}
-  #  
+  #
   # Output
   # My great title
   class Capitalize
@@ -49,11 +98,8 @@ module Liquid::Filters
         data
       end
     end
-    
-
-
   end
-    
+
   # Filter abs
   #
   # Returns the absolute value of a number.
@@ -80,21 +126,21 @@ module Liquid::Filters
   end
 
   # append
-  #  
+  #
   # Concatenates two strings and returns the concatenated value.
-  #  
+  #
   # Input
   # {{ "/my/fancy/url" | append: ".html" }}
-  #  
+  #
   # Output
   # /my/fancy/url.html
-  #  
+  #
   # append can also be used with variables:
-  #  
+  #
   # Input
   # {% assign filename = "/index.html" %}
   # {{ "website.com" | append: filename }}
-  #  
+  #
   # Output
   # website.com/index.html
   class Append
