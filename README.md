@@ -47,7 +47,7 @@ result = tpl.render ctx
 - [x] ceil
 - [ ] compact
 - [x] date
-- [ ] default
+- [x] default
 - [ ] divided_by
 - [ ] downcase
 - [x] escape
@@ -74,7 +74,7 @@ result = tpl.render ctx
 - [ ] slice
 - [ ] sort
 - [ ] sort_natural
-- [ ] split
+- [x] split
 - [ ] strip
 - [ ] strip_html
 - [ ] strip_newlines
@@ -102,7 +102,7 @@ TODO:
 - [x] Add iteration over Arrays
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
-- [ ] Improve data interface
+- [x] Improve data interface
 - [x] Add Filter support
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
