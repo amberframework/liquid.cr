@@ -36,5 +36,10 @@ module Liquid::Nodes
       ok.each &.match(/^#{FILTERED}$/).should_not be_nil
       err.each &.match(/^#{FILTERED}$/).should be_nil
     end
+
+    it "should match filters with multiple arguments" do
+      "filtered | filter: arg1, arg2".match(/^#{GFILTERED}$/).should_not be_nil
+    end
+    
   end
 end

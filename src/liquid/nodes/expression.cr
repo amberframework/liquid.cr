@@ -19,8 +19,8 @@ module Liquid::Nodes
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 
-  FILTER    = /#{VAR}(?:: ?#{TYPE_OR_VAR})?/
-  GFILTER   = /(?<filter>#{VAR})(?:: ?(?<arg>#{TYPE_OR_VAR}))?/
+  FILTER    = /#{VAR}(?:: ?#{TYPE_OR_VAR}(?:, ?#{TYPE_OR_VAR})*)?/
+  GFILTER   = /(?<filter>#{VAR})(?:: ?(?<args>#{TYPE_OR_VAR}(?:, ?#{TYPE_OR_VAR})*))?/
   FILTERED  = /#{TYPE_OR_VAR}(?:\s?\|\s?#{FILTER})+/
   GFILTERED = /(?<first>#{TYPE_OR_VAR})(\s?\|\s?(#{FILTER}))+/
 
@@ -47,10 +47,12 @@ module Liquid::Nodes
 
         matches.each do |fm|
           if filter = Filters::FilterRegister.get fm["filter"]
+            args : Array(Expression)?
             args = nil
-            if arg = fm["arg"]?
+            if (margs = fm["args"]?)
               args = Array(Expression).new
-              args << Expression.new arg
+              splitted = margs.split(',').map &.strip
+              splitted.each { |m| args << Expression.new(m) }
             end
             @filters << {filter, args}
           else
