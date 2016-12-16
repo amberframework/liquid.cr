@@ -1,4 +1,5 @@
-require "./filters/*"
+require "./filters/base"
+require "./filters/date"
 require "./context"
 
 module Liquid::Filters
@@ -20,9 +21,7 @@ module Liquid::Filters
   FilterRegister.register "ceil", Ceil
   
 
-  module Filter
-    abstract def filter(data : Context::DataType, arguments : Array(Context::DataType)?) : DataType
-  end
+
 
   # ceil
   # Rounds the input up to the nearest whole number.

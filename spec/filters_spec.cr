@@ -34,4 +34,13 @@ describe Liquid::Filters do
       Ceil.filter("3.5").should eq 4
     end
   end
+
+  describe Date do
+    it "should format the date" do
+      time = Time.new(2016, 2, 15, 10, 20, 30) # => 2016-02-15 10:20:30 UTC
+      Date.filter(time, Array{"%a, %b %d, %y"}).should eq "Mon, Feb 15, 16"
+      Date.filter(time, Array{"%Y"}).should eq "2016"
+      Date.filter("now", Array{"%Y-%m-%d %H:%M"}).should eq Time.now.to_s "%Y-%m-%d %H:%M"
+    end
+  end
 end

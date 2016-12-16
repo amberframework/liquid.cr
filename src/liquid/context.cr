@@ -26,6 +26,6 @@ module Liquid
       @inner.delete key
     end
 
-    alias DataType = Nil | String | Float32 | Float64 | Int32 | Bool | Array(DataType) | Hash(DataType, DataType)
+    alias DataType = Nil | String | Float32 | Float64 | Int32 | Bool | Time | Array(DataType) | Hash(DataType, DataType)
   end
 end
