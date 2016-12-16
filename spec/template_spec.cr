@@ -10,6 +10,7 @@ describe Template do
 
   it "should render for loop with range" do
     tpl = Parser.parse("{% for x in 0..2 %}something {% endfor %}")
+    pp tpl
     tpl.render(Context.new).should eq "something something something "
   end
 

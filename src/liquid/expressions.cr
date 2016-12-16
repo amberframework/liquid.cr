@@ -50,14 +50,13 @@ module Liquid
   end
 
   class BinOperator(T)
-
     OPS = [
       "==",
       "!=",
       "<=",
       ">=",
       "<",
-      ">"
+      ">",
     ]
 
     def self.process(operator : String, left : Any, right : Any) : Any
@@ -69,15 +68,15 @@ module Liquid
         Any.new left.raw != right.raw
       elsif (left_raw = left.raw.as?(Number)) && (right_raw = right.raw.as?(Number))
         res = case operator
-        when "<="
-          left_raw <= right_raw
-        when ">="
-          left_raw >= right_raw
-        when "<"
-          left_raw < right_raw
-        when ">"
-          left_raw > right_raw
-        end
+              when "<="
+                left_raw <= right_raw
+              when ">="
+                left_raw >= right_raw
+              when "<"
+                left_raw < right_raw
+              when ">"
+                left_raw > right_raw
+              end
         Any.new res
       elsif (left_t = left.as_t?) && (right_t = right.as_t?)
         res = case operator
@@ -92,10 +91,9 @@ module Liquid
               end
         Any.new res
       else
-        #raise "Invalid comparison operator, can't proceed #{left} #{operator} #{right}"
+        # raise "Invalid comparison operator, can't proceed #{left} #{operator} #{right}"
         Any.new nil
       end
-
     end
 
     def self.check_operator(str : String)

@@ -1,8 +1,8 @@
-require "./node"
+require "./block"
 require "../filters"
 require "../context"
 
-module Liquid::Nodes
+module Liquid::Block
   OPERATOR = /==|!=|<=|>=|<|>/
   GVAR     = /[a-z]\w*(\.[a-z]\w*)*/
   VAR      = /[a-z]\w*(?:\.[a-z]\w*)*/
@@ -98,13 +98,6 @@ module Liquid::Nodes
   class Expression < AbstractExpression
     @var : String
 
-    # Improve template rendering time by adding leaf node when possible
-    # instead of evaluating at render time
-    def initialize(token : Tokens::Expression)
-      @var = token.content.strip
-      pre_cache
-    end
-
     def initialize(var)
       @var = var.strip
       pre_cache
@@ -126,36 +119,35 @@ module Liquid::Nodes
 
     def eval(data) : Any
       ret = if @var == "true" || @var == "false"
-        @var == "true"
-      elsif m = @var.match GSTRING
-        m["str"]
-      elsif m = @var.match intern(GINT)
-        m["intval"].to_i
-      elsif m = @var.match intern(GFLOAT)
-        m["floatval"].to_f32
-      elsif @var.match intern(VAR)
-        data.get(@var)
-      elsif m = @var.match intern(GCMP)
-        le = Expression.new(m["left"]).eval data
-        re = Expression.new(m["right"]).eval data
-        BinOperator.process m["op"], le, re
-      elsif m = @var.scan MULTIPLE_EXPR
-        stack = [] of Expression | BoolOperator
-        m.each do |match|
-          stack << BoolOperator.new match["op"] if match["op"]?
-          stack << Expression.new match["expr"]
-        end
-        BoolOperator.process stack, data
-      else
-        raise InvalidExpression.new "Invalid Expression : #{@var}"
-      end
+              @var == "true"
+            elsif m = @var.match GSTRING
+              m["str"]
+            elsif m = @var.match intern(GINT)
+              m["intval"].to_i
+            elsif m = @var.match intern(GFLOAT)
+              m["floatval"].to_f32
+            elsif @var.match intern(VAR)
+              data.get(@var)
+            elsif m = @var.match intern(GCMP)
+              le = Expression.new(m["left"]).eval data
+              re = Expression.new(m["right"]).eval data
+              BinOperator.process m["op"], le, re
+            elsif m = @var.scan MULTIPLE_EXPR
+              stack = [] of Expression | BoolOperator
+              m.each do |match|
+                stack << BoolOperator.new match["op"] if match["op"]?
+                stack << Expression.new match["expr"]
+              end
+              BoolOperator.process stack, data
+            else
+              raise InvalidExpression.new "Invalid Expression : #{@var}"
+            end
 
       if ret.is_a? Any
         ret
       else
         Any.new ret
       end
-
     end
 
     def render(data, io)

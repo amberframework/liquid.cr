@@ -1,19 +1,67 @@
-require "./tokens"
 require "./template"
 
 module Liquid
   class Parser
+    RAW        = /^(?<raw>[^{]+)/
+    STATEMENT  = /^\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
+    EXPRESSION = /^\{{(?<expr>[^}]*)}}/
+
     # Parse a String
     # Run Lexer
     # validate
     # Build tree
     # returns Template
     def self.parse(str : String) : Template
-      lexer = Lexer.new
-      tokens = lexer.tokenize str
-      self.validate tokens
-      root = self.build_tree tokens
+      root = self.build str
       Template.new root
+    end
+
+    def self.consume(str, fin)
+      fin = fin.not_nil!
+      str[fin..-1]
+    end
+
+    def self.consume_statement(str, match)
+      keyword = match["keyword"]
+      block = BlockRegister.for_name keyword
+      str = consume(str, match.end)
+      return str, block
+    end
+
+    def self.consume_expression(str, match)
+      expr = Expression.new match["expr"]
+      return consume(str, match.end), expr
+    end
+
+    def self.build(str : String)
+      prev = nil?
+      root = Root.new
+      stack = [root]
+
+      while !str.empty? && prev != str
+        prev = str
+        if match = str.match RAW
+          stack.last << Raw.new match["raw"]
+          str = consume(str, match.end)
+        elsif match = str.match STATEMENT
+          str, block = consume_statement(str, match)
+          pp block, match, block.is_a? BeginBlock
+          case block
+          when Block::InlineBlock
+            stack.last << block.new match["full"]
+          when Block::BeginBlock
+            stack.last << block
+            stack << block
+          when Block::EndBlock
+            while (pop = stack.pop) && !pop.class == block.begin_block.class
+            end
+          end
+        elsif match = str.match EXPRESSION
+          str, expr = consume_expression str, match
+          stack.last << expr
+        end
+      end
+      root
     end
 
     def self.validate(tokens : Array(Tokens::Token))

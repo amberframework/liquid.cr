@@ -6,7 +6,7 @@ describe Liquid::Parser do
   it "parses raw text" do
     txt = "raw text"
     template = Parser.parse txt
-    expected = [Nodes::Raw.new(Tokens::Raw.new("raw text"))]
+    expected = [Block::Raw.new("raw text")]
     template.root.children.should eq expected
   end
 
@@ -14,9 +14,9 @@ describe Liquid::Parser do
     txt = "{% for x in 0..2 %} shown 2 times {% endfor %}"
     template = Liquid::Parser.parse txt
 
-    expected = [] of Nodes::Node
-    expected << Nodes::For.new(Tokens::ForStatement.new "for x in 0..2")
-    expected.last << Nodes::Raw.new(Tokens::Raw.new " shown 2 times ")
+    expected = [] of Block::Node
+    expected << Block::For.new("for x in 0..2")
+    expected.last << Block::Raw.new(" shown 2 times ")
 
     template.root.children.should eq expected
   end
@@ -25,9 +25,9 @@ describe Liquid::Parser do
     txt = "{% if a == true %} shown {% endif %}"
     template = Liquid::Parser.parse txt
 
-    expected = [] of Nodes::Node
-    expected << Nodes::If.new(Tokens::IfStatement.new "if a == true")
-    expected.last << Nodes::Raw.new(Tokens::Raw.new " shown ")
+    expected = [] of Block::Node
+    expected << Block::If.new("if a == true")
+    expected.last << Block::Raw.new(" shown ")
 
     template.root.children.should eq expected
   end
@@ -36,12 +36,12 @@ describe Liquid::Parser do
     txt = "{% if a == true %} shown {% else %} not shown {% endif %}"
     template = Liquid::Parser.parse txt
 
-    expected = [] of Nodes::Node
-    if_node = Nodes::If.new(Tokens::IfStatement.new "if a == true")
-    if_node << Nodes::Raw.new(Tokens::Raw.new " shown ")
-    else_node = Nodes::Else.new(Tokens::ElseStatement.new)
-    else_node << Nodes::Raw.new(Tokens::Raw.new " not shown ")
-    if_node.set_else else_node
+    expected = [] of Block::Node
+    if_node = Block::If.new("if a == true")
+    if_node << Block::Raw.new(" shown ")
+    else_node = Block::Else.new("")
+    else_node << Block::Raw.new(" not shown ")
+    if_node << else_node
     expected << if_node
 
     template.root.children.should eq expected

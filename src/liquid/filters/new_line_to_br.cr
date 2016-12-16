@@ -1,19 +1,18 @@
 require "./base"
 
 module Liquid::Filters
-
   #   newline_to_br
-  #  
+  #
   # Replaces every newline (\n) with an HTML line break (<br>).
-  #  
+  #
   # Input
   # {% capture string_with_newlines %}
   # Hello
   # there
   # {% endcapture %}
-  #  
+  #
   # {{ string_with_newlines | newline_to_br }}
-  #  
+  #
   # Output
   # <br />
   # Hello<br />
@@ -31,5 +30,4 @@ module Liquid::Filters
   end
 
   FilterRegister.register "newline_to_br", NewLineToBr
-  
 end
