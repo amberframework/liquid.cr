@@ -3,6 +3,20 @@ require "./spec_helper"
 include Liquid::Filters
 
 describe Liquid::Filters do
+
+  describe FilterRegister do
+
+    it "should have registered default filters" do
+      FilterRegister.get("abs").should eq Abs
+      FilterRegister.get("append").should eq Append
+      FilterRegister.get("capitalize").should eq Capitalize
+      FilterRegister.get("ceil").should eq Ceil
+      FilterRegister.get("default").should eq Default
+      FilterRegister.get("escape").should eq Escape
+    end
+    
+  end
+  
   describe Abs do
     it "filter var and return absolute value" do
       Abs.filter(-12).should eq 12
@@ -50,6 +64,13 @@ describe Liquid::Filters do
       Default.filter(4.99, Array{2.99}).should eq 4.99
       Default.filter("", Array{2.99}).should eq 2.99
       Default.filter(false, Array{true}).should be_true
+    end
+  end
+
+  describe Escape do
+    it "should escape specials chars" do
+      Escape.filter("Have you read 'James & the Giant Peach'?").should eq "Have you read &#39;James &amp; the Giant Peach&#39;?"
+      Escape.filter("Tetsuro Takara").should eq "Tetsuro Takara"
     end
   end
   

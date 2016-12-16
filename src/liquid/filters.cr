@@ -1,6 +1,7 @@
 require "./filters/base"
 require "./filters/date"
 require "./filters/default"
+require "./filters/escape"
 require "./context"
 
 module Liquid::Filters
