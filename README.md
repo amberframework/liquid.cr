@@ -43,10 +43,10 @@ result = tpl.render ctx
 # Filters
 - [x] abs
 - [x] append
-- [ ] capitalize
-- [ ] ceil
+- [x] capitalize
+- [x] ceil
 - [ ] compact
-- [ ] date
+- [x] date
 - [ ] default
 - [ ] divided_by
 - [ ] downcase
