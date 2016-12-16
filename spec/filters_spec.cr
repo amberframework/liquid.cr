@@ -12,12 +12,17 @@ describe Liquid::Filters do
     end
   end
 
-
   describe Append do
     it "should append a string at the end of another" do
       args = Array(Context::DataType).new
       args << " world"
       Append.filter("hello", args).should eq "hello world"
+    end
+  end
+
+  describe Capitalize do
+    it "should capitalize a string" do
+      Capitalize.filter("my great title").should eq "My great title"
     end
   end
 end

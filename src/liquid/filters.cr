@@ -16,11 +16,44 @@ module Liquid::Filters
 
   FilterRegister.register "abs", Abs
   FilterRegister.register "append", Append
+  FilterRegister.register "capitalize", Capitalize
 
   module Filter
     abstract def filter(data : Context::DataType, arguments : Array(Context::DataType)?) : DataType
   end
 
+  # capitalize
+  #
+  # Makes the first character of a string capitalized.
+  #  
+  # Input
+  # {{ "title" | capitalize }}
+  #  
+  # Output
+  # Title
+  #  
+  # capitalize only capitalizes the first character of the string, so later words are not affected:
+  #  
+  # Input
+  # {{ "my great title" | capitalize }}
+  #  
+  # Output
+  # My great title
+  class Capitalize
+    extend Filter
+
+    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
+      if data.responds_to? :capitalize
+        data.capitalize
+      else
+        data
+      end
+    end
+    
+
+
+  end
+    
   # Filter abs
   #
   # Returns the absolute value of a number.
@@ -46,6 +79,24 @@ module Liquid::Filters
     end
   end
 
+  # append
+  #  
+  # Concatenates two strings and returns the concatenated value.
+  #  
+  # Input
+  # {{ "/my/fancy/url" | append: ".html" }}
+  #  
+  # Output
+  # /my/fancy/url.html
+  #  
+  # append can also be used with variables:
+  #  
+  # Input
+  # {% assign filename = "/index.html" %}
+  # {{ "website.com" | append: filename }}
+  #  
+  # Output
+  # website.com/index.html
   class Append
     extend Filter
 
