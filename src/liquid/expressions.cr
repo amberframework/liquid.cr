@@ -15,13 +15,14 @@ module Liquid
       exp = Exception.new "Invalid Boolean operation "
       raise exp if arr.size < 3 || arr.first.is_a? BoolOperator
       arr.each_index do |i|
-        raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) || (i % 2 == 1 && arr[i].is_a? Expression)
+        raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) ||
+                     (i % 2 == 1 && arr[i].is_a? Expression)
       end
       left = nil
       i = 1
       while i < arr.size
-        left ||= arr[i - 1].as(Expression).eval(data).as?(Bool)
-        right = arr[i + 1].as(Expression).eval(data).as?(Bool)
+        left ||= arr[i - 1].as(Expression).eval(data).as_bool?
+        right = arr[i + 1].as(Expression).eval(data).as_bool?
 
         raise exp if left.nil? || right.nil?
 
@@ -48,41 +49,59 @@ module Liquid
     alias BoolProc = Proc(Bool, Bool, Bool)
   end
 
-  class BinOperator
-    macro responds_to(l, o, r)
-      if {{l.id}}.responds_to?(:{{o.id}})
-        {{l.id}} {{o.id}} {{r.id}}
+  class BinOperator(T)
+
+    OPS = [
+      "==",
+      "!=",
+      "<=",
+      ">=",
+      "<",
+      ">"
+    ]
+
+    def self.process(operator : String, left : Any, right : Any) : Any
+      self.check_operator operator
+
+      if operator == "=="
+        Any.new left.raw == right.raw
+      elsif operator == "!="
+        Any.new left.raw != right.raw
+      elsif (left_raw = left.raw.as?(Number)) && (right_raw = right.raw.as?(Number))
+        res = case operator
+        when "<="
+          left_raw <= right_raw
+        when ">="
+          left_raw >= right_raw
+        when "<"
+          left_raw < right_raw
+        when ">"
+          left_raw > right_raw
+        end
+        Any.new res
+      elsif (left_t = left.as_t?) && (right_t = right.as_t?)
+        res = case operator
+              when "<="
+                left_t <= right_t
+              when ">="
+                left_t >= right_t
+              when "<"
+                left_t < right_t
+              when ">"
+                left_t > right_t
+              end
+        Any.new res
       else
-        raise InvalidExpression.new "{{l.id}} can't be compared with {{r.id}}"
+        #raise "Invalid comparison operator, can't proceed #{left} #{operator} #{right}"
+        Any.new nil
+      end
+
+    end
+
+    def self.check_operator(str : String)
+      if !OPS.includes? str
+        raise Exception.new "Invalid comparison operator : #{str}"
       end
     end
-
-    EQ = BinProc.new { |left, right| left == right }
-    NE = BinProc.new { |left, right| left != right }
-    LE = BinProc.new { |left, right| responds_to(left, :<=, right) }
-    GE = BinProc.new { |left, right| responds_to(left, :>=, right) }
-    LT = BinProc.new { |left, right| responds_to(left, :<, right) }
-    GT = BinProc.new { |left, right| responds_to(left, :>, right) }
-
-    @inner : BinProc
-
-    def initialize(str : String)
-      @inner = case str
-               when "==" then EQ
-               when "!=" then NE
-               when "<=" then LE
-               when ">=" then GE
-               when "<"  then LT
-               when ">"  then GT
-               else
-                 raise Exception.new "Invalid comparison operator : #{str}"
-               end
-    end
-
-    def call(left : Context::DataType, right : Context::DataType)
-      @inner.call left.as(Context::DataType), right.as(Context::DataType)
-    end
-
-    alias BinProc = Proc(Context::DataType, Context::DataType, Bool)
   end
 end

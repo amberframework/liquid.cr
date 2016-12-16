@@ -1,31 +1,35 @@
+require "./any"
+
 module Liquid
-  class Context
-    @inner = Hash(String, DataType).new
 
-    def self.new(ctx : Context)
-      ctx.dup
+  alias Type = Nil | String | Float32 | Float64 | Int32 | Bool | Time | Array(Type) | Hash(String, Type)
+
+  class Context < Hash(String, Any)
+
+    def set(key, val : Any)
+      self[key] = val
     end
 
-    def set(key, value : DataType)
-      @inner[key] = value
+    def set(key, val : Type)
+      self[key] = Any.new val
     end
 
-    def set(key, value : Array)
-      @inner[key] = value.map { |e| e.as(DataType) }
+    def get(key)
+      self[key]?
     end
 
-    def get(key) : DataType
-      @inner[key]?
+    def set(key, val : Array)
+      self[key] = Any.new val
     end
 
-    def [](key)
-      get(key)
+    def dup
+      ctx = Context.new()
+      each do |key, value|
+        ctx[key] = value
+      end
+      ctx
     end
 
-    def delete(key)
-      @inner.delete key
-    end
-
-    alias DataType = Nil | String | Float32 | Float64 | Int32 | Bool | Time | Array(DataType) | Hash(DataType, DataType)
   end
+
 end

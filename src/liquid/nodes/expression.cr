@@ -65,7 +65,7 @@ module Liquid::Nodes
     end
 
     def render(data, io)
-      result : Context::DataType
+      result : Any
       result = @first.eval(data)
       @filters.each do |tuple|
         args = tuple[1].not_nil!.map &.eval(data) if tuple[1]
@@ -124,8 +124,8 @@ module Liquid::Nodes
       /^#{re}$/
     end
 
-    def eval(data) : Context::DataType
-      if @var == "true" || @var == "false"
+    def eval(data) : Any
+      ret = if @var == "true" || @var == "false"
         @var == "true"
       elsif m = @var.match GSTRING
         m["str"]
@@ -136,10 +136,9 @@ module Liquid::Nodes
       elsif @var.match intern(VAR)
         data.get(@var)
       elsif m = @var.match intern(GCMP)
-        op = BinOperator.new m["op"]
-        le = Expression.new m["left"]
-        re = Expression.new m["right"]
-        op.call le.eval(data), re.eval(data)
+        le = Expression.new(m["left"]).eval data
+        re = Expression.new(m["right"]).eval data
+        BinOperator.process m["op"], le, re
       elsif m = @var.scan MULTIPLE_EXPR
         stack = [] of Expression | BoolOperator
         m.each do |match|
@@ -150,6 +149,13 @@ module Liquid::Nodes
       else
         raise InvalidExpression.new "Invalid Expression : #{@var}"
       end
+
+      if ret.is_a? Any
+        ret
+      else
+        Any.new ret
+      end
+
     end
 
     def render(data, io)

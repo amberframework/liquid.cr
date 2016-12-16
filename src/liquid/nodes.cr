@@ -49,13 +49,13 @@ module Liquid::Nodes
     end
 
     def render(data, io)
-      if @if_expression.eval(data)
+      if @if_expression.eval(data).as_bool?
         @children.each &.render(data, io)
       else
         found = false
         if elsifpart = @elsif
           elsifpart.each do |alt|
-            if alt.eval(data)
+            if alt.eval(data).as_bool?
               found = true
               alt.render(data, io)
               break

@@ -16,11 +16,10 @@ module Liquid::Filters
   class Join
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
-      raise FilterArgumentException.new "join filter expects one string argument" unless args && args.first?.is_a? String
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
 
-      if data.responds_to? :join
-        data.join args.first
+      if args && (tmp = args.first?) && (arg = tmp.as_s?) && (d = data.as_a?)
+        Any.new d.join(arg)
       else
         data
       end

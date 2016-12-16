@@ -29,19 +29,19 @@ module Liquid::Filters
   # Note that the value will be the current time of when the page was last generated from the template, not when the page is presented to a user if caching or static site generation is involved.
   class Date
     extend Filter
-    def self.filter(data : Context::DataType, arguments : Array(Context::DataType)?) : Context::DataType
+    def self.filter(data : Any, arguments : Array(Any)?) : Any
       raise FilterArgumentException.new "date filter require an argument" unless arguments && arguments.size == 1
 
-      format = if (arg = arguments.first?) && arg.is_a? String
+      format = if (arg = arguments.first.as_s?)
                  arg
                else
                  raise FilterArgumentException.new "First argument of date filter should be a string"
                end
 
-      if data.is_a? Time
-        data.to_s format
-      elsif data.is_a? String && data == "now"
-        Time.now.to_s format
+      if (time = data.as_t?)
+        Any.new time.to_s format
+      elsif (d = data.as_s?) && d == "now"
+        Any.new Time.now.to_s format
       else
         data
       end

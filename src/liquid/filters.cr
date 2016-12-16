@@ -24,7 +24,7 @@ module Liquid::Filters
   FilterRegister.register "append", Append
   FilterRegister.register "capitalize", Capitalize
   FilterRegister.register "ceil", Ceil
-  
+
 
 
 
@@ -59,16 +59,12 @@ module Liquid::Filters
   class Ceil
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
-      case data
-      when Number
-        data.ceil
-      when String
-        if fl = data.to_f32?
-          fl.ceil
-        else
-          data
-        end
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+
+      if (raw = data.raw) && raw.is_a? Number
+        Any.new raw.ceil
+      elsif (str = data.as_s?) && (flt = str.to_f32?)
+        Any.new flt.ceil
       else
         data
       end
@@ -95,9 +91,9 @@ module Liquid::Filters
   class Capitalize
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
-      if data.responds_to? :capitalize
-        data.capitalize
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+      if (raw = data.raw) && raw.responds_to? :capitalize
+        Any.new raw.capitalize
       else
         data
       end
@@ -118,11 +114,11 @@ module Liquid::Filters
   class Abs
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
-      if data.responds_to? :abs
-        data.abs
-      elsif data.is_a? String && (float = data.to_f32?)
-        float.abs
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+      if data.raw.is_a? Number
+        Any.new data.raw.as(Number).abs
+      elsif (str = data.as_s?) && (flt = str.to_f32?)
+        Any.new flt.abs
       else
         data
       end
@@ -150,12 +146,11 @@ module Liquid::Filters
   class Append
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)?) : Context::DataType
-      raise FilterArgumentException.new "The append filter expects one argument" if !args || args.size != 1
-      if args && (arg = args[0]) && arg.is_a? String && data.is_a? String
-        data + arg
+    def self.filter(data : Any, args : Array(Any)?) : Any
+      if (d = data.as_s?) && args && args.size == 1 && (arg = args.first.as_s?)
+        Any.new d+arg
       else
-        raise FilterArgumentException.new "The first argument of append filter should be a string" if args.size != 1
+        data
       end
     end
   end

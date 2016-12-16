@@ -21,9 +21,9 @@ module Liquid::Filters
   class NewLineToBr
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
-      if data.responds_to? :to_s
-        data.to_s.gsub /\n/, "<br />"
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+      if data.raw.responds_to? :to_s
+        Any.new data.raw.to_s.gsub /\n/, "<br />"
       else
         data
       end

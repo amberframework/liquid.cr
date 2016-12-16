@@ -17,6 +17,8 @@ module Liquid::Nodes
     VARNAME = /^\s*(?<varname>#{VAR})\s*$/
 
     @loop_var : String
+    @to_restore : Any?
+
     @loop_over : String?
     @begin : Int32?
     @end : Int32?
@@ -37,7 +39,7 @@ module Liquid::Nodes
       end
     end
 
-    def render_with_range(data, io)
+    def render_with_range(data : Context, io)
       i = 0
       start = @begin.as(Int32)
       stop = @end.as(Int32)
@@ -57,7 +59,7 @@ module Liquid::Nodes
 
     def render_with_var(data, io)
       val = Expression.new @loop_over.not_nil!
-      if (arr = val.eval(data)) && arr.is_a? Array
+      if (arr = val.eval(data).as_a?)
         i = 0
         stop = arr.size
         arr.each do |val|
@@ -77,8 +79,8 @@ module Liquid::Nodes
       end
     end
 
-    def render(data, io)
-      data = Context.new data
+    def render(data : Context, io)
+      data = data.dup
       if @begin.is_a?(Int32) && @end.is_a?(Int32)
         render_with_range data, io
       elsif @loop_over.is_a?(String)

@@ -5,7 +5,7 @@ module Liquid::Nodes
 
     abstract def initialize(token)
 
-    abstract def render(data, io)
+    abstract def render(data : Context, io)
 
     def <<(node : Node)
       @children << node

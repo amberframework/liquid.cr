@@ -24,15 +24,10 @@ module Liquid::Filters
   class Split
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType 
-      raise FilterArgumentException.new "split filter expects one string argument" unless args && args.first?.is_a? String
-
-      arg = args.first
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any 
       
-      if data.responds_to? :split && (arg.is_a? String || arg.is_a? Regex)
-        arr = Array(Context::DataType).new
-        data.split(arg).each {|str| arr << str }
-        arr
+      if (raw = data.raw) && raw.responds_to?(:split) && args && (fa = args.first?) && (arg = fa.as_s?)
+        Any.new raw.split(arg)
       else
         data
       end

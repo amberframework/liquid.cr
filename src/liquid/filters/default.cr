@@ -36,10 +36,10 @@ module Liquid::Filters
   class Default
     extend Filter
 
-    def self.filter(data : Context::DataType, args : Array(Context::DataType)? = nil) : Context::DataType
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
       raise FilterArgumentException.new "default filter expects one argument" unless args && args.first?
 
-      if !data || (data.responds_to?(:empty?) && data.empty?)
+      if !data.raw || ((r = data.raw) && r.responds_to?(:empty?) && r.empty?)
         args.first
       else
         data
