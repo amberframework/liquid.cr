@@ -56,4 +56,10 @@ module Liquid::Tokens
 
   class AssignStatement < Raw
   end
+
+  class CaptureStatement < Raw
+  end
+
+  class EndCaptureStatement < Token
+  end
 end

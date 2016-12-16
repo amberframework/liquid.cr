@@ -8,10 +8,17 @@ describe Liquid::Nodes do
       stmt << Expression.new "x"
       ctx = Context.new
       ctx.set("myarray", ["apple", 12])
-      io = IO::Memory.new
-      stmt.render(ctx, io)
-      io.close
-      io.to_s.should eq "apple12"
+      node_output(stmt, ctx).should eq "apple12"
+    end
+  end
+
+  describe Capture do
+    it "should capture the content of the block" do
+      block = Capture.new "capture mavar"
+      block << Raw.new "Hello World!"
+      ctx = Context.new
+      node_output(block, ctx)
+      ctx.get("mavar").should eq "Hello World!"
     end
   end
 
@@ -90,7 +97,7 @@ describe Liquid::Nodes do
       io.close
       io.to_s.should eq "Hello World !"
     end
-    
+
   end
 
   describe Expression do

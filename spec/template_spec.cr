@@ -81,6 +81,11 @@ describe Template do
     result.should eq "\n    \n      You killed Kenny!  You bastard!!!\n    \n    "
   end
 
+  it "should render captured variables" do
+    tpl = Template.parse "{% capture mavar %}Hello World!{% endcapture %}{{mavar}}"
+    tpl.render(Context.new).should eq "Hello World!"
+  end
+
   it "should render assigned variable" do
     tpl = Parser.parse "{% assign var = \"Hello World\"%}{{var}}"
     tpl.render(Context.new).should eq "Hello World"

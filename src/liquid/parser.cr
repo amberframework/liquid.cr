@@ -24,6 +24,10 @@ module Liquid
       stack = [root] of Node
       tokens.each do |token|
         case token
+        when Tokens::CaptureStatement
+          node = Capture.new token
+          stack.last << node
+          stack << node
         when Tokens::IfStatement
           node = If.new token
           stack.last << node
@@ -51,6 +55,7 @@ module Liquid
           stack.last << node
           stack << node
         when Tokens::EndForStatement
+        when Tokens::EndCaptureStatement
           stack.pop
         when Tokens::Expression
           stack.last << Expression.new token

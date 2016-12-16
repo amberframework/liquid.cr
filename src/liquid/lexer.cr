@@ -54,6 +54,8 @@ module Liquid
       when "else"   then Tokens::ElseStatement.new
       when "endif"  then Tokens::EndIfStatement.new
       when "assign" then Tokens::AssignStatement.new match["full"]
+      when "capture" then Tokens::CaptureStatement.new match["full"]
+      when "endcapture" then Tokens::EndCaptureStatement.new
       else
         raise "Invalid statement : #{match}"
       end

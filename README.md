@@ -96,9 +96,9 @@ TODO:
 - [x] Add iteration over Arrays
 - [x] Improve data interface
 - [x] Add Filter support
+- [x] Add capture block
 - [ ] Add increment block
 - [ ] Add decrement block
-- [ ] Add capture block
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions
 - [ ] Add case/when

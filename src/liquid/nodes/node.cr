@@ -1,6 +1,7 @@
 module Liquid::Nodes
   abstract class Node
     getter children
+    @children : Array(Node)
     @children = Array(Node).new
 
     abstract def initialize(token)
