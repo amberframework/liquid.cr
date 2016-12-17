@@ -1,7 +1,7 @@
 require "./block"
 
 module Liquid::Block
-  class ElsIf < BeginBlock
+  class ElsIf < InlineBlock
     SIMPLE_EXP = /^\s*elsif (?<expr>.+)\s*$/
     @if_expression : Expression
 

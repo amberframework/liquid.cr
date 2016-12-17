@@ -1,7 +1,7 @@
 require "./block"
 
 module Liquid::Block
-  class Else < BeginBlock
+  class Else < InlineBlock
     def initialize(str : String)
     end
 

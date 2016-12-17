@@ -2,6 +2,17 @@ require "./spec_helper"
 
 describe Liquid do
   describe Block do
+
+    describe If do
+      it "should add elsif node" do
+        ifnode = If.new "if true == true"
+        elsifnode = ElsIf.new "elsif true == false"
+        ifnode << elsifnode
+        ifnode.elsif.should_not be_nil
+      end
+    end
+
+
     describe For do
       it "should be inherit BeginBlock" do
         For.new("for x in array").should be_a BeginBlock
