@@ -1,15 +1,10 @@
-require "./node"
+require "./block"
 require "../context"
 
-module Liquid::Nodes
-
-  class Capture < Node
+module Liquid::Block
+  class Capture < BeginBlock
     REGEXP = /capture (?<varname>#{VAR})/
     @var_name : String
-
-    def self.new(token : Tokens::CaptureStatement)
-      new token.content
-    end
 
     def initialize(content : String)
       if match = content.strip.match REGEXP
@@ -26,5 +21,4 @@ module Liquid::Nodes
       data.set @var_name, io_memory.to_s
     end
   end
-
 end

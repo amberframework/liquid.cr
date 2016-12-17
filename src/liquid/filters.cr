@@ -25,9 +25,6 @@ module Liquid::Filters
   FilterRegister.register "capitalize", Capitalize
   FilterRegister.register "ceil", Ceil
 
-
-
-
   # ceil
   # Rounds the input up to the nearest whole number.
   # Liquid tries to convert the input to a number before the filter is applied.
@@ -60,7 +57,6 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-
       if (raw = data.raw) && raw.is_a? Number
         Any.new raw.ceil
       elsif (str = data.as_s?) && (flt = str.to_f32?)
@@ -148,7 +144,7 @@ module Liquid::Filters
 
     def self.filter(data : Any, args : Array(Any)?) : Any
       if (d = data.as_s?) && args && args.size == 1 && (arg = args.first.as_s?)
-        Any.new d+arg
+        Any.new d + arg
       else
         data
       end

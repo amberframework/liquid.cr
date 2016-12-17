@@ -1,11 +1,9 @@
 require "./any"
 
 module Liquid
-
   alias Type = Nil | String | Float32 | Float64 | Int32 | Bool | Time | Array(Type) | Hash(String, Type)
 
   class Context < Hash(String, Any)
-
     def set(key, val : Any)
       self[key] = val
     end
@@ -23,13 +21,11 @@ module Liquid
     end
 
     def dup
-      ctx = Context.new()
+      ctx = Context.new
       each do |key, value|
         ctx[key] = value
       end
       ctx
     end
-
   end
-
 end

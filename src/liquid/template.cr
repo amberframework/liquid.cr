@@ -1,19 +1,16 @@
-require "./nodes"
-require "./tokens"
-
-include Liquid::Nodes
+require "./blocks"
 
 module Liquid
   class Template
     getter root
 
-    @root : Root
+    @root : Block::Root
 
     def self.parse(str : String) : Template
       Parser.parse(str)
     end
 
-    def initialize(@root : Root)
+    def initialize(@root : Block::Root)
     end
 
     def render(data, io = IO::Memory.new)

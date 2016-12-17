@@ -40,6 +40,5 @@ module Liquid::Nodes
     it "should match filters with multiple arguments" do
       "filtered | filter: arg1, arg2".match(/^#{GFILTERED}$/).should_not be_nil
     end
-    
   end
 end

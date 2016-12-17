@@ -1,71 +1,126 @@
-require "./tokens"
-require "./template"
+require "./blocks"
 
 module Liquid
+
   class Parser
-    # Parse a String
-    # Run Lexer
-    # validate
-    # Build tree
-    # returns Template
-    def self.parse(str : String) : Template
-      lexer = Lexer.new
-      tokens = lexer.tokenize str
-      self.validate tokens
-      root = self.build_tree tokens
-      Template.new root
+    STATEMENT  = /^\s*(?<keyword>[a-z]+).*$/
+
+    getter root : Root
+
+    @str : String
+    @i = 0
+    @current_line = 0
+
+    # buffers
+    @nodes = Array(Node).new
+    @buffer = ""
+    @wait_buffer = ""
+
+    def self.parse(str : String)
+      internal = self.new str
+      internal.parse
+      Template.new internal.root
     end
 
-    def self.validate(tokens : Array(Tokens::Token))
+    def initialize(@str)
+      @root = Root.new
+      @nodes << @root
     end
 
-    def self.build_tree(tokens : Array(Tokens::Token))
-      root = Root.new
-      stack = [root] of Node
-      tokens.each do |token|
-        case token
-        when Tokens::CaptureStatement
-          node = Capture.new token
-          stack.last << node
-          stack << node
-        when Tokens::IfStatement
-          node = If.new token
-          stack.last << node
-          stack << node
-        when Tokens::ElsIfStatement
-          if stack.last.is_a? If
-            elsifnode = stack.last.as(If).add_elsif token
-            stack << elsifnode
-          end
-        when Tokens::ElseStatement
-          if stack.last.is_a? If
-            elsenode = stack.last.as(If).set_else token
-            stack << elsenode
-          elsif (s = stack[-2]?) && s.is_a?(If)
-            elsenode = stack[-2].as(If).set_else token
-            stack << elsenode
-          end
-        when Tokens::EndIfStatement
-          stack.size.times do
-            pop = stack.pop
-            break if pop.is_a? If
-          end
-        when Tokens::ForStatement
-          node = For.new token
-          stack.last << node
-          stack << node
-        when Tokens::EndForStatement
-        when Tokens::EndCaptureStatement
-          stack.pop
-        when Tokens::Expression
-          stack.last << Expression.new token
-        when Tokens::AssignStatement
-          stack.last << Assign.new token
-        when Tokens::Raw
-          stack.last << Raw.new token
+    def has_char?
+      @i < str.size
+    end
+
+    # parse string
+    def parse
+      @i = 0
+      while @i < @str.size-1
+        if @str[@i] == '{' && @str[@i+1] == '%'
+          @i += 2
+          add_raw
+          consume_statement
+        elsif @str[@i] == '{' && @str[@i+1] == '{'
+          @i += 2
+          add_raw
+          consume_expression
+        else
+          consume_char
         end
+        @i += 1
       end
-      root
+      consume_char # last char ?
+      add_raw
     end
+
+    # Create and add a Raw node with current buffer
+    def add_raw
+      if !@buffer.empty?
+        @nodes.last << Raw.new @buffer
+        @buffer = ""
+      end
+    end
+
+    def consume_expression
+      while @i < @str.size-1
+        if @str[@i] == '}' && @str[@i+1] == '}'
+          @i += 1
+          break
+        else
+          consume_char
+        end
+        @i += 1
+      end
+
+      if !@buffer.empty?
+        @nodes.last << Expression.new @buffer
+        @buffer = ""
+      else
+        raise "Invalid Expression at line #{@current_line}"
+      end
+
+    end
+
+    # Consume a statement
+    def consume_statement
+      while @i < @str.size-1
+        if @str[@i] == '%' && @str[@i+1] == '}'
+          @i += 1
+          break
+        else
+          consume_char
+        end
+        @i += 1
+      end
+
+      if match = @buffer.match STATEMENT
+        block_class = BlockRegister.for_name match["keyword"]
+        case block_class.type
+        when BlockType::End
+          while (pop = @nodes.pop?) && pop.is_a? Block && !pop.class.type == BlockType::Begin
+          end
+        when BlockType::Begin
+          block = block_class.new @buffer
+          @nodes.last << block
+          @nodes << block
+        when BlockType::Inline
+          @nodes.last << block_class.new @buffer
+        end
+      else
+        raise "Invalid Statement at line #{@current_line}"
+      end
+
+      @buffer = ""
+
+    end
+
+    # Add current char to buffer
+    def consume_char
+      if @i < @str.size
+        @buffer += @str[@i]
+        @current_line += 1 if @str[@i] == '\n'
+      end
+    end
+
   end
+
 end

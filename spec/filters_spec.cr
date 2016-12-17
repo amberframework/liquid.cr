@@ -3,9 +3,7 @@ require "./spec_helper"
 include Liquid::Filters
 
 describe Liquid::Filters do
-
   describe FilterRegister do
-
     it "should have registered default filters" do
       FilterRegister.get("abs").should eq Abs
       FilterRegister.get("append").should eq Append
@@ -17,7 +15,6 @@ describe Liquid::Filters do
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
     end
-
   end
 
   describe Abs do
@@ -61,10 +58,10 @@ describe Liquid::Filters do
 
   describe Default do
     it "should return default value if false, nil or empty" do
-      Default.filter(Any.new(nil),   Array{ Any.new 2.99}).should eq 2.99
-      Default.filter(Any.new(4.99),  Array{ Any.new 2.99}).should eq 4.99
-      Default.filter(Any.new(""),    Array{ Any.new 2.99}).should eq 2.99
-      Default.filter(Any.new(false), Array{ Any.new true}).should be_true
+      Default.filter(Any.new(nil), Array{Any.new 2.99}).should eq 2.99
+      Default.filter(Any.new(4.99), Array{Any.new 2.99}).should eq 4.99
+      Default.filter(Any.new(""), Array{Any.new 2.99}).should eq 2.99
+      Default.filter(Any.new(false), Array{Any.new true}).should be_true
     end
   end
 
@@ -92,5 +89,4 @@ describe Liquid::Filters do
       Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "]).should eq ["John", "Paul", "George", "Ringo"]
     end
   end
-
 end

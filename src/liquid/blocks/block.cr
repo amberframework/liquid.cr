@@ -1,0 +1,60 @@
+module Liquid::Block
+
+  enum BlockType
+    Inline
+    Begin
+    End
+  end
+
+  abstract def type : BlockType
+
+  abstract class Node
+    getter children
+    @children : Array(Node)
+    @children = Array(Node).new
+
+    abstract def initialize(content)
+
+    abstract def render(data : Context, io)
+
+    def <<(node : Node)
+      @children << node
+    end
+
+    def_equals @children
+  end
+
+  class Root < Node
+    def initialize
+    end
+
+    def initialize(content)
+    end
+
+    def render(data, io)
+      @children.each &.render(data, io)
+    end
+  end
+
+
+  abstract class InlineBlock < Node
+    extend Block
+    def self.type
+      BlockType::Inline
+    end
+  end
+
+  abstract class BeginBlock < Node
+    extend Block
+    def self.type
+      BlockType::Begin
+    end
+  end
+
+  abstract class EndBlock < Node
+    extend Block
+    def self.type
+      BlockType::End
+    end
+  end
+end

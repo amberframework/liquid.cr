@@ -1,7 +1,7 @@
-require "./node"
+require "./block"
 require "../context"
 
-module Liquid::Nodes
+module Liquid::Block
   # Inside of a for-loop block, you can access some special variables:
   # Variable      	Description
   # loop.index 	    The current iteration of the loop. (1 indexed)
@@ -11,7 +11,7 @@ module Liquid::Nodes
   # loop.first    	True if first iteration.
   # loop.last     	True if last iteration.
   # loop.length    	The number of items in the sequence.
-  class For < Node
+  class For < BeginBlock
     GLOBAL  = /for (?<var>\w+) in (?<range>.+)/
     RANGE   = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
     VARNAME = /^\s*(?<varname>#{VAR})\s*$/
@@ -23,8 +23,8 @@ module Liquid::Nodes
     @begin : Int32?
     @end : Int32?
 
-    def initialize(token : Tokens::ForStatement)
-      if gmatch = token.content.match GLOBAL
+    def initialize(content : String)
+      if gmatch = content.match(GLOBAL)
         @loop_var = gmatch["var"]
         if rmatch = gmatch["range"].match RANGE
           @begin = rmatch["start"].to_i
@@ -32,10 +32,10 @@ module Liquid::Nodes
         elsif (rmatch = gmatch["range"].match VARNAME)
           @loop_over = rmatch["varname"]
         else
-          raise InvalidNode.new "Invalid for node : #{token.content}"
+          raise InvalidNode.new "Invalid for node : #{content}"
         end
       else
-        raise InvalidNode.new "Invalid for node : #{token.content}"
+        raise InvalidNode.new "Invalid for node : #{content}"
       end
     end
 

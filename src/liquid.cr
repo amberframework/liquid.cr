@@ -1,5 +1,10 @@
-require "./liquid/*"
-
-module Liquid
-  
-end
+require "./liquid/any"
+require "./liquid/block_register"
+require "./liquid/blocks"
+require "./liquid/context"
+require "./liquid/exceptions"
+require "./liquid/expressions"
+require "./liquid/filters"
+require "./liquid/parser"
+require "./liquid/template"
+require "./liquid/version"
