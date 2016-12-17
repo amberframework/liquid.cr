@@ -8,3 +8,5 @@ require "./liquid/filters"
 require "./liquid/parser"
 require "./liquid/template"
 require "./liquid/version"
+
+require "./liquid/parser_next"

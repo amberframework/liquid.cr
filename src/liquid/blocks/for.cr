@@ -24,7 +24,7 @@ module Liquid::Block
     @end : Int32?
 
     def initialize(content : String)
-      if (gmatch = content.match(GLOBAL)) && @check
+      if gmatch = content.match(GLOBAL)
         @loop_var = gmatch["var"]
         if rmatch = gmatch["range"].match RANGE
           @begin = rmatch["start"].to_i
