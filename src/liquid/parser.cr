@@ -1,119 +1,126 @@
-require "./template"
+require "./blocks"
 
 module Liquid
+
   class Parser
-    RAW        = /^(?<raw>[^{]+)/
-    STATEMENT  = /^\{%(?<full> ?(?<keyword>[a-z]+)([^%]*))%}/
-    EXPRESSION = /^\{{(?<expr>[^}]*)}}/
+    STATEMENT  = /^\s*(?<keyword>[a-z]+).*$/
 
-    # Parse a String
-    # Run Lexer
-    # validate
-    # Build tree
-    # returns Template
-    def self.parse(str : String) : Template
-      root = self.build str
-      Template.new root
+    getter root : Root
+
+    @str : String
+    @i = 0
+    @current_line = 0
+
+    # buffers
+    @nodes = Array(Node).new
+    @buffer = ""
+    @wait_buffer = ""
+
+    def self.parse(str : String)
+      internal = self.new str
+      internal.parse
+      Template.new internal.root
     end
 
-    def self.consume(str, fin)
-      fin = fin.not_nil!
-      str[fin..-1]
+    def initialize(@str)
+      @root = Root.new
+      @nodes << @root
     end
 
-    def self.consume_statement(str, match)
-      keyword = match["keyword"]
-      block = BlockRegister.for_name keyword
-      str = consume(str, match.end)
-      return str, block
+    def has_char?
+      @i < str.size
     end
 
-    def self.consume_expression(str, match)
-      expr = Expression.new match["expr"]
-      return consume(str, match.end), expr
-    end
-
-    def self.build(str : String)
-      prev = nil?
-      root = Root.new
-      stack = [root]
-
-      while !str.empty? && prev != str
-        prev = str
-        if match = str.match RAW
-          stack.last << Raw.new match["raw"]
-          str = consume(str, match.end)
-        elsif match = str.match STATEMENT
-          str, block = consume_statement(str, match)
-          pp block, match, block.is_a? BeginBlock
-          case block
-          when Block::InlineBlock
-            stack.last << block.new match["full"]
-          when Block::BeginBlock
-            stack.last << block
-            stack << block
-          when Block::EndBlock
-            while (pop = stack.pop) && !pop.class == block.begin_block.class
-            end
-          end
-        elsif match = str.match EXPRESSION
-          str, expr = consume_expression str, match
-          stack.last << expr
+    # parse string
+    def parse
+      @i = 0
+      while @i < @str.size-1
+        if @str[@i] == '{' && @str[@i+1] == '%'
+          @i += 2
+          add_raw
+          consume_statement
+        elsif @str[@i] == '{' && @str[@i+1] == '{'
+          @i += 2
+          add_raw
+          consume_expression
+        else
+          consume_char
         end
+        @i += 1
       end
-      root
+      consume_char # last char ?
+      add_raw
     end
 
-    def self.validate(tokens : Array(Tokens::Token))
+    # Create and add a Raw node with current buffer
+    def add_raw
+      if !@buffer.empty?
+        @nodes.last << Raw.new @buffer
+        @buffer = ""
+      end
     end
 
-    def self.build_tree(tokens : Array(Tokens::Token))
-      root = Root.new
-      stack = [root] of Node
-      tokens.each do |token|
-        case token
-        when Tokens::CaptureStatement
-          node = Capture.new token
-          stack.last << node
-          stack << node
-        when Tokens::IfStatement
-          node = If.new token
-          stack.last << node
-          stack << node
-        when Tokens::ElsIfStatement
-          if stack.last.is_a? If
-            elsifnode = stack.last.as(If).add_elsif token
-            stack << elsifnode
-          end
-        when Tokens::ElseStatement
-          if stack.last.is_a? If
-            elsenode = stack.last.as(If).set_else token
-            stack << elsenode
-          elsif (s = stack[-2]?) && s.is_a?(If)
-            elsenode = stack[-2].as(If).set_else token
-            stack << elsenode
-          end
-        when Tokens::EndIfStatement
-          stack.size.times do
-            pop = stack.pop
-            break if pop.is_a? If
-          end
-        when Tokens::ForStatement
-          node = For.new token
-          stack.last << node
-          stack << node
-        when Tokens::EndForStatement
-        when Tokens::EndCaptureStatement
-          stack.pop
-        when Tokens::Expression
-          stack.last << Expression.new token
-        when Tokens::AssignStatement
-          stack.last << Assign.new token
-        when Tokens::Raw
-          stack.last << Raw.new token
+    def consume_expression
+      while @i < @str.size-1
+        if @str[@i] == '}' && @str[@i+1] == '}'
+          @i += 1
+          break
+        else
+          consume_char
         end
+        @i += 1
       end
-      root
+
+      if !@buffer.empty?
+        @nodes.last << Expression.new @buffer
+        @buffer = ""
+      else
+        raise "Invalid Expression at line #{@current_line}"
+      end
+
     end
+
+    # Consume a statement
+    def consume_statement
+      while @i < @str.size-1
+        if @str[@i] == '%' && @str[@i+1] == '}'
+          @i += 1
+          break
+        else
+          consume_char
+        end
+        @i += 1
+      end
+
+      if match = @buffer.match STATEMENT
+        block_class = BlockRegister.for_name match["keyword"]
+        case block_class.type
+        when BlockType::End
+          while (pop = @nodes.pop?) && pop.is_a? Block && !pop.class.type == BlockType::Begin
+          end
+        when BlockType::Begin
+          block = block_class.new @buffer
+          @nodes.last << block
+          @nodes << block
+        when BlockType::Inline
+          @nodes.last << block_class.new @buffer
+        end
+      else
+        raise "Invalid Statement at line #{@current_line}"
+      end
+
+      @buffer = ""
+
+    end
+
+    # Add current char to buffer
+    def consume_char
+      if @i < @str.size
+        @buffer += @str[@i]
+        @current_line += 1 if @str[@i] == '\n'
+      end
+    end
+
   end
+
 end
