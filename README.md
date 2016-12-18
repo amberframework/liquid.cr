@@ -26,11 +26,11 @@ txt = "
       Kenny looks okay --- so far
     {% endif %}
     "
-ctx = Context.new
-ctx.set "kenny.sick", false
-ctx.set "kenny.dead", true
+ctx = Liquid::Context.new
+ctx.set "kenny", { "sick" => false, "dead" => true}
 
-tpl = Template.parse txt
+tpl = Liquid::Template.parse txt  # tpl can be cached and reused
+
 result = tpl.render ctx
 
 # result = "
