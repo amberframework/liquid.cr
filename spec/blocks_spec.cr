@@ -2,7 +2,6 @@ require "./spec_helper"
 
 describe Liquid do
   describe Block do
-
     describe If do
       it "should add elsif node" do
         ifnode = If.new "if true == true"
@@ -11,7 +10,6 @@ describe Liquid do
         ifnode.elsif.should_not be_nil
       end
     end
-
 
     describe For do
       it "should be inherit BeginBlock" do
@@ -44,9 +42,9 @@ describe Liquid do
         expr3 = Assign.new "assign int = 12"
         ctx = Context.new
 
-        expr.render(ctx, IO::Memory.new)
-        expr2.render(ctx, IO::Memory.new)
-        expr3.render(ctx, IO::Memory.new)
+        expr.accept RenderVisitor.new ctx
+        expr2.accept RenderVisitor.new ctx
+        expr3.accept RenderVisitor.new ctx
 
         ctx.get("bool").should be_true
         ctx.get("str").should eq "test"
@@ -57,49 +55,41 @@ describe Liquid do
     describe Filtered do
       it "should filter a string" do
         node = Filtered.new " \"whatever\" | abs"
-        ctx = Context.new
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "whatever"
+        v = RenderVisitor.new
+        node.accept v
+        v.output.should eq "whatever"
       end
 
       it "should filter a int" do
         node = Filtered.new "-12 | abs"
-        ctx = Context.new
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "12"
+        v = RenderVisitor.new
+        node.accept v
+        v.output.should eq "12"
       end
 
       it "should filter a float" do
         node = Filtered.new "-12.25 | abs"
-        ctx = Context.new
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "12.25"
+        v = RenderVisitor.new
+        node.accept v
+        v.output.should eq "12.25"
       end
 
       it "should filter a var" do
         node = Filtered.new "var | abs"
         ctx = Context.new
         ctx.set "var", -12
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "12"
+        v = RenderVisitor.new ctx
+        node.accept v
+        v.output.should eq "12"
       end
 
       it "should use multiple filters" do
         node = Filtered.new "var | append: \"Hello \" | append: \"World !\""
         ctx = Context.new
         ctx.set "var", ""
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "Hello World !"
+        v = RenderVisitor.new ctx
+        node.accept v
+        v.output.should eq "Hello World !"
       end
 
       it "should filter with an argument" do
@@ -107,10 +97,9 @@ describe Liquid do
         ctx = Context.new
         ctx.set "var", "Hello"
         ctx.set "var2", " World !"
-        io = IO::Memory.new
-        node.render(ctx, io)
-        io.close
-        io.to_s.should eq "Hello World !"
+        v = RenderVisitor.new ctx
+        node.accept v
+        v.output.should eq "Hello World !"
       end
     end
 

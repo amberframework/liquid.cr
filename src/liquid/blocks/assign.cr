@@ -9,6 +9,8 @@ module Liquid::Block
     @varname : String
     @value : Expression
 
+    getter varname, value
+
     def initialize(str : String)
       if match = str.strip.match ASSIGN
         @varname = match["varname"]
@@ -18,8 +20,5 @@ module Liquid::Block
       end
     end
 
-    def render(data, io)
-      data.set @varname, @value.eval(data)
-    end
   end
 end

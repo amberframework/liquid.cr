@@ -16,9 +16,5 @@ module Liquid::Block
     def eval(data)
       @if_expression.eval data
     end
-
-    def render(data, io)
-      @children.each &.render(data, io)
-    end
   end
 end

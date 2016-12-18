@@ -1,4 +1,6 @@
 require "./blocks"
+require "./visitor"
+require "./render_visitor"
 
 module Liquid
   class Template
@@ -14,9 +16,9 @@ module Liquid
     end
 
     def render(data, io = IO::Memory.new)
-      @root.render(data, io)
-      io.close
-      io.to_s
+      visitor =  RenderVisitor.new data, io
+      visitor.visit @root
+      visitor.output
     end
   end
 end

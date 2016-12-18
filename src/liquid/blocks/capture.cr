@@ -4,6 +4,9 @@ require "../context"
 module Liquid::Block
   class Capture < BeginBlock
     REGEXP = /capture (?<varname>#{VAR})/
+
+    getter var_name
+
     @var_name : String
 
     def initialize(content : String)
@@ -14,11 +17,5 @@ module Liquid::Block
       end
     end
 
-    def render(data : Context, io)
-      io_memory = IO::Memory.new
-      @children.each &.render(data, io_memory)
-      io_memory.close
-      data.set @var_name, io_memory.to_s
-    end
   end
 end

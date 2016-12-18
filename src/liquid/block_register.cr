@@ -1,5 +1,4 @@
 class Liquid::BlockRegister
-
   @@inner = Hash(String, Block).new
 
   def self.register(name : String, block : Block, has_end = true)

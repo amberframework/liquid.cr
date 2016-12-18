@@ -1,9 +1,8 @@
 require "./blocks"
 
 module Liquid
-
   class Parser
-    STATEMENT  = /^\s*(?<keyword>[a-z]+).*$/
+    STATEMENT = /^\s*(?<keyword>[a-z]+).*$/
 
     getter root : Root
 
@@ -34,12 +33,12 @@ module Liquid
     # parse string
     def parse
       @i = 0
-      while @i < @str.size-1
-        if @str[@i] == '{' && @str[@i+1] == '%'
+      while @i < @str.size - 1
+        if @str[@i] == '{' && @str[@i + 1] == '%'
           @i += 2
           add_raw
           consume_statement
-        elsif @str[@i] == '{' && @str[@i+1] == '{'
+        elsif @str[@i] == '{' && @str[@i + 1] == '{'
           @i += 2
           add_raw
           consume_expression
@@ -61,8 +60,8 @@ module Liquid
     end
 
     def consume_expression
-      while @i < @str.size-1
-        if @str[@i] == '}' && @str[@i+1] == '}'
+      while @i < @str.size - 1
+        if @str[@i] == '}' && @str[@i + 1] == '}'
           @i += 1
           break
         else
@@ -77,13 +76,12 @@ module Liquid
       else
         raise "Invalid Expression at line #{@current_line}"
       end
-
     end
 
     # Consume a statement
     def consume_statement
-      while @i < @str.size-1
-        if @str[@i] == '%' && @str[@i+1] == '}'
+      while @i < @str.size - 1
+        if @str[@i] == '%' && @str[@i + 1] == '}'
           @i += 1
           break
         else
@@ -110,7 +108,6 @@ module Liquid
       end
 
       @buffer = ""
-
     end
 
     # Add current char to buffer
@@ -120,7 +117,5 @@ module Liquid
         @current_line += 1 if @str[@i] == '\n'
       end
     end
-
   end
-
 end
