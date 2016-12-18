@@ -13,6 +13,11 @@ struct Liquid::Any
     raw.each { |e| @raw.as(Array(Liquid::Type)) << e.as(Liquid::Type) }
   end
 
+  def initialize(raw : Hash)
+    @raw = Hash(String, Liquid::Type).new
+    raw.each { |k, v| @raw.as(Hash(String, Liquid::Type))[k] = v }
+  end
+
   # Assumes the underlying value is an `Array` or `Hash` and returns
   # its size.
   # Raises if the underlying value is not an `Array` or `Hash`.
