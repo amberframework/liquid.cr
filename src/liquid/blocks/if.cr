@@ -13,7 +13,7 @@ module Liquid::Block
       Else
     end
 
-    getter :elsif
+    getter :else, :elsif, :if_expression
 
     @if_expression : Expression?
     @elsif : Array(ElsIf)?
@@ -26,26 +26,6 @@ module Liquid::Block
         @if_expression = Expression.new match["expr"]
       else
         raise InvalidNode.new "Invalid if node"
-      end
-    end
-
-    def render(data, io)
-      if @if_expression.not_nil!.eval(data).as_bool?
-        @children.each &.render(data, io)
-      else
-        found = false
-        if elsifpart = @elsif
-          elsifpart.each do |alt|
-            if alt.eval(data).as_bool?
-              found = true
-              alt.render(data, io)
-              break
-            end
-          end
-        end
-        if (elsepart = @else) && !found
-          elsepart.render data, io
-        end
       end
     end
 

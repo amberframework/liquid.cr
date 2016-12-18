@@ -1,5 +1,6 @@
-module Liquid::Block
+require "../visitor"
 
+module Liquid::Block
   enum BlockType
     Inline
     Begin
@@ -15,7 +16,9 @@ module Liquid::Block
 
     abstract def initialize(content)
 
-    abstract def render(data : Context, io)
+    def accept(visitor : Visitor)
+      visitor.visit self
+    end
 
     def <<(node : Node)
       @children << node
@@ -30,15 +33,11 @@ module Liquid::Block
 
     def initialize(content)
     end
-
-    def render(data, io)
-      @children.each &.render(data, io)
-    end
   end
-
 
   abstract class InlineBlock < Node
     extend Block
+
     def self.type
       BlockType::Inline
     end
@@ -46,6 +45,7 @@ module Liquid::Block
 
   abstract class BeginBlock < Node
     extend Block
+
     def self.type
       BlockType::Begin
     end
@@ -53,6 +53,7 @@ module Liquid::Block
 
   abstract class EndBlock < Node
     extend Block
+
     def self.type
       BlockType::End
     end

@@ -32,7 +32,7 @@ module Liquid::Block
   end
 
   class Filtered < AbstractExpression
-    getter filters
+    getter filters, first
     @first : Expression
     @filters : Array(Tuple(Filters::Filter, Array(Expression)?))
 
@@ -64,18 +64,10 @@ module Liquid::Block
       end
     end
 
-    def render(data, io)
-      result : Any
-      result = @first.eval(data)
-      @filters.each do |tuple|
-        args = tuple[1].not_nil!.map &.eval(data) if tuple[1]
-        result = tuple[0].filter(result, args)
-      end
-      io << result
-    end
   end
 
   class Boolean < AbstractExpression
+    getter inner
     @inner : Bool
 
     def initialize(str)
@@ -88,10 +80,6 @@ module Liquid::Block
 
     def match(str : String) : Regex::MatchData?
       str.match /^false$|^true$/
-    end
-
-    def render(data, io)
-      @inner ? "true" : "false"
     end
   end
 
@@ -150,9 +138,5 @@ module Liquid::Block
       end
     end
 
-    def render(data, io)
-      io << eval(data) if @children.empty?
-      @children.each &.render(data, io)
-    end
   end
 end
