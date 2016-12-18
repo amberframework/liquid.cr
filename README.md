@@ -46,6 +46,9 @@ Tags can be escaped :
 ```
 will render `{% assign myvar = 15 %}`
 
+# Blocks
+Cache block ( only support caching using redis ) : https://github.com/TechMagister/liquid-cache.cr
+
 # Filters
 - [x] abs
 - [x] append
