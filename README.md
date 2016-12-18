@@ -40,6 +40,12 @@ result = tpl.render ctx
 
 ```
 
+Tags can be escaped :
+``` liquid
+\{% assign myvar = 15 %}
+```
+will render `{% assign myvar = 15 %}`
+
 # Filters
 - [x] abs
 - [x] append
