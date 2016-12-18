@@ -1,6 +1,7 @@
 require "./blocks"
 require "./visitor"
 require "./render_visitor"
+require "./codegen_visitor"
 
 module Liquid
   class Template
@@ -16,9 +17,16 @@ module Liquid
     end
 
     def render(data, io = IO::Memory.new)
-      visitor =  RenderVisitor.new data, io
+      visitor = RenderVisitor.new data, io
       visitor.visit @root
       visitor.output
+    end
+
+    def to_code(io_name : String, io : IO = IO::Memory.new)
+      visitor = CodeGenVisitor.new io, io_name
+      io << io_name << " << \"root = Root.new\"\n"
+      root.accept visitor
+      io << io_name << " << \"Template.new root\"\n"
     end
   end
 end

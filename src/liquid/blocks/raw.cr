@@ -2,7 +2,6 @@ require "./block"
 
 module Liquid::Block
   class Raw < Node
-
     getter content
 
     @content : String

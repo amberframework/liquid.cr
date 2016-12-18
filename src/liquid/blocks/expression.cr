@@ -32,11 +32,13 @@ module Liquid::Block
   end
 
   class Filtered < AbstractExpression
-    getter filters, first
+    getter filters, first, raw
+    @raw : String
     @first : Expression
     @filters : Array(Tuple(Filters::Filter, Array(Expression)?))
 
     def initialize(str)
+      @raw = str
       if match = str.match GFILTERED
         @first = Expression.new match["first"]
         @filters = Array(Tuple(Filters::Filter, Array(Expression)?)).new
@@ -63,7 +65,6 @@ module Liquid::Block
         raise InvalidExpression.new "Invalid filter use :#{str}"
       end
     end
-
   end
 
   class Boolean < AbstractExpression
@@ -84,6 +85,7 @@ module Liquid::Block
   end
 
   class Expression < AbstractExpression
+    getter var
     @var : String
 
     def initialize(var)
@@ -137,6 +139,5 @@ module Liquid::Block
         Any.new ret
       end
     end
-
   end
 end

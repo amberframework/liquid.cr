@@ -11,6 +11,9 @@ module Liquid::Block
 
     getter varname, value
 
+    def initialize(@varname, @value)
+    end
+
     def initialize(str : String)
       if match = str.strip.match ASSIGN
         @varname = match["varname"]
@@ -19,6 +22,5 @@ module Liquid::Block
         raise InvalidNode.new "Invalid assignment Node"
       end
     end
-
   end
 end
