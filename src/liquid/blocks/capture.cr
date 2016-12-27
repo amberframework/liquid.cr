@@ -1,5 +1,4 @@
 require "./block"
-require "../context"
 
 module Liquid::Block
   class Capture < BeginBlock

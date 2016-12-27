@@ -106,7 +106,7 @@ TODO:
 - [x] Improve data interface
 - [x] Add Filter support
 - [x] Add capture block
-- [ ] Add increment block
+- [x] Add increment block
 - [ ] Add decrement block
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions
