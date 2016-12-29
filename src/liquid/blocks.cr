@@ -8,6 +8,7 @@ require "./blocks/raw"
 require "./blocks/for"
 require "./blocks/capture"
 require "./blocks/increment"
+require "./blocks/decrement"
 
 include Liquid::Block
 
@@ -19,4 +20,5 @@ module Liquid
   BlockRegister.register "capture", Capture
   BlockRegister.register "assign", Assign, false
   BlockRegister.register "increment", Increment, false
+  BlockRegister.register "decrement", Decrement, false
 end

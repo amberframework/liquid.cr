@@ -13,7 +13,11 @@ module Liquid
     end
 
     def [](key)
-      get key
+      if r = get key
+        r
+      else
+        raise "Unable to find #{key} key"
+      end
     end
 
     def get(key)
