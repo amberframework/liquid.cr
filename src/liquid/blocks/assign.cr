@@ -19,6 +19,5 @@ module Liquid::Block
         raise InvalidNode.new "Invalid assignment Node"
       end
     end
-
   end
 end
