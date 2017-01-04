@@ -35,6 +35,10 @@ describe Liquid do
       end
     end
 
+    describe Increment do
+
+    end
+
     describe Assign do
       it "should assign a value" do
         expr = Assign.new "assign bool = true"

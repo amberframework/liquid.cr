@@ -10,6 +10,18 @@ describe Liquid::Parser do
     template.root.children.should eq expected
   end
 
+  it "should allow to escape statement" do
+    txt = "\\{% assign mavar = 12 %}"
+    template = Liquid::Parser.parse txt
+    template.render(Context.new).should eq txt
+  end
+
+  it "should allow to escape expressions" do
+    txt = "\\{{ assign mavar = 12 }}"
+    template = Liquid::Parser.parse txt
+    template.render(Context.new).should eq txt
+  end
+
   it "parses for loop" do
     txt = "{% for x in 0..2 %} shown 2 times {% endfor %}"
     template = Liquid::Parser.parse txt

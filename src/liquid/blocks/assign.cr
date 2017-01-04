@@ -1,5 +1,5 @@
 require "./block"
-require "./expression"
+require "../regex"
 require "../block_register"
 
 module Liquid::Block

@@ -26,11 +26,11 @@ txt = "
       Kenny looks okay --- so far
     {% endif %}
     "
-ctx = Context.new
-ctx.set "kenny.sick", false
-ctx.set "kenny.dead", true
+ctx = Liquid::Context.new
+ctx.set "kenny", { "sick" => false, "dead" => true}
 
-tpl = Template.parse txt
+tpl = Liquid::Template.parse txt  # tpl can be cached and reused
+
 result = tpl.render ctx
 
 # result = "
@@ -39,6 +39,15 @@ result = tpl.render ctx
 #    "
 
 ```
+
+Tags can be escaped :
+``` liquid
+\{% assign myvar = 15 %}
+```
+will render `{% assign myvar = 15 %}`
+
+# Blocks
+Cache block ( only support caching using redis ) : https://github.com/TechMagister/liquid-cache.cr
 
 # Filters
 - [x] abs
@@ -66,7 +75,7 @@ result = tpl.render ctx
 - [ ] prepend
 - [ ] remove
 - [ ] remove_first
-- [ ] replace
+- [x] replace
 - [ ] replace_first
 - [ ] reverse
 - [ ] round
@@ -97,7 +106,7 @@ TODO:
 - [x] Improve data interface
 - [x] Add Filter support
 - [x] Add capture block
-- [ ] Add increment block
+- [x] Add increment block
 - [ ] Add decrement block
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions

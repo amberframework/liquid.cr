@@ -17,6 +17,12 @@ describe Liquid::Filters do
     end
   end
 
+  describe Replace do
+    it "should replace" do
+      Replace.filter(Any.new("Toto"), [Any.new("o"), Any.new("a")]).should eq "Tata"
+    end
+  end
+
   describe Abs do
     it "filter var and return absolute value" do
       Abs.filter(Any.new -12).should eq 12

@@ -9,11 +9,11 @@ module Liquid
     @str : String
     @i = 0
     @current_line = 0
+    @escape = false
 
     # buffers
     @nodes = Array(Node).new
     @buffer = ""
-    @wait_buffer = ""
 
     def self.parse(str : String)
       internal = self.new str
@@ -34,17 +34,19 @@ module Liquid
     def parse
       @i = 0
       while @i < @str.size - 1
-        if @str[@i] == '{' && @str[@i + 1] == '%'
+        if @str[@i] == '{' && @str[@i + 1] == '%' && !@escape
           @i += 2
           add_raw
           consume_statement
-        elsif @str[@i] == '{' && @str[@i + 1] == '{'
+        elsif @str[@i] == '{' && @str[@i + 1] == '{' && !@escape
           @i += 2
           add_raw
           consume_expression
         else
           consume_char
         end
+        @escape = false if @escape
+        @escape = true if @str[@i] == '\\'
         @i += 1
       end
       consume_char # last char ?

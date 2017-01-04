@@ -10,7 +10,16 @@ struct Liquid::Any
 
   def initialize(raw : Array)
     @raw = Array(Liquid::Type).new
-    raw.each { |e| @raw.as(Array(Liquid::Type)) << e.as(Liquid::Type) }
+    if raw.first?.is_a? Hash
+      raw.each { |e| @raw.as(Array(Liquid::Type)) << Any.new(e).raw }
+    else
+      raw.each { |e| @raw.as(Array(Liquid::Type)) << e.as(Liquid::Type) if e.is_a? Liquid::Type }
+    end
+  end
+
+  def initialize(raw : Hash)
+    @raw = Hash(String, Liquid::Type).new
+    raw.each { |k, v| @raw.as(Hash(String, Liquid::Type))[k] = v }
   end
 
   # Assumes the underlying value is an `Array` or `Hash` and returns

@@ -8,16 +8,45 @@ module Liquid
       self[key] = val
     end
 
-    def set(key, val : Type)
+    def set(key, val : Nil | String | Float32 | Float64 | Int32 | Bool | Time)
       self[key] = Any.new val
     end
 
+    def [](key)
+      if r = get key
+        r
+      else
+        raise "Unable to find #{key} key"
+      end
+    end
+
     def get(key)
-      self[key]?
+      if simple = self.fetch(key, nil)
+        simple
+      else
+        regexp = /^(#{key}\.(\w+))/
+        hash = Hash(String, Type).new
+        self.keys.each do |k|
+          if match = k.match regexp
+            hash[match[2]] = self.get(match[1]).not_nil!.raw
+          end
+        end
+        if !hash.empty?
+          Any.new hash
+        else
+          nil
+        end
+      end
     end
 
     def set(key, val : Array)
       self[key] = Any.new val
+    end
+
+    def set(key, val : Hash)
+      val.each do |k, v|
+        self.set "#{key}.#{k}", v
+      end
     end
 
     def dup

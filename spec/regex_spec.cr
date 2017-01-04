@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-module Liquid::Nodes
+module Liquid
   describe "Match Regex" do
     it "should match vars" do
       ok = ["mavar", "ma_var", "mavar2", "m646_dfd54"]
@@ -40,5 +40,10 @@ module Liquid::Nodes
     it "should match filters with multiple arguments" do
       "filtered | filter: arg1, arg2".match(/^#{GFILTERED}$/).should_not be_nil
     end
+
+    it "should match a string" do
+      "\"content\"".match(GSTRING).should_not be_nil
+    end
+
   end
 end

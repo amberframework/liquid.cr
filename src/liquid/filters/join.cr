@@ -1,4 +1,5 @@
 require "./base"
+require "../filters"
 
 module Liquid::Filters
   # join
