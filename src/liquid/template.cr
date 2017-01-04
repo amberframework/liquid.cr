@@ -23,10 +23,20 @@ module Liquid
     end
 
     def to_code(io_name : String, io : IO = IO::Memory.new)
-      visitor = CodeGenVisitor.new io, io_name
-      io << io_name << " << \"root = Liquid::Root.new\"\n"
+      visitor = CodeGenVisitor.new io
+      io.puts "begin"
+
+      io.puts <<-EOF
+context = Liquid::Context.new
+\{% for var in @type.instance_vars %}
+    context.set \{{var.id.stringify}}, @\{{var.id}}
+\{% end %}
+EOF
+
       root.accept visitor
-      io << io_name << " << \"Liquid::Template.new root\"\n"
+
+      io.puts "#{io_name} << Liquid::Template.new(root).render context"
+      io.puts "end"
     end
   end
 end

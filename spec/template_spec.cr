@@ -116,4 +116,11 @@ describe Template do
     ctx.set "var", "Hello"
     tpl.render(ctx).should eq "Hello World"
   end
+
+  it "should render replace filter" do
+    tpl = Template.parse %({{var | replace: "a" "b"}})
+    ctx = Context{"var" => "aaa"}
+
+  end
+
 end

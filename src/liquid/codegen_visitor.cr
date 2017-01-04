@@ -1,7 +1,7 @@
 require "./visitor"
 
 module Liquid
-  class CodeGen2Visitor < Visitor
+  class CodeGenVisitor < Visitor
     @io : IO
     @stack : Array(String)
 
@@ -41,21 +41,25 @@ module Liquid
       @io << new_var << " = " << some << "\n"
     end
 
+    def escape(some : String)
+      some.gsub '"', "\\\""
+    end
+
     def visit(node : Node)
       node.children.each &.accept self
     end
 
     def visit(node : Raw)
-      to_io %(Liquid::Block::Raw.new("#{node.content}"))
+      to_io %(Liquid::Block::Raw.new("#{escape node.content}"))
     end
 
     def visit(node : Assign)
-      to_io %(Liquid::Block::Assign.new("#{node.varname}",
-                   Liquid::Block::Expression.new("#{node.value.var}")))
+      to_io %(Liquid::Block::Assign.new("#{escape node.varname}",
+                    Liquid::Block::Expression.new("#{escape node.value.var}")))
     end
 
     def visit(node : Capture)
-      def_to_io("Liquid::Block::Capture.new(\"#{node.var_name}\")")
+      def_to_io %(Liquid::Block::Capture.new("#{escape node.var_name}"))
       push
       node.children.each &.accept(self)
       pop
@@ -63,7 +67,8 @@ module Liquid
 
     def visit(node : For)
       if node.begin && node.end
-        def_to_io "Liquid::Block::For.new(\"#{node.loop_var}\", #{node.begin}, #{node.end})"
+        def_to_io %(Liquid::Block::For.new("#{node.loop_var}",
+                                          #{node.begin}, #{node.end}))
       else
         def_to_io "Liquid::Block::For.new(\"#{node.loop_var}\", \"#{node.loop_over}\")"
       end
@@ -73,12 +78,12 @@ module Liquid
     end
 
     def visit(node : Expression)
-      to_io %(Liquid::Block::Expression.new("#{node.var}"))
+      to_io %(Liquid::Block::Expression.new("#{escape node.var}"))
     end
 
     def visit(node : If)
       def_to_io %(Liquid::Block::Expression.new(
-                   "#{node.if_expression.not_nil!.var.gsub('"', "\\\"")}"))
+                   "#{escape node.if_expression.not_nil!.var}"))
       def_to_io "Liquid::Block::If.new(#{@last_var})"
       push
       node.children.each &.accept self
@@ -92,7 +97,7 @@ module Liquid
     end
 
     def visit(node : ElsIf)
-      def_to_io "Liquid::Block::ElsIf.new( Expression.new(\"#{node.if_expression.var}\"))"
+      def_to_io "Liquid::Block::ElsIf.new( Expression.new(\"#{escape node.if_expression.var}\"))"
       push
       node.children.each &.accept self
       pop
