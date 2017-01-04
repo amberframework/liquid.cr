@@ -1,9 +1,7 @@
 require "./blocks"
 
 module Liquid
-
   class RenderVisitor < Visitor
-
     @data : Context
     @io : IO
 
@@ -24,7 +22,7 @@ module Liquid
       @io.to_s
     end
 
-    def visit( node : If)
+    def visit(node : If)
       if node.if_expression.not_nil!.eval(@data).as_bool?
         node.children.each &.accept(self)
       else
@@ -44,19 +42,19 @@ module Liquid
       end
     end
 
-    def visit( node : Node)
+    def visit(node : Node)
       node.children.each &.accept(self)
     end
 
-    def visit( node : Assign)
+    def visit(node : Assign)
       @data.set node.varname, node.value.eval(@data)
     end
 
-    def visit( node : Raw)
+    def visit(node : Raw)
       @io << node.content
     end
 
-    def visit( node : Capture)
+    def visit(node : Capture)
       io = IO::Memory.new
       visitor = RenderVisitor.new @data, io
       node.children.each &.accept visitor
@@ -64,7 +62,7 @@ module Liquid
       @data.set node.var_name, io.to_s
     end
 
-    def visit( node : Increment )
+    def visit(node : Increment)
       var = @data.get node.var_name
       if var && (num = var.as_i?)
         @data.set node.var_name, num + 1
@@ -73,7 +71,7 @@ module Liquid
       end
     end
 
-    def visit( node : Expression)
+    def visit(node : Expression)
       if node.children.empty?
         @io << node.eval(@data)
       else
@@ -95,7 +93,7 @@ module Liquid
       @io << (node.inner ? "true" : "false")
     end
 
-    def visit( node : For)
+    def visit(node : For)
       data = @data.dup
       if node.begin && node.end
         render_with_range node, data
@@ -147,7 +145,5 @@ module Liquid
         raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
       end
     end
-
   end
-
 end

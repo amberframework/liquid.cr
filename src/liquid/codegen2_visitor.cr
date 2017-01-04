@@ -1,18 +1,18 @@
 require "./visitor"
 
 module Liquid
-  class CodeGenVisitor < Visitor
+  class CodeGen2Visitor < Visitor
     @io : IO
-    @io_name : String
     @stack : Array(String)
 
     @var_count : Int32
     @last_var : String
 
-    def initialize(@io : IO, @io_name : String)
+    def initialize(@io : IO)
       @stack = ["root"]
       @last_var = ""
       @var_count = 0
+      @io << "root = Liquid::Block::Root.new\n"
     end
 
     def output
@@ -34,11 +34,11 @@ module Liquid
     end
 
     def to_io(some : String)
-      @io << @io_name << " << " << '"' << @stack.last << " << " << some.gsub(/"/, "\\\"") << "\"\n"
+      @io <<  @stack.last << " << " << some << "\n"
     end
 
     def def_to_io(some : String)
-      @io << @io_name << " << " << '"' << new_var << " = " << some.gsub(/"/, "\\\"") << "\"\n"
+      @io <<  new_var << " = " << some << "\n"
     end
 
     def visit(node : Node)
@@ -46,15 +46,16 @@ module Liquid
     end
 
     def visit(node : Raw)
-      to_io("Raw.new(\"#{node.content}\")")
+      to_io %(Liquid::Block::Raw.new("#{node.content}"))
     end
 
     def visit(node : Assign)
-      to_io("Assign.new(\"#{node.varname}\", Expression.new(\"#{node.value.var}\"))")
+      to_io %(Liquid::Block::Assign.new("#{node.varname}",
+                   Liquid::Block::Expression.new("#{node.value.var}")))
     end
 
     def visit(node : Capture)
-      def_to_io("Capture.new(\"#{node.var_name}\")")
+      def_to_io("Liquid::Block::Capture.new(\"#{node.var_name}\")")
       push
       node.children.each &.accept(self)
       pop
@@ -62,9 +63,9 @@ module Liquid
 
     def visit(node : For)
       if node.begin && node.end
-        def_to_io "For.new(\"#{node.loop_var}\", #{node.begin}, #{node.end})"
+        def_to_io "Liquid::Block::For.new(\"#{node.loop_var}\", #{node.begin}, #{node.end})"
       else
-        def_to_io "For.new(\"#{node.loop_var}\", \"#{node.loop_over}\")"
+        def_to_io "Liquid::Block::For.new(\"#{node.loop_var}\", \"#{node.loop_over}\")"
       end
       push
       node.children.each &.accept(self)
@@ -72,12 +73,13 @@ module Liquid
     end
 
     def visit(node : Expression)
-      to_io "Expression.new(\"#{node.var}\")"
+      to_io %(Liquid::Block::Expression.new("#{node.var}"))
     end
 
     def visit(node : If)
-      def_to_io "Expression.new(\"#{node.if_expression.not_nil!.var}\")"
-      def_to_io "If.new(#{@last_var})"
+      def_to_io %(Liquid::Block::Expression.new(
+                   "#{node.if_expression.not_nil!.var.gsub('"', "\\\"")}"))
+      def_to_io "Liquid::Block::If.new(#{@last_var})"
       push
       node.children.each &.accept self
       if arr = node.elsif
@@ -90,14 +92,14 @@ module Liquid
     end
 
     def visit(node : ElsIf)
-      def_to_io "ElsIf.new( Expression.new(\"#{node.if_expression.var}\"))"
+      def_to_io "Liquid::Block::ElsIf.new( Expression.new(\"#{node.if_expression.var}\"))"
       push
       node.children.each &.accept self
       pop
     end
 
     def visit(node : Else)
-      def_to_io "Else.new"
+      def_to_io "Liquid::Block::Else.new"
       push
       node.children.each &.accept self
       pop

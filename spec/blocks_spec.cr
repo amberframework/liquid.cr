@@ -36,7 +36,6 @@ describe Liquid do
     end
 
     describe Increment do
-
     end
 
     describe Assign do

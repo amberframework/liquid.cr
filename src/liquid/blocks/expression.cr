@@ -4,7 +4,6 @@ require "../context"
 require "../regex"
 
 module Liquid::Block
-
   abstract class AbstractExpression < Node
   end
 
