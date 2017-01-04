@@ -118,9 +118,9 @@ describe Template do
   end
 
   it "should render replace filter" do
-    tpl = Template.parse %({{var | replace: "a" "b"}})
+    tpl = Template.parse %({{var | replace: "a", "b"}})
     ctx = Context{"var" => "aaa"}
-
+    tpl.render(ctx).should eq "bbb"
   end
 
 end
