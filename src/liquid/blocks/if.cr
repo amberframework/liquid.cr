@@ -21,6 +21,9 @@ module Liquid::Block
 
     @last = PutInto::If
 
+    def initialize(@if_expression)
+    end
+
     def initialize(content : String)
       if match = content.strip.match SIMPLE_EXP
         @if_expression = Expression.new match["expr"]

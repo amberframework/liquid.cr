@@ -11,6 +11,9 @@ module Liquid::Block
 
     getter varname, value
 
+    def initialize(@varname, @value)
+    end
+
     def initialize(str : String)
       if match = str.strip.match ASSIGN
         @varname = match["varname"]

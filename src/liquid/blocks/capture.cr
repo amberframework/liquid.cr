@@ -8,6 +8,9 @@ module Liquid::Block
 
     @var_name : String
 
+    def initialize(@var_name)
+    end
+
     def initialize(content : String)
       if match = content.strip.match REGEXP
         @var_name = match["varname"]

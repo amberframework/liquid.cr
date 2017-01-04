@@ -22,6 +22,12 @@ module Liquid::Block
     @begin : Int32?
     @end : Int32?
 
+    def initialize(@loop_var, @begin, @end)
+    end
+
+    def initialize(@loop_var, @loop_over)
+    end
+
     def initialize(content : String)
       if gmatch = content.match(GLOBAL)
         @loop_var = gmatch["var"]
