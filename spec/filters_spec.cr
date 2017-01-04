@@ -86,13 +86,15 @@ describe Liquid::Filters do
 
   describe Join do
     it "join (yes)" do
-      Join.filter(Any.new(["John", "Paul", "George", "Ringo"]), [Any.new " and "]).should eq "John and Paul and George and Ringo"
+      n = ["John", "Paul", "George", "Ringo"].to_json
+      Join.filter(JSON.parse(n), [Any.new " and "]).should eq "John and Paul and George and Ringo"
     end
   end
 
   describe Split do
     it "split a string into an array" do
-      Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "]).should eq ["John", "Paul", "George", "Ringo"]
+      Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "])
+           .should eq ["John", "Paul", "George", "Ringo"]
     end
   end
 end

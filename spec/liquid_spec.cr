@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Liquid do
   describe Context do
     it "should allow to add hash to context" do
-      hash = Liquid::Any.new Hash(String, Liquid::Type){"test" => "truc"}
+      hash = {"test" => "truc"}
       ctx = Context.new
       ctx.set "val", hash
       ctx.get("val").should eq hash
