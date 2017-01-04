@@ -1,20 +1,21 @@
 require "./context"
 
 module Liquid
-  macro embed(filename)
-    \{{run "./liquid/process", {{filename}}}}
+  macro embed(filename, io_name, *args)
+    \{{run "./liquid/process", {{filename}}, {{io_name.id.stringify}}}}
   end
 
-  module View
-    macro liquid_to_s( filename )
-      def to_s(io : IO)
-        context = Liquid::Context.new
-        \{% for var in @type.instance_vars %}
-          context.set \{{var.id.stringify}}, \{{var}}
-        \{% end %}
-        template = Liquid.embed({{filename}})
-        io << template.render context
-      end
+
+  macro file(filename, io_name = "__liquid_io__", *args)
+    def to_s({{io_name.id}})
+      Liquid.embed({{filename}}, {{io_name}}, {{*args}})
     end
   end
+
+  macro render(filename, *args)
+    String.build do |__kilt_io__|
+      Liquid.embed({{filename}}, "__kilt_io__", {{*args}})
+    end
+  end
+
 end
