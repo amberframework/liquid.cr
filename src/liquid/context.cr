@@ -1,60 +1,50 @@
 require "./any"
 
 module Liquid
-  alias Type = Nil | String | Float32 | Float64 | Int32 | Bool | Time | Array(Type) | Hash(String, Type)
+  struct Context
+    @inner = Hash(String, JSON::Any).new
 
-  class Context < Hash(String, Any)
-    def set(key, val : Any)
-      self[key] = val
-    end
-
-    def set(key, val : Nil | String | Float32 | Float64 | Int32 | Bool | Time)
-      self[key] = Any.new val
-    end
-
-    def [](key)
-      if r = get key
-        r
+    def [](key : String)
+      if !@inner[key]? && key.includes? '.'
+        splitted = key.split '.'
+        res = @inner[splitted.first]
+        splitted[1..-1].each do |k|
+          res = res[k]
+        end
+        res
       else
-        raise "Unable to find #{key} key"
+        @inner[key]
       end
     end
 
+    def []?(key : String)
+      if !@inner[key]? && key.includes? '.'
+        splitted = key.split '.'
+        res = @inner[splitted.first]?
+        splitted[1..-1].each do |k|
+          res = res[k]? if res
+        end
+        res
+      else
+        @inner[key]?
+      end
+    end
+
+    @[AlwaysInline]
+    def []=(key, value)
+      @inner[key] = Any.from_json value.to_json
+    end
+
+    # alias for []?(key)
+    @[AlwaysInline]
     def get(key)
-      if simple = self.fetch(key, nil)
-        simple
-      else
-        regexp = /^(#{key}\.(\w+))/
-        hash = Hash(String, Type).new
-        self.keys.each do |k|
-          if match = k.match regexp
-            hash[match[2]] = self.get(match[1]).not_nil!.raw
-          end
-        end
-        if !hash.empty?
-          Any.new hash
-        else
-          nil
-        end
-      end
+      self[key]?
     end
 
-    def set(key, val : Array)
-      self[key] = Any.new val
-    end
-
-    def set(key, val : Hash)
-      val.each do |k, v|
-        self.set "#{key}.#{k}", v
-      end
-    end
-
-    def dup
-      ctx = Context.new
-      each do |key, value|
-        ctx[key] = value
-      end
-      ctx
+    # alias for []=(key, val)
+    @[AlwaysInline]
+    def set(key, val)
+      self[key] = val
     end
   end
 end

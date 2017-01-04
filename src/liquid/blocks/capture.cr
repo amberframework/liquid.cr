@@ -15,6 +15,5 @@ module Liquid::Block
         raise InvalidNode.new "capture block needs an argument"
       end
     end
-
   end
 end

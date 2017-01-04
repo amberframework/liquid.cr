@@ -16,7 +16,7 @@ module Liquid
     end
 
     def render(data, io = IO::Memory.new)
-      visitor =  RenderVisitor.new data, io
+      visitor = RenderVisitor.new data, io
       visitor.visit @root
       visitor.output
     end

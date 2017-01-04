@@ -4,7 +4,6 @@ require "../context"
 require "../regex"
 
 module Liquid::Block
-
   abstract class AbstractExpression < Node
   end
 
@@ -40,7 +39,6 @@ module Liquid::Block
         raise InvalidExpression.new "Invalid filter use :#{str}"
       end
     end
-
   end
 
   class Boolean < AbstractExpression
@@ -114,6 +112,5 @@ module Liquid::Block
         Any.new ret
       end
     end
-
   end
 end

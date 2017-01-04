@@ -1,7 +1,6 @@
 require "../blocks"
 
 module Liquid::Block
-
   class Increment < Liquid::Block::InlineBlock
     REGEXP = /increment (?<varname>#{VAR})/
 
@@ -16,7 +15,5 @@ module Liquid::Block
         raise InvalidNode.new "increment block needs an argument"
       end
     end
-
   end
-
 end

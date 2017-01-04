@@ -24,8 +24,9 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (raw = data.raw) && raw.responds_to?(:split) && args && (fa = args.first?) && (arg = fa.as_s?)
-        Any.new raw.split(arg)
+      if (raw = data.raw) && raw.responds_to?(:split) &&
+         args && (fa = args.first?) && (arg = fa.as_s?)
+        JSON.parse raw.split(arg).to_json
       else
         data
       end

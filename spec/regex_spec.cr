@@ -44,6 +44,5 @@ module Liquid
     it "should match a string" do
       "\"content\"".match(GSTRING).should_not be_nil
     end
-
   end
 end
