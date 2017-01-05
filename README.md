@@ -1,6 +1,9 @@
 # liquid
+[![Build Status](https://travis-ci.org/TechMagister/liquid.cr.svg?branch=master)](https://travis-ci.org/TechMagister/liquid.cr)
 
-Kind of liquid template engine for Crystal
+Liquid template engine for Crystal.
+
+Liquid templating language : [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
 
 ## Installation
 
