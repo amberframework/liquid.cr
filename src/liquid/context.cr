@@ -1,8 +1,16 @@
+require "json"
 require "./any"
 
 module Liquid
   struct Context
-    @inner = Hash(String, JSON::Any).new
+
+    JSON.mapping(
+      inner: Hash(String, JSON::Any)
+    )
+
+    def initialize
+      @inner = Hash(String, JSON::Any).new
+    end
 
     def [](key : String)
       if !@inner[key]? && key.includes? '.'
