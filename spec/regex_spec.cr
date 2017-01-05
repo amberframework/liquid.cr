@@ -3,7 +3,7 @@ require "./spec_helper"
 module Liquid
   describe "Match Regex" do
     it "should match vars" do
-      ok = ["mavar", "ma_var", "mavar2", "m646_dfd54"]
+      ok = ["mavar", "ma_var", "mavar2", "m646_dfd54", "_tagazok"]
       err = ["2var", "Unexpected-", "not-me", "rage$"]
       ok.each &.match(/^#{VAR}$/).should_not be_nil
       err.each &.match(/^#{VAR}$/).should be_nil

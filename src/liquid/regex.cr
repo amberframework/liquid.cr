@@ -1,7 +1,7 @@
 module Liquid
   OPERATOR = /==|!=|<=|>=|<|>/
-  GVAR     = /[a-z]\w*(\.[a-z]\w*)*/
-  VAR      = /[a-z]\w*(?:\.[a-z]\w*)*/
+  GVAR     = /[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*/
+  VAR      = /[a-z_][a-z_0-9]*(?:\.[a-z_][a-z_0-9]*)*/
 
   STRING      = /"[^"]*"/
   INT         = /-?[1-9][0-9]*/
