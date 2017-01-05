@@ -80,6 +80,26 @@ module Liquid
     end
 
     def visit(node : Filtered)
+      matches = node.raw.scan GFILTER
+      if matches.first["filter"] == node.first.var ||
+         "\"#{matches.first["filter"]}\"" == node.first.var
+        matches.shift
+      end
+      matches.each do |fm|
+        if filter = Filters::FilterRegister.get fm["filter"]
+          args : Array(Expression)?
+          args = nil
+          if (margs = fm["args"]?)
+            args = Array(Expression).new
+            splitted = margs.split(',').map &.strip
+            splitted.each { |m| args << Expression.new(m) }
+          end
+          node.filters << {filter, args}
+        else
+          raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
+        end
+      end
+
       result : Any
       result = node.first.eval @data
       node.filters.each do |tuple|

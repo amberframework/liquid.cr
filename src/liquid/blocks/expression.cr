@@ -18,25 +18,6 @@ module Liquid::Block
       if match = str.match GFILTERED
         @first = Expression.new match["first"]
         @filters = Array(Tuple(Filters::Filter, Array(Expression)?)).new
-        matches = str.scan GFILTER
-        if matches.first["filter"] == match["first"] || "\"#{matches.first["filter"]}\"" == match["first"]
-          matches.shift
-        end
-
-        matches.each do |fm|
-          if filter = Filters::FilterRegister.get fm["filter"]
-            args : Array(Expression)?
-            args = nil
-            if (margs = fm["args"]?)
-              args = Array(Expression).new
-              splitted = margs.split(',').map &.strip
-              splitted.each { |m| args << Expression.new(m) }
-            end
-            @filters << {filter, args}
-          else
-            raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
-          end
-        end
       else
         raise InvalidExpression.new "Invalid filter use :#{str}"
       end
