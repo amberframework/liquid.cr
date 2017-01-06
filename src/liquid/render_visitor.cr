@@ -23,13 +23,13 @@ module Liquid
     end
 
     def visit(node : If)
-      if node.if_expression.not_nil!.eval(@data).as_bool?
+      if node.if_expression.not_nil!.eval(@data).raw
         node.children.each &.accept(self)
       else
         found = false
         if elsif_arr = node.elsif
           elsif_arr.each do |alt|
-            if alt.eval(@data).as_bool?
+            if alt.eval(@data).raw
               found = true
               alt.accept self
               break

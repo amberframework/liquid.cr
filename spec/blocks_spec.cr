@@ -3,11 +3,27 @@ require "./spec_helper"
 describe Liquid do
   describe Block do
     describe If do
+
       it "should add elsif node" do
         ifnode = If.new "if true == true"
         elsifnode = ElsIf.new "elsif true == false"
         ifnode << elsifnode
         ifnode.elsif.should_not be_nil
+      end
+
+      it "should render if true" do
+        ifnode = If.new "if var"
+        ifnode << Raw.new "ok"
+        node_output(ifnode, Context{"var" => "exists"}).should eq "ok"
+        node_output(ifnode, Context{"var" => 0}).should eq "ok"
+      end
+
+      it "should not render if false" do
+        ifnode = If.new "if var"
+        ifnode << Raw.new "ok"
+        node_output(ifnode, Context{"var" => false}).should eq ""
+        node_output(ifnode, Context.new).should eq ""
+        node_output(ifnode, Context{"var" => nil}).should eq ""
       end
     end
 
