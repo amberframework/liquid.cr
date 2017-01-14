@@ -1,5 +1,6 @@
 require "./spec_helper"
 
+include Liquid
 include Liquid::Filters
 
 describe Liquid::Filters do
@@ -14,6 +15,7 @@ describe Liquid::Filters do
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
+      FilterRegister.get("downcase").should eq Downcase
     end
   end
 
@@ -68,6 +70,12 @@ describe Liquid::Filters do
       Default.filter(Any.new(4.99), Array{Any.new 2.99}).should eq 4.99
       Default.filter(Any.new(""), Array{Any.new 2.99}).should eq 2.99
       Default.filter(Any.new(false), Array{Any.new true}).should be_true
+    end
+  end
+
+  describe Downcase do
+    it "should lowercase the string" do
+      Downcase.filter(Any.new "This_Is_MY_cusTom_slug").should eq "this_is_my_custom_slug"
     end
   end
 
