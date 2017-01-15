@@ -17,8 +17,9 @@ describe Liquid::Filters do
       FilterRegister.get("escape").should eq Escape
       FilterRegister.get("first").should eq First
       FilterRegister.get("floor").should eq Floor
-      FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
+      FilterRegister.get("last").should eq Last
+      FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("split").should eq Split
     end
   end
@@ -129,16 +130,25 @@ describe Liquid::Filters do
     end
   end
 
-  describe NewLineToBr do
-    it "should replace newline \\n by <br />" do
-      NewLineToBr.filter(Any.new "Hello\nWorld").should eq "Hello<br />World"
-    end
-  end
-
   describe Join do
     it "join (yes)" do
       n = ["John", "Paul", "George", "Ringo"].to_json
       Join.filter(JSON.parse(n), [Any.new " and "]).should eq "John and Paul and George and Ringo"
+    end
+  end
+
+  describe Last do
+    it "should return the last item in an array that isn't empty" do
+      a = ["one", "two", "three"].to_json
+      empty = [] of String
+      Last.filter(JSON.parse(a)).should eq "three"
+      Last.filter(JSON.parse(empty.to_json)).should eq empty
+    end
+  end
+
+  describe NewLineToBr do
+    it "should replace newline \\n by <br />" do
+      NewLineToBr.filter(Any.new "Hello\nWorld").should eq "Hello<br />World"
     end
   end
 
