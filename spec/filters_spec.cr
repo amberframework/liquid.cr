@@ -12,6 +12,7 @@ describe Liquid::Filters do
       FilterRegister.get("ceil").should eq Ceil
       FilterRegister.get("default").should eq Default
       FilterRegister.get("escape").should eq Escape
+      FilterRegister.get("first").should eq First
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
@@ -100,6 +101,13 @@ describe Liquid::Filters do
     it "should escape specials chars" do
       Escape.filter(Any.new "Have you read 'James & the Giant Peach'?").should eq "Have you read &#39;James &amp; the Giant Peach&#39;?"
       Escape.filter(Any.new "Tetsuro Takara").should eq "Tetsuro Takara"
+    end
+  end
+
+  describe First do
+    it "should return first result of an array" do
+      a = [false, 1, "two"].to_json
+      First.filter(JSON.parse(a)).should eq false
     end
   end
 
