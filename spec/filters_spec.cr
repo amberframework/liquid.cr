@@ -10,14 +10,15 @@ describe Liquid::Filters do
       FilterRegister.get("append").should eq Append
       FilterRegister.get("capitalize").should eq Capitalize
       FilterRegister.get("ceil").should eq Ceil
+      FilterRegister.get("compact").should eq Compact
       FilterRegister.get("default").should eq Default
+      FilterRegister.get("divided_by").should eq DividedBy
+      FilterRegister.get("downcase").should eq Downcase
       FilterRegister.get("escape").should eq Escape
       FilterRegister.get("first").should eq First
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
-      FilterRegister.get("downcase").should eq Downcase
-      FilterRegister.get("divided_by").should eq DividedBy
     end
   end
 
@@ -54,6 +55,14 @@ describe Liquid::Filters do
       Ceil.filter(Any.new 2.0).should eq 2
       Ceil.filter(Any.new 183.357).should eq 184
       Ceil.filter(Any.new "3.5").should eq 4
+    end
+  end
+
+  describe Compact do
+    it "should remove all nil values from array" do
+      a = [nil, true, "other", 1, nil, nil, nil, "wuddup!"].to_json
+      expected = [true, "other", 1, "wuddup!"]
+      Compact.filter(JSON.parse(a)).should eq expected
     end
   end
 

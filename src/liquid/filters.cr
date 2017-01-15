@@ -1,4 +1,5 @@
 require "./filters/base"
+require "./filters/compact"
 require "./filters/date"
 require "./filters/default"
 require "./filters/divided_by"
