@@ -6,7 +6,7 @@ module Liquid::Filters
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       
-      # raise error if user doesn't provide an argument to divided by
+      # raise error if user doesn't provide an argument to subtract by
       raise FilterArgumentException.new "minus filter expects one argument" unless args && args.first?
 
       # can only subtract numbers
