@@ -118,7 +118,9 @@ describe Liquid::Filters do
   describe First do
     it "should return first result of an array" do
       a = [false, 1, "two"].to_json
+      empty = [] of String
       First.filter(JSON.parse(a)).should eq false
+      First.filter(JSON.parse(empty.to_json)).should eq empty
     end
   end
 

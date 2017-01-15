@@ -5,7 +5,7 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (d = data.as_a?)
+      if (d = data.as_a?) && !d.empty?
         Any.new d.first
       else
         data
