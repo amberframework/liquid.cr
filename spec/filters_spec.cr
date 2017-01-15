@@ -19,6 +19,7 @@ describe Liquid::Filters do
       FilterRegister.get("floor").should eq Floor
       FilterRegister.get("join").should eq Join
       FilterRegister.get("last").should eq Last
+      FilterRegister.get("lstrip").should eq LStrip
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("split").should eq Split
     end
@@ -145,6 +146,12 @@ describe Liquid::Filters do
       empty = [] of String
       Last.filter(JSON.parse(a)).should eq "three"
       Last.filter(JSON.parse(empty.to_json)).should eq empty
+    end
+  end
+
+  describe LStrip do
+    it "should return string with leading whitespace stripped" do
+      LStrip.filter(Any.new "   mystring").should eq "mystring"
     end
   end
 

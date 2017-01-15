@@ -10,6 +10,7 @@ require "./filters/floor"
 require "./filters/new_line_to_br"
 require "./filters/join"
 require "./filters/last"
+require "./filters/lstrip"
 require "./filters/split"
 require "./filters/replace"
 
