@@ -21,6 +21,7 @@ describe Liquid::Filters do
       FilterRegister.get("last").should eq Last
       FilterRegister.get("lstrip").should eq LStrip
       FilterRegister.get("minus").should eq Minus
+      FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("split").should eq Split
     end
@@ -161,6 +162,15 @@ describe Liquid::Filters do
       Minus.filter(Any.new(10), Array{Any.new (2)}).should eq 8
       Minus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 8.0
       Minus.filter(Any.new("10"), Array{Any.new(2.0)}).should eq "10"
+    end
+  end
+
+  describe Modulo do
+    it "should return the modulo of two numbers" do
+      Modulo.filter(Any.new(10), Array{Any.new(3)}).should eq 1
+      Modulo.filter(Any.new(10.0), Array{Any.new(3)}).should eq 1.0
+      Modulo.filter(Any.new(10.0), Array{Any.new(3.0)}).should eq 1.0
+      Modulo.filter(Any.new(10), Array{Any.new(3.0)}).should eq 10
     end
   end
 
