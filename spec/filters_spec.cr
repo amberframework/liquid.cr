@@ -16,6 +16,7 @@ describe Liquid::Filters do
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
       FilterRegister.get("downcase").should eq Downcase
+      FilterRegister.get("divided_by").should eq DividedBy
     end
   end
 
@@ -70,6 +71,22 @@ describe Liquid::Filters do
       Default.filter(Any.new(4.99), Array{Any.new 2.99}).should eq 4.99
       Default.filter(Any.new(""), Array{Any.new 2.99}).should eq 2.99
       Default.filter(Any.new(false), Array{Any.new true}).should be_true
+    end
+  end
+
+  describe DividedBy do
+    it "should divide Number's by the appropriate value and not matching 0" do
+      DividedBy.filter(Any.new(10), Array{Any.new 4}).should eq 2
+      DividedBy.filter(Any.new(10), Array{Any.new 4.0}).should eq 2.5
+      DividedBy.filter(Any.new(10.0), Array{Any.new 4}).should eq 2.5
+      DividedBy.filter(Any.new(10.0), Array{Any.new 4.0}).should eq 2.5
+    end
+
+    it "should raise error if missing arguments or passing zero" do
+      expect_raises(FilterArgumentException) do
+        DividedBy.filter(Any.new(10))
+        DividedBy.filter(Any.new(10), Array{Any.new 0})
+      end
     end
   end
 
