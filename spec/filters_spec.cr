@@ -20,6 +20,7 @@ describe Liquid::Filters do
       FilterRegister.get("join").should eq Join
       FilterRegister.get("last").should eq Last
       FilterRegister.get("lstrip").should eq LStrip
+      FilterRegister.get("minus").should eq Minus
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("split").should eq Split
     end
@@ -152,6 +153,14 @@ describe Liquid::Filters do
   describe LStrip do
     it "should return string with leading whitespace stripped" do
       LStrip.filter(Any.new "   mystring").should eq "mystring"
+    end
+  end
+
+  describe Minus do
+    it "should should subtract numbers" do
+      Minus.filter(Any.new(10), Array{Any.new (2)}).should eq 8
+      Minus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 8.0
+      Minus.filter(Any.new("10"), Array{Any.new(2.0)}).should eq "10"
     end
   end
 
