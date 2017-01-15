@@ -16,6 +16,7 @@ describe Liquid::Filters do
       FilterRegister.get("downcase").should eq Downcase
       FilterRegister.get("escape").should eq Escape
       FilterRegister.get("first").should eq First
+      FilterRegister.get("floor").should eq Floor
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("join").should eq Join
       FilterRegister.get("split").should eq Split
@@ -117,6 +118,14 @@ describe Liquid::Filters do
     it "should return first result of an array" do
       a = [false, 1, "two"].to_json
       First.filter(JSON.parse(a)).should eq false
+    end
+  end
+
+  describe Floor do
+    it "should floor float data" do
+      Floor.filter(Any.new "242.34").should eq 242.0
+      Floor.filter(Any.new 242.47).should eq 242.0
+      Floor.filter(Any.new 242).should eq 242
     end
   end
 
