@@ -21,6 +21,7 @@ describe Liquid::Filters do
       FilterRegister.get("join").should eq Join
       FilterRegister.get("last").should eq Last
       FilterRegister.get("lstrip").should eq LStrip
+      FilterRegister.get("map").should eq Map
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
@@ -168,6 +169,16 @@ describe Liquid::Filters do
   describe LStrip do
     it "should return string with leading whitespace stripped" do
       LStrip.filter(Any.new "   mystring").should eq "mystring"
+    end
+  end
+
+  describe Map do
+    it "should return the property of the array of hashes & hash values" do
+      d1 = JSON.parse({"category" => "yoo"}.to_json)
+      d2 = JSON.parse([{"category" => "yoo"}, {"category" => "another"}].to_json)
+      Map.filter(d1, [Any.new "category"]).should eq "yoo"
+      Map.filter(d2, [Any.new "category"]).should eq ["yoo", "another"]
+      Map.filter(d2, [Any.new "test"]).should eq [{"category" => "yoo"}, {"category" => "another"}]
     end
   end
 

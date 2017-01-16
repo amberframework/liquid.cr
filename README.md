@@ -69,7 +69,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] join
 - [x] last
 - [x] lstrip
-- [ ] map
+- [x] map
 - [x] minus
 - [x] modulo
 - [x] newline_to_br
