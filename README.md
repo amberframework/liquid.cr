@@ -57,23 +57,22 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] append
 - [x] capitalize
 - [x] ceil
+- [x] compact
 - [x] date
 - [x] default
+- [x] divided_by
+- [x] downcase
 - [x] escape
-- [x] newline_to_br
-- [x] split
-- [ ] compact
-- [ ] divided_by
-- [ ] downcase
 - [ ] escape_once
-- [ ] first
-- [ ] floor
-- [ ] join
-- [ ] last
-- [ ] lstrip
+- [x] first
+- [x] floor
+- [x] join
+- [x] last
+- [x] lstrip
 - [ ] map
-- [ ] minus
-- [ ] modulo
+- [x] minus
+- [x] modulo
+- [x] newline_to_br
 - [ ] plus
 - [ ] prepend
 - [ ] remove
@@ -87,6 +86,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [ ] slice
 - [ ] sort
 - [ ] sort_natural
+- [x] split
 - [ ] strip
 - [ ] strip_html
 - [ ] strip_newlines
