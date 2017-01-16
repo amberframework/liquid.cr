@@ -15,6 +15,7 @@ describe Liquid::Filters do
       FilterRegister.get("divided_by").should eq DividedBy
       FilterRegister.get("downcase").should eq Downcase
       FilterRegister.get("escape").should eq Escape
+      FilterRegister.get("escape_once").should eq EscapeOnce
       FilterRegister.get("first").should eq First
       FilterRegister.get("floor").should eq Floor
       FilterRegister.get("join").should eq Join
@@ -120,6 +121,14 @@ describe Liquid::Filters do
     it "should escape specials chars" do
       Escape.filter(Any.new "Have you read 'James & the Giant Peach'?").should eq "Have you read &#39;James &amp; the Giant Peach&#39;?"
       Escape.filter(Any.new "Tetsuro Takara").should eq "Tetsuro Takara"
+    end
+  end
+
+  describe EscapeOnce do
+    it "should escape specials chars" do
+      EscapeOnce.filter(Any.new "Me, myself & I").should eq "Me, myself &amp; I"
+      EscapeOnce.filter(Any.new "Me, myself &amp; I &#33; &#33;").should eq "Me, myself &amp; I &#33; &#33;"
+      EscapeOnce.filter(Any.new "Me, myself && &amp; I &#33; &#33;").should eq "Me, myself &amp;&amp; &amp; I &#33; &#33;"
     end
   end
 

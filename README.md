@@ -63,7 +63,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] divided_by
 - [x] downcase
 - [x] escape
-- [ ] escape_once
+- [x] escape_once
 - [x] first
 - [x] floor
 - [x] join
