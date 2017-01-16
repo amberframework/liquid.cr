@@ -23,6 +23,7 @@ require "./filters/replace"
 require "./filters/replace_first"
 require "./filters/reverse"
 require "./filters/round"
+require "./filters/rstrip"
 require "./filters/size"
 require "./filters/split"
 

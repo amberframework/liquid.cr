@@ -32,6 +32,7 @@ describe Liquid::Filters do
       FilterRegister.get("replace_first").should eq ReplaceFirst
       FilterRegister.get("reverse").should eq Reverse
       FilterRegister.get("round").should eq Round
+      FilterRegister.get("rstrip").should eq RStrip
       FilterRegister.get("size").should eq Size
       FilterRegister.get("split").should eq Split
     end
@@ -261,6 +262,12 @@ describe Liquid::Filters do
       Round.filter(Any.new 1.5242).should eq 2.0
       Round.filter(Any.new(1.5242), [Any.new(2)]).should eq 1.52
       Round.filter(Any.new("1.5242"), [Any.new(2)]).should eq "1.5242"
+    end
+  end
+
+  describe RStrip do
+    it "should return string with following whitespace stripped" do
+      RStrip.filter(Any.new "   mystring     ").should eq "   mystring"
     end
   end
 

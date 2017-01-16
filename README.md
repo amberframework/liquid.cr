@@ -81,7 +81,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] replace_first
 - [x] reverse
 - [x] round
-- [ ] rstrip
+- [x] rstrip
 - [x] size
 - [ ] slice
 - [ ] sort
