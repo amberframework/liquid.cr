@@ -1,5 +1,4 @@
 require "html"
-
 require "./base"
 
 module Liquid::Filters
