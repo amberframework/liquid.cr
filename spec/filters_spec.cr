@@ -34,6 +34,7 @@ describe Liquid::Filters do
       FilterRegister.get("round").should eq Round
       FilterRegister.get("rstrip").should eq RStrip
       FilterRegister.get("size").should eq Size
+      FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
     end
   end
@@ -280,6 +281,15 @@ describe Liquid::Filters do
       Size.filter(Any.new("example")).should eq 7
       Size.filter(JSON.parse(arr.to_json)).should eq 4
       Size.filter(JSON.parse(hash.to_json)).should eq 2
+    end
+  end
+
+  describe StrSlice do
+    it "should return substring of the current string value" do
+      StrSlice.filter(Any.new("valuable"), [Any.new(4)]).should eq "able"
+      StrSlice.filter(Any.new("valuable"), [Any.new(10)]).should eq "valuable"
+      StrSlice.filter(Any.new("valuable"), [Any.new(2), Any.new(4)]).should eq "lua"
+      StrSlice.filter(Any.new("valuable"), [Any.new(2), Any.new("test")]).should eq "luable"
     end
   end
 
