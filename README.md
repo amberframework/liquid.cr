@@ -69,7 +69,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] join
 - [x] last
 - [x] lstrip
-- [ ] map
+- [x] map
 - [x] minus
 - [x] modulo
 - [x] newline_to_br
@@ -79,11 +79,11 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] remove_first
 - [x] replace
 - [x] replace_first
-- [ ] reverse
-- [ ] round
-- [ ] rstrip
-- [ ] size
-- [ ] slice
+- [x] reverse
+- [x] round
+- [x] rstrip
+- [x] size
+- [x] slice
 - [ ] sort
 - [ ] sort_natural
 - [x] split

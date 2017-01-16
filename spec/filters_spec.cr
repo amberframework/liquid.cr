@@ -21,6 +21,7 @@ describe Liquid::Filters do
       FilterRegister.get("join").should eq Join
       FilterRegister.get("last").should eq Last
       FilterRegister.get("lstrip").should eq LStrip
+      FilterRegister.get("map").should eq Map
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
@@ -29,6 +30,11 @@ describe Liquid::Filters do
       FilterRegister.get("remove_first").should eq RemoveFirst
       FilterRegister.get("replace").should eq Replace
       FilterRegister.get("replace_first").should eq ReplaceFirst
+      FilterRegister.get("reverse").should eq Reverse
+      FilterRegister.get("round").should eq Round
+      FilterRegister.get("rstrip").should eq RStrip
+      FilterRegister.get("size").should eq Size
+      FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
     end
   end
@@ -171,6 +177,16 @@ describe Liquid::Filters do
     end
   end
 
+  describe Map do
+    it "should return the property of the array of hashes & hash values" do
+      d1 = JSON.parse({"category" => "yoo"}.to_json)
+      d2 = JSON.parse([{"category" => "yoo"}, {"category" => "another"}].to_json)
+      Map.filter(d1, [Any.new "category"]).should eq "yoo"
+      Map.filter(d2, [Any.new "category"]).should eq ["yoo", "another"]
+      Map.filter(d2, [Any.new "test"]).should eq [{"category" => "yoo"}, {"category" => "another"}]
+    end
+  end
+
   describe Minus do
     it "should should subtract numbers" do
       Minus.filter(Any.new(10), Array{Any.new (2)}).should eq 8
@@ -232,6 +248,48 @@ describe Liquid::Filters do
   describe ReplaceFirst do
     it "should replace the first occurence from the current string" do
       ReplaceFirst.filter(Any.new("Take my protein pills and put my helmet on"), [Any.new("my"), Any.new("your")]).should eq "Take your protein pills and put my helmet on"
+    end
+  end
+  
+  describe Reverse do
+    it "should reverse an array" do
+      d = [1, 2, 3].to_json
+      Reverse.filter(JSON.parse(d)).should eq [3, 2, 1]
+    end
+  end
+
+  describe Round do
+    it "should round to the nearest precision in decimal digits" do
+      Round.filter(Any.new 1.5242).should eq 2.0
+      Round.filter(Any.new(1.5242), [Any.new(2)]).should eq 1.52
+      Round.filter(Any.new("1.5242"), [Any.new(2)]).should eq "1.5242"
+    end
+  end
+
+  describe RStrip do
+    it "should return string with following whitespace stripped" do
+      RStrip.filter(Any.new "   mystring     ").should eq "   mystring"
+    end
+  end
+
+  describe Size do
+    it "returns the size of a string, array or hash or return 0" do
+      arr = [1, 2, 3, "4"]
+      hash = {"example" => "hash", :blah => "wut"}
+
+      Size.filter(Any.new(10)).should eq 0
+      Size.filter(Any.new("example")).should eq 7
+      Size.filter(JSON.parse(arr.to_json)).should eq 4
+      Size.filter(JSON.parse(hash.to_json)).should eq 2
+    end
+  end
+
+  describe StrSlice do
+    it "should return substring of the current string value" do
+      StrSlice.filter(Any.new("valuable"), [Any.new(4)]).should eq "able"
+      StrSlice.filter(Any.new("valuable"), [Any.new(10)]).should eq "valuable"
+      StrSlice.filter(Any.new("valuable"), [Any.new(2), Any.new(4)]).should eq "lua"
+      StrSlice.filter(Any.new("valuable"), [Any.new(2), Any.new("test")]).should eq "luable"
     end
   end
 
