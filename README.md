@@ -73,7 +73,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] minus
 - [x] modulo
 - [x] newline_to_br
-- [ ] plus
+- [x] plus
 - [ ] prepend
 - [ ] remove
 - [ ] remove_first

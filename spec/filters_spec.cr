@@ -23,6 +23,7 @@ describe Liquid::Filters do
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
+      FilterRegister.get("plus").should eq Plus
       FilterRegister.get("split").should eq Split
     end
   end
@@ -177,6 +178,17 @@ describe Liquid::Filters do
   describe NewLineToBr do
     it "should replace newline \\n by <br />" do
       NewLineToBr.filter(Any.new "Hello\nWorld").should eq "Hello<br />World"
+    end
+  end
+
+  describe Plus do
+    it "should should add numbers" do
+      Plus.filter(Any.new(10), Array{Any.new (2)}).should eq 12
+      Plus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 12.0
+      Plus.filter(Any.new(10.0), Array{Any.new(2)}).should eq 12.0
+      Plus.filter(Any.new(10.0), Array{Any.new(2.0)}).should eq 12.0
+      Plus.filter(Any.new(10), Array{Any.new(4.30)}).should eq 14.3
+      Plus.filter(Any.new("10"), Array{Any.new(2.0)}).should eq "10"
     end
   end
 
