@@ -32,6 +32,7 @@ describe Liquid::Filters do
       FilterRegister.get("replace_first").should eq ReplaceFirst
       FilterRegister.get("reverse").should eq Reverse
       FilterRegister.get("round").should eq Round
+      FilterRegister.get("size").should eq Size
       FilterRegister.get("split").should eq Split
     end
   end
@@ -260,6 +261,18 @@ describe Liquid::Filters do
       Round.filter(Any.new 1.5242).should eq 2.0
       Round.filter(Any.new(1.5242), [Any.new(2)]).should eq 1.52
       Round.filter(Any.new("1.5242"), [Any.new(2)]).should eq "1.5242"
+    end
+  end
+
+  describe Size do
+    it "returns the size of a string, array or hash or return 0" do
+      arr = [1, 2, 3, "4"]
+      hash = {"example" => "hash", :blah => "wut"}
+
+      Size.filter(Any.new(10)).should eq 0
+      Size.filter(Any.new("example")).should eq 7
+      Size.filter(JSON.parse(arr.to_json)).should eq 4
+      Size.filter(JSON.parse(hash.to_json)).should eq 2
     end
   end
 
