@@ -31,6 +31,7 @@ describe Liquid::Filters do
       FilterRegister.get("replace").should eq Replace
       FilterRegister.get("replace_first").should eq ReplaceFirst
       FilterRegister.get("reverse").should eq Reverse
+      FilterRegister.get("round").should eq Round
       FilterRegister.get("split").should eq Split
     end
   end
@@ -251,6 +252,14 @@ describe Liquid::Filters do
     it "should reverse an array" do
       d = [1, 2, 3].to_json
       Reverse.filter(JSON.parse(d)).should eq [3, 2, 1]
+    end
+  end
+
+  describe Round do
+    it "should round to the nearest precision in decimal digits" do
+      Round.filter(Any.new 1.5242).should eq 2.0
+      Round.filter(Any.new(1.5242), [Any.new(2)]).should eq 1.52
+      Round.filter(Any.new("1.5242"), [Any.new(2)]).should eq "1.5242"
     end
   end
 
