@@ -192,6 +192,12 @@ describe Liquid::Filters do
     end
   end
 
+  describe Prepend do
+    it "should prepend a string at the beginning of another" do
+      Prepend.filter(Any.new("/index.html"), [Any.new "www.example.com"]).should eq "www.example.com/index.html"
+    end
+  end
+
   describe Split do
     it "split a string into an array" do
       Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "])

@@ -14,6 +14,7 @@ require "./filters/minus"
 require "./filters/modulo"
 require "./filters/new_line_to_br"
 require "./filters/plus"
+require "./filters/prepend"
 require "./filters/split"
 require "./filters/replace"
 
