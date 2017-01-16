@@ -78,7 +78,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] remove
 - [x] remove_first
 - [x] replace
-- [ ] replace_first
+- [x] replace_first
 - [ ] reverse
 - [ ] round
 - [ ] rstrip

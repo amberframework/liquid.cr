@@ -26,6 +26,7 @@ describe Liquid::Filters do
       FilterRegister.get("plus").should eq Plus
       FilterRegister.get("remove").should eq Remove
       FilterRegister.get("remove_first").should eq RemoveFirst
+      FilterRegister.get("replace_first").should eq ReplaceFirst
       FilterRegister.get("split").should eq Split
     end
   end
@@ -209,6 +210,12 @@ describe Liquid::Filters do
   describe RemoveFirst do
     it "should remove the first occurence from the current string" do
       RemoveFirst.filter(Any.new("I strained to see the train through the rain"), [Any.new "rain"]).should eq "I sted to see the train through the rain"
+    end
+  end
+
+  describe ReplaceFirst do
+    it "should replace the first occurence from the current string" do
+      ReplaceFirst.filter(Any.new("Take my protein pills and put my helmet on"), [Any.new("my"), Any.new("your")]).should eq "Take your protein pills and put my helmet on"
     end
   end
 
