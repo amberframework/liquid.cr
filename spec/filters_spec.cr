@@ -15,6 +15,7 @@ describe Liquid::Filters do
       FilterRegister.get("divided_by").should eq DividedBy
       FilterRegister.get("downcase").should eq Downcase
       FilterRegister.get("escape").should eq Escape
+      FilterRegister.get("escape_once").should eq EscapeOnce
       FilterRegister.get("first").should eq First
       FilterRegister.get("floor").should eq Floor
       FilterRegister.get("join").should eq Join
@@ -23,6 +24,11 @@ describe Liquid::Filters do
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
+      FilterRegister.get("plus").should eq Plus
+      FilterRegister.get("remove").should eq Remove
+      FilterRegister.get("remove_first").should eq RemoveFirst
+      FilterRegister.get("replace").should eq Replace
+      FilterRegister.get("replace_first").should eq ReplaceFirst
       FilterRegister.get("split").should eq Split
     end
   end
@@ -118,6 +124,14 @@ describe Liquid::Filters do
     end
   end
 
+  describe EscapeOnce do
+    it "should escape specials chars" do
+      EscapeOnce.filter(Any.new "Me, myself & I").should eq "Me, myself &amp; I"
+      EscapeOnce.filter(Any.new "Me, myself &amp; I &#33; &#33;").should eq "Me, myself &amp; I &#33; &#33;"
+      EscapeOnce.filter(Any.new "Me, myself && &amp; I &#33; &#33;").should eq "Me, myself &amp;&amp; &amp; I &#33; &#33;"
+    end
+  end
+
   describe First do
     it "should return first result of an array" do
       a = [false, 1, "two"].to_json
@@ -177,6 +191,47 @@ describe Liquid::Filters do
   describe NewLineToBr do
     it "should replace newline \\n by <br />" do
       NewLineToBr.filter(Any.new "Hello\nWorld").should eq "Hello<br />World"
+    end
+  end
+
+  describe Plus do
+    it "should should add numbers" do
+      Plus.filter(Any.new(10), Array{Any.new (2)}).should eq 12
+      Plus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 12.0
+      Plus.filter(Any.new(10.0), Array{Any.new(2)}).should eq 12.0
+      Plus.filter(Any.new(10.0), Array{Any.new(2.0)}).should eq 12.0
+      Plus.filter(Any.new(10), Array{Any.new(4.30)}).should eq 14.3
+      Plus.filter(Any.new("10"), Array{Any.new(2.0)}).should eq "10"
+    end
+  end
+
+  describe Prepend do
+    it "should prepend a string at the beginning of another" do
+      Prepend.filter(Any.new("/index.html"), [Any.new "www.example.com"]).should eq "www.example.com/index.html"
+    end
+  end
+
+  describe Remove do
+    it "should remove every occurence from the current string" do
+      Remove.filter(Any.new("I strained to see the train through the rain"), [Any.new "rain"]).should eq "I sted to see the t through the "
+    end
+  end
+
+  describe RemoveFirst do
+    it "should remove the first occurence from the current string" do
+      RemoveFirst.filter(Any.new("I strained to see the train through the rain"), [Any.new "rain"]).should eq "I sted to see the train through the rain"
+    end
+  end
+
+  describe Replace do
+    it "should replace all occurences from the current string" do
+      Replace.filter(Any.new("Take my protein pills and put my helmet on"), [Any.new("my"), Any.new("your")]).should eq "Take your protein pills and put your helmet on"
+    end
+  end
+
+  describe ReplaceFirst do
+    it "should replace the first occurence from the current string" do
+      ReplaceFirst.filter(Any.new("Take my protein pills and put my helmet on"), [Any.new("my"), Any.new("your")]).should eq "Take your protein pills and put my helmet on"
     end
   end
 
