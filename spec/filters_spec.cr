@@ -30,6 +30,7 @@ describe Liquid::Filters do
       FilterRegister.get("remove_first").should eq RemoveFirst
       FilterRegister.get("replace").should eq Replace
       FilterRegister.get("replace_first").should eq ReplaceFirst
+      FilterRegister.get("reverse").should eq Reverse
       FilterRegister.get("split").should eq Split
     end
   end
@@ -243,6 +244,13 @@ describe Liquid::Filters do
   describe ReplaceFirst do
     it "should replace the first occurence from the current string" do
       ReplaceFirst.filter(Any.new("Take my protein pills and put my helmet on"), [Any.new("my"), Any.new("your")]).should eq "Take your protein pills and put my helmet on"
+    end
+  end
+  
+  describe Reverse do
+    it "should reverse an array" do
+      d = [1, 2, 3].to_json
+      Reverse.filter(JSON.parse(d)).should eq [3, 2, 1]
     end
   end
 
