@@ -15,8 +15,10 @@ require "./filters/modulo"
 require "./filters/new_line_to_br"
 require "./filters/plus"
 require "./filters/prepend"
-require "./filters/split"
+require "./filters/remove"
+require "./filters/remove_first"
 require "./filters/replace"
+require "./filters/split"
 
 require "./context"
 

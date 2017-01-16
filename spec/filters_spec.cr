@@ -24,6 +24,8 @@ describe Liquid::Filters do
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("plus").should eq Plus
+      FilterRegister.get("remove").should eq Remove
+      FilterRegister.get("remove_first").should eq RemoveFirst
       FilterRegister.get("split").should eq Split
     end
   end
@@ -195,6 +197,18 @@ describe Liquid::Filters do
   describe Prepend do
     it "should prepend a string at the beginning of another" do
       Prepend.filter(Any.new("/index.html"), [Any.new "www.example.com"]).should eq "www.example.com/index.html"
+    end
+  end
+
+  describe Remove do
+    it "should remove every occurence from the current string" do
+      Remove.filter(Any.new("I strained to see the train through the rain"), [Any.new "rain"]).should eq "I sted to see the t through the "
+    end
+  end
+
+  describe RemoveFirst do
+    it "should remove the first occurence from the current string" do
+      RemoveFirst.filter(Any.new("I strained to see the train through the rain"), [Any.new "rain"]).should eq "I sted to see the train through the rain"
     end
   end
 
