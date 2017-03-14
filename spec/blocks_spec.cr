@@ -54,6 +54,19 @@ describe Liquid do
     describe Increment do
     end
 
+    describe Include do
+      it "should include a page" do
+        filename = "spec/data/include.html"
+        expr = Include.new "include    \"#{filename}\""
+        expr2 = Include.new "include \"#{filename}\""
+        expr3 = Include.new "include \"#{filename}\"     "
+
+        expr.template_name.should eq filename
+        expr2.template_name.should eq filename
+        expr3.template_name.should eq filename
+      end
+    end
+
     describe Assign do
       it "should assign a value" do
         expr = Assign.new "assign bool = true"

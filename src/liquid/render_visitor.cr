@@ -124,6 +124,12 @@ module Liquid
       end
     end
 
+    def visit(node : Include)
+      template_content = File.read node.template_name
+      template = Template.parse(template_content)
+      @io << template.render(@data)
+    end
+
     private def render_with_range(node : For, data : Context)
       i = 0
       visitor = RenderVisitor.new data, @io

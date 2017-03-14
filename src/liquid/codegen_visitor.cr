@@ -58,6 +58,10 @@ module Liquid
                     Liquid::Block::Expression.new("#{escape node.value.var}")))
     end
 
+    def visit(node : Include)
+      to_io %(Liquid::Block::Include.new("#{escape node.template_name}"))
+    end
+
     def visit(node : Capture)
       def_to_io %(Liquid::Block::Capture.new("#{escape node.var_name}"))
       push
