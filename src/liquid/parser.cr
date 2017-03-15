@@ -21,6 +21,15 @@ module Liquid
       Template.new internal.root
     end
 
+    def self.parse(file : File)
+      str = file.gets_to_end
+      path = File.dirname(file.path)
+
+      internal = self.new str
+      internal.parse
+      Template.new internal.root, path
+    end
+
     def initialize(@str)
       @root = Root.new
       @nodes << @root

@@ -6,7 +6,7 @@ module Liquid
   STRING      = /"[^"]*"/
   INT         = /-?[1-9][0-9]*/
   FLOAT       = /#{INT}\.[0-9]+/
-  TYPE        = /(?:#{STRING})|(?:#{INT})|(?:#{FLOAT})/
+  TYPE        = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})/
   TYPE_OR_VAR = /(?:#{TYPE})|(?:#{VAR})/
   CMP         = /(?:#{TYPE_OR_VAR}) ?(?:#{OPERATOR}) ?(?:#{TYPE_OR_VAR})/
   GCMP        = /(?<left>#{TYPE_OR_VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{TYPE_OR_VAR})/

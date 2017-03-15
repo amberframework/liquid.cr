@@ -4,6 +4,7 @@ module Liquid
   class RenderVisitor < Visitor
     @data : Context
     @io : IO
+    @template_path : String?
 
     def initialize
       @data = Context.new
@@ -15,6 +16,9 @@ module Liquid
     end
 
     def initialize(@data : Context, @io : IO)
+    end
+
+    def initialize(@data : Context, @io : IO, @template_path : String?)
     end
 
     def output
@@ -122,6 +126,24 @@ module Liquid
       else
         raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
       end
+    end
+
+    def visit(node : Include)
+      filename = if @template_path != nil
+          File.join(@template_path.not_nil!, node.template_name)
+        else
+          node.template_name
+        end
+
+      if node.template_vars != nil
+        node.template_vars.each do |key, value|
+          @data.set key, value.eval(@data)
+        end
+      end
+
+      template_content = File.read filename
+      template = Template.parse template_content
+      @io << template.render(@data)
     end
 
     private def render_with_range(node : For, data : Context)

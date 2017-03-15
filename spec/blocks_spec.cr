@@ -54,6 +54,58 @@ describe Liquid do
     describe Increment do
     end
 
+    describe Include do
+      it "should include a page" do
+        filename = "spec/data/include.html"
+        expr = Include.new "include    \"#{filename}\""
+        expr2 = Include.new "include \"#{filename}\""
+        expr3 = Include.new "include \"#{filename}\"     "
+
+        expr.template_name.should eq filename
+        expr2.template_name.should eq filename
+        expr3.template_name.should eq filename
+      end
+
+      it "should include a page with variable" do
+        template_name = "spec/data/color"
+        filename = "#{template_name}.liquid"
+        varname = File.basename(template_name)
+        varvalue = "red"
+
+        expr = Include.new "include \"#{template_name}\" with \"#{varvalue}\""
+        ctx = Context.new
+
+        expr.accept RenderVisitor.new ctx
+        expr.template_name.should eq filename
+        ctx.get(varname).should eq varvalue
+      end
+
+      it "should include a page with multi variables" do
+        ctx = Context.new
+        template_name = "spec/data/color.liquid"
+        template_vars = {
+          "string" => "\"green\"",
+          "integer" => 20,
+          "float" => 3.0,
+          "bool" => true,
+        }
+
+        parse_text = "include \"#{template_name}\""
+        template_vars.each do |k, v|
+          parse_text += ", #{k}: #{v}"
+        end
+
+        expr = Include.new parse_text
+        expr.accept RenderVisitor.new ctx
+
+        expr.template_name.should eq template_name
+        ctx.get("string").should eq "green"
+        ctx.get("integer").should eq 20
+        ctx.get("float").should eq 3.0
+        ctx.get("bool").should be_true
+      end
+    end
+
     describe Assign do
       it "should assign a value" do
         expr = Assign.new "assign bool = true"
