@@ -134,6 +134,7 @@ module Liquid
         else
           node.template_name
         end
+      filename += ".liquid" if File.extname(filename).empty?
 
       template_content = File.read filename
       template = Template.parse template_content
