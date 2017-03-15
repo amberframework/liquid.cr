@@ -134,7 +134,12 @@ module Liquid
         else
           node.template_name
         end
-      filename += ".liquid" if File.extname(filename).empty?
+
+      if node.template_vars != nil
+        node.template_vars.each do |key, value|
+          @data.set key, value.eval(@data)
+        end
+      end
 
       template_content = File.read filename
       template = Template.parse template_content
