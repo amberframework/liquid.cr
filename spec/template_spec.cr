@@ -5,7 +5,20 @@ include Liquid
 describe Template do
   it "should render raw text" do
     tpl = Parser.parse("raw text")
+    template_path = __DIR__
+    tpl.template_path = template_path
+
     tpl.render(Context.new).should eq "raw text"
+    tpl.template_path.should eq template_path
+  end
+
+  it "should render from file" do
+    filename = "spec/data/include.html"
+    file_path = File.dirname(filename)
+
+    tpl = Parser.parse(File.open(filename))
+    tpl.render(Context.new).should eq File.read(filename)
+    tpl.template_path.should eq file_path
   end
 
   it "should render for loop with range" do

@@ -6,18 +6,27 @@ require "./codegen_visitor"
 module Liquid
   class Template
     getter root
+    property template_path
 
     @root : Block::Root
+    @template_path : String?
 
     def self.parse(str : String) : Template
       Parser.parse(str)
     end
 
+    def self.parse(file : File) : Template
+      Parser.parse(file)
+    end
+
     def initialize(@root : Block::Root)
     end
 
+    def initialize(@root : Block::Root, @template_path : String)
+    end
+
     def render(data, io = IO::Memory.new)
-      visitor = RenderVisitor.new data, io
+      visitor = RenderVisitor.new data, io, @template_path
       visitor.visit @root
       visitor.output
     end

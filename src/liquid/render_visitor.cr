@@ -4,6 +4,7 @@ module Liquid
   class RenderVisitor < Visitor
     @data : Context
     @io : IO
+    @template_path : String?
 
     def initialize
       @data = Context.new
@@ -15,6 +16,9 @@ module Liquid
     end
 
     def initialize(@data : Context, @io : IO)
+    end
+
+    def initialize(@data : Context, @io : IO, @template_path : String?)
     end
 
     def output
@@ -125,8 +129,14 @@ module Liquid
     end
 
     def visit(node : Include)
-      template_content = File.read node.template_name
-      template = Template.parse(template_content)
+      filename = if @template_path != nil
+          File.join(@template_path.not_nil!, node.template_name)
+        else
+          node.template_name
+        end
+
+      template_content = File.read filename
+      template = Template.parse template_content
       @io << template.render(@data)
     end
 
