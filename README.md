@@ -130,3 +130,4 @@ TODO:
 ## Contributors
 
 - [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer
+- [docelic](https://github.com/docelic) Davor Ocelic
