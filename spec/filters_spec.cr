@@ -36,6 +36,7 @@ describe Liquid::Filters do
       FilterRegister.get("size").should eq Size
       FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
+      FilterRegister.get("strip").should eq Strip
     end
   end
 
@@ -297,6 +298,14 @@ describe Liquid::Filters do
     it "split a string into an array" do
       Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "])
            .should eq ["John", "Paul", "George", "Ringo"]
+    end
+  end
+
+  describe Strip do
+    it "should remove whitespace from around string" do
+      Strip.filter(Any.new "          So much room for activities!          ").should eq "So much room for activities!"
+      Strip.filter(Any.new " ab c  ").should eq "ab c"
+      Strip.filter(Any.new " \tab c  \n \t").should eq "ab c"
     end
   end
 end
