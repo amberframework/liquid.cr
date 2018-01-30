@@ -108,6 +108,15 @@ describe Template do
     ctx.get("mavar").should eq 2
   end
 
+  it "should handle decrement block" do
+    tpl = Template.parse "{% decrement mavar %}"
+    ctx = Context.new
+    tpl.render ctx
+    ctx.get("mavar").should eq -1
+    tpl.render ctx
+    ctx.get("mavar").should eq -2
+  end
+
   it "should render assigned variable" do
     tpl = Parser.parse "{% assign var = \"Hello World\"%}{{var}}"
     tpl.render(Context.new).should eq "Hello World"
