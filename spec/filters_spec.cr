@@ -303,7 +303,9 @@ describe Liquid::Filters do
 
   describe StripHtml do
     it "should return string with HTML stripped" do
-      StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "myString"
+      StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "mystringmyString"
+      StripHtml.filter(Any.new "<b>bla blub</a>").should eq "bla blub"
+      StripHtml.filter(Any.new "<!-- split and some <ul> tag --><b>bla blub</a>").should eq "bla blub"
     end
   end
 end
