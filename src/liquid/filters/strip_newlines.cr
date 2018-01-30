@@ -20,7 +20,7 @@ module Liquid::Filters
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       if data.raw.responds_to? :to_s
-        Any.new data.raw.to_s.gsub /\n/, ""
+        Any.new data.raw.to_s.gsub /\r?\n/, ""
       else
         data
       end
