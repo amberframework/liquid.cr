@@ -25,6 +25,7 @@ describe Liquid::Filters do
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
+      FilterRegister.get("strip_newlines").should eq StripNewLines
       FilterRegister.get("plus").should eq Plus
       FilterRegister.get("remove").should eq Remove
       FilterRegister.get("remove_first").should eq RemoveFirst
@@ -207,6 +208,12 @@ describe Liquid::Filters do
   describe NewLineToBr do
     it "should replace newline \\n by <br />" do
       NewLineToBr.filter(Any.new "Hello\nWorld").should eq "Hello<br />World"
+    end
+  end
+
+  describe StripNewLines do
+    it "should replace newline \\n by empty string" do
+      StripNewLines.filter(Any.new "\nHello\n\nWorld\n").should eq "HelloWorld"
     end
   end
 

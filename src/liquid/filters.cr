@@ -27,6 +27,7 @@ require "./filters/rstrip"
 require "./filters/size"
 require "./filters/slice"
 require "./filters/split"
+require "./filters/strip_newlines"
 
 require "./context"
 
