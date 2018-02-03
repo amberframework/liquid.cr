@@ -87,9 +87,9 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [ ] sort
 - [ ] sort_natural
 - [x] split
-- [ ] strip
-- [ ] strip_html
-- [ ] strip_newlines
+- [x] strip
+- [x] strip_html
+- [x] strip_newlines
 - [ ] times
 - [ ] truncate
 - [ ] truncatewords
@@ -110,7 +110,7 @@ TODO:
 - [x] Add Filter support
 - [x] Add capture block
 - [x] Add increment block
-- [ ] Add decrement block
+- [x] Add decrement block
 - [ ] Add "contains" keyword
 - [ ] Add support for Array into expressions
 - [ ] Add case/when
