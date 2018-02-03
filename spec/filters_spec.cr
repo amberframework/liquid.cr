@@ -25,6 +25,7 @@ describe Liquid::Filters do
       FilterRegister.get("minus").should eq Minus
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
+      FilterRegister.get("strip_newlines").should eq StripNewLines
       FilterRegister.get("plus").should eq Plus
       FilterRegister.get("remove").should eq Remove
       FilterRegister.get("remove_first").should eq RemoveFirst
@@ -37,6 +38,7 @@ describe Liquid::Filters do
       FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
       FilterRegister.get("strip").should eq Strip
+      FilterRegister.get("strip_html").should eq StripHtml
     end
   end
 
@@ -211,6 +213,12 @@ describe Liquid::Filters do
     end
   end
 
+  describe StripNewLines do
+    it "should replace newline \\n by empty string" do
+      StripNewLines.filter(Any.new "\nHello\n\nWorld\n").should eq "HelloWorld"
+    end
+  end
+
   describe Plus do
     it "should should add numbers" do
       Plus.filter(Any.new(10), Array{Any.new (2)}).should eq 12
@@ -306,6 +314,14 @@ describe Liquid::Filters do
       Strip.filter(Any.new "          So much room for activities!          ").should eq "So much room for activities!"
       Strip.filter(Any.new " ab c  ").should eq "ab c"
       Strip.filter(Any.new " \tab c  \n \t").should eq "ab c"
+    end
+  end
+  
+  describe StripHtml do
+    it "should return string with HTML stripped" do
+      StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "mystringmyString"
+      StripHtml.filter(Any.new "<b>bla blub</a>").should eq "bla blub"
+      StripHtml.filter(Any.new "<!-- split and some <ul> tag --><b>bla blub</a>").should eq "bla blub"
     end
   end
 end
