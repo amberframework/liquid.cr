@@ -37,6 +37,7 @@ describe Liquid::Filters do
       FilterRegister.get("size").should eq Size
       FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
+      FilterRegister.get("strip_html").should eq StripHtml
     end
   end
 
@@ -304,6 +305,14 @@ describe Liquid::Filters do
     it "split a string into an array" do
       Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "])
            .should eq ["John", "Paul", "George", "Ringo"]
+    end
+  end
+
+  describe StripHtml do
+    it "should return string with HTML stripped" do
+      StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "mystringmyString"
+      StripHtml.filter(Any.new "<b>bla blub</a>").should eq "bla blub"
+      StripHtml.filter(Any.new "<!-- split and some <ul> tag --><b>bla blub</a>").should eq "bla blub"
     end
   end
 end
