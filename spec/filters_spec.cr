@@ -37,6 +37,7 @@ describe Liquid::Filters do
       FilterRegister.get("size").should eq Size
       FilterRegister.get("slice").should eq StrSlice
       FilterRegister.get("split").should eq Split
+      FilterRegister.get("strip").should eq Strip
       FilterRegister.get("strip_html").should eq StripHtml
     end
   end
@@ -308,6 +309,14 @@ describe Liquid::Filters do
     end
   end
 
+  describe Strip do
+    it "should remove whitespace from around string" do
+      Strip.filter(Any.new "          So much room for activities!          ").should eq "So much room for activities!"
+      Strip.filter(Any.new " ab c  ").should eq "ab c"
+      Strip.filter(Any.new " \tab c  \n \t").should eq "ab c"
+    end
+  end
+  
   describe StripHtml do
     it "should return string with HTML stripped" do
       StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "mystringmyString"
