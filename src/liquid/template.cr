@@ -46,6 +46,7 @@ EOF
 
       io.puts "#{io_name} << Liquid::Template.new(root).render context"
       io.puts "end"
+      io
     end
   end
 end
