@@ -53,7 +53,7 @@ module Liquid::Block
     def pre_cache
       @children << Boolean.new @var if @var == "true" || @var == "false"
       if m = @var.match GSTRING
-        @children << Raw.new m["str"]
+        @children << Block::Raw.new m["str"]
       end
       if @var.match intern(FILTERED)
         @children << Filtered.new @var

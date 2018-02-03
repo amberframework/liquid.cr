@@ -65,7 +65,7 @@ module Liquid
     # Create and add a Raw node with current buffer
     def add_raw
       if !@buffer.empty?
-        @nodes.last << Raw.new @buffer
+        @nodes.last << Block::Raw.new @buffer
         @buffer = ""
       end
     end

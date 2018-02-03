@@ -13,14 +13,14 @@ describe Liquid do
 
       it "should render if true" do
         ifnode = If.new "if var"
-        ifnode << Raw.new "ok"
+        ifnode << Block::Raw.new "ok"
         node_output(ifnode, Context{"var" => "exists"}).should eq "ok"
         node_output(ifnode, Context{"var" => 0}).should eq "ok"
       end
 
       it "should not render if false" do
         ifnode = If.new "if var"
-        ifnode << Raw.new "ok"
+        ifnode << Block::Raw.new "ok"
         node_output(ifnode, Context{"var" => false}).should eq ""
         node_output(ifnode, Context.new).should eq ""
         node_output(ifnode, Context{"var" => nil}).should eq ""
@@ -44,7 +44,7 @@ describe Liquid do
     describe Capture do
       it "should capture the content of the block" do
         block = Capture.new "capture mavar"
-        block << Raw.new "Hello World!"
+        block << Block::Raw.new "Hello World!"
         ctx = Context.new
         node_output(block, ctx)
         ctx.get("mavar").should eq "Hello World!"
