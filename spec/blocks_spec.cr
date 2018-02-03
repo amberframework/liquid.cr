@@ -54,6 +54,9 @@ describe Liquid do
     describe Increment do
     end
 
+    describe Decrement do
+    end
+
     describe Include do
       it "should include a page" do
         filename = "spec/data/include.html"

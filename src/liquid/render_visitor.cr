@@ -75,6 +75,15 @@ module Liquid
       end
     end
 
+    def visit(node : Decrement)
+      var = @data.get node.var_name
+      if var && (num = var.as_i?)
+        @data.set node.var_name, num - 1
+      else
+        @data.set node.var_name, -1
+      end
+    end
+
     def visit(node : Expression)
       if node.children.empty?
         @io << node.eval(@data)
