@@ -20,12 +20,21 @@ module Liquid::Filters
   class EscapeOnce
     extend Filter
 
+    # From crystal/src/html.cr
+    private SUBSTITUTIONS = {
+      '&'  => "&amp;",
+      '<'  => "&lt;",
+      '>'  => "&gt;",
+      '"'  => "&quot;",
+      '\'' => "&#39;",
+    }
+
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       if data.raw.responds_to? :to_s
         str = data.to_s
 
         # replace all except for ampersand
-        HTML::SUBSTITUTIONS.each do |key, val|
+        SUBSTITUTIONS.each do |key, val|
           str = str.gsub(key, val) if key != '&'
         end
 
