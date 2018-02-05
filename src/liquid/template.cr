@@ -31,20 +31,23 @@ module Liquid
       visitor.output
     end
 
-    def to_code(io_name : String, io : IO = IO::Memory.new)
+    def to_code(io_name : String, io : IO = IO::Memory.new, context : String? = nil)
       visitor = CodeGenVisitor.new io
       io.puts "begin"
 
-      io.puts <<-EOF
+      unless context
+        context = "context"
+        io.puts <<-EOF
 context = Liquid::Context.new
 \{% for var in @type.instance_vars %}
     context.set \{{var.id.stringify}}, @\{{var.id}}
 \{% end %}
 EOF
+      end
 
       root.accept visitor
 
-      io.puts "#{io_name} << Liquid::Template.new(root).render context"
+      io.puts "#{io_name} << Liquid::Template.new(root).render #{context}"
       io.puts "end"
       io
     end
