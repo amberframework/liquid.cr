@@ -55,6 +55,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 # Filters
 - [x] abs
 - [x] append
+- [x] camelcase | camelize
 - [x] capitalize
 - [x] ceil
 - [x] compact
@@ -73,6 +74,7 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [x] minus
 - [x] modulo
 - [x] newline_to_br
+- [x] pluralize
 - [x] plus
 - [x] prepend
 - [x] remove
@@ -93,7 +95,9 @@ Cache block ( only support caching using redis ) : https://github.com/TechMagist
 - [ ] times
 - [ ] truncate
 - [ ] truncatewords
+- [x] underscore
 - [ ] uniq
+- [x] upcase | uppercase
 
 ## Development
 
