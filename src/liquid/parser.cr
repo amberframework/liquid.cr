@@ -111,8 +111,8 @@ module Liquid
     def consume_statement
       while @i < @str.size - 1
         if @str[@i] == '-' && @str[@i+1] == '%' && @str[@i + 2] == '}'
-          @i += 2
           @lstrip = true
+          @i += 2
           break
         elsif @str[@i] == '%' && @str[@i + 1] == '}'
           @i += 1
