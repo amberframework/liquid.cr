@@ -10,6 +10,8 @@ module Liquid
     @i = 0
     @current_line = 0
     @escape = false
+    @lstrip = false
+    @rstrip = false
 
     # buffers
     @nodes = Array(Node).new
@@ -45,10 +47,18 @@ module Liquid
       while @i < @str.size - 1
         if @str[@i] == '{' && @str[@i + 1] == '%' && !@escape
           @i += 2
+          if @str[@i] == '-'
+            @i += 1
+            @rstrip = true
+          end
           add_raw
           consume_statement
         elsif @str[@i] == '{' && @str[@i + 1] == '{' && !@escape
           @i += 2
+          if @str[@i] == '-'
+            @i += 1
+            @rstrip = true
+          end
           add_raw
           consume_expression
         else
@@ -65,14 +75,22 @@ module Liquid
     # Create and add a Raw node with current buffer
     def add_raw
       if !@buffer.empty?
+        @buffer = @buffer.lstrip if @lstrip
+        @buffer = @buffer.rstrip if @rstrip
         @nodes.last << Block::Raw.new @buffer
         @buffer = ""
+        @lstrip = false
+        @rstrip = false
       end
     end
 
     def consume_expression
       while @i < @str.size - 1
-        if @str[@i] == '}' && @str[@i + 1] == '}'
+        if @str[@i] == '-' && @str[@i+1] == '}' && @str[@i + 2] == '}'
+          @lstrip = true
+          @i += 2
+          break
+        elsif @str[@i] == '}' && @str[@i + 1] == '}'
           @i += 1
           break
         else
@@ -92,7 +110,11 @@ module Liquid
     # Consume a statement
     def consume_statement
       while @i < @str.size - 1
-        if @str[@i] == '%' && @str[@i + 1] == '}'
+        if @str[@i] == '-' && @str[@i+1] == '%' && @str[@i + 2] == '}'
+          @i += 2
+          @lstrip = true
+          break
+        elsif @str[@i] == '%' && @str[@i + 1] == '}'
           @i += 1
           break
         else
