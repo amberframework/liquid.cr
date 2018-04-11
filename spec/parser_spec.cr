@@ -58,4 +58,52 @@ describe Liquid::Parser do
 
     template.root.children.should eq expected
   end
+
+  it "trims lspace in statements" do
+    txt = "PRE \t\n{%- if a == true %} \t\nPOST"
+    template = Liquid::Parser.parse txt
+
+    expected = [] of Block::Node
+    expected << Block::Raw.new("PRE")
+    expected << Block::If.new("if a == true")
+    expected.last << Block::Raw.new(" \t\nPOST")
+
+    template.root.children.should eq expected
+  end
+
+  it "trims rspace in statements" do
+    txt = "PRE \t\n{% if a == true -%} \t\nPOST"
+    template = Liquid::Parser.parse txt
+
+    expected = [] of Block::Node
+    expected << Block::Raw.new("PRE \t\n")
+    expected << Block::If.new("if a == true")
+    expected.last << Block::Raw.new("POST")
+
+    template.root.children.should eq expected
+  end
+
+  it "trims lspace in expressions" do
+    txt = "PRE \t\n{{- assign mavar = 12 }} \t\nPOST"
+    template = Liquid::Parser.parse txt
+
+    expected = [] of Block::Node
+    expected << Block::Raw.new("PRE")
+    expected << Block::Expression.new("assign mavar = 12")
+    expected << Block::Raw.new(" \t\nPOST")
+
+    template.root.children.should eq expected
+  end
+
+  it "trims rspace in expressions" do
+    txt = "PRE \t\n{{ assign mavar = 12 -}} \t\nPOST"
+    template = Liquid::Parser.parse txt
+
+    expected = [] of Block::Node
+    expected << Block::Raw.new("PRE \t\n")
+    expected << Block::Expression.new("assign mavar = 12")
+    expected << Block::Raw.new("POST")
+
+    template.root.children.should eq expected
+  end
 end
