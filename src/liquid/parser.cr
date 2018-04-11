@@ -48,16 +48,16 @@ module Liquid
         if @str[@i] == '{' && @str[@i + 1] == '%' && !@escape
           @i += 2
           if @str[@i] == '-'
-            @i += 1
             @rstrip = true
+            @i += 1
           end
           add_raw
           consume_statement
         elsif @str[@i] == '{' && @str[@i + 1] == '{' && !@escape
           @i += 2
           if @str[@i] == '-'
-            @i += 1
             @rstrip = true
+            @i += 1
           end
           add_raw
           consume_expression
