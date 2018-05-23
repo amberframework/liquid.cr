@@ -13,7 +13,7 @@ module Liquid::Filters
 
       # raise error if user doesn't provide a string argument
       raise FilterArgumentException.new "map filter expects argument to be a string" unless args.first.raw.is_a?(String)
-      
+
       if (raw = data.raw) && raw.is_a?(Array) && (first = args.first?)
         result = raw.compact_map { |r| self.responds_to(r, first.as_s) }
         if result.empty?
@@ -22,14 +22,14 @@ module Liquid::Filters
           JSON.parse(result.to_json)
         end
       elsif (raw = data.raw) && raw.is_a?(Hash) && (first = args.first?)
-        Any.new raw[first.as_s]?
+        raw[first.as_s]
       else
         data
       end
     end
 
     def self.responds_to(data, key)
-      if data.is_a?(Hash)
+      if data = data.as_h?
         data[key]?
       else
         nil
