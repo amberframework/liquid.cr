@@ -1,6 +1,6 @@
 language: crystal
 
+script: crystal spec
+
 crystal:
   - latest
-
-script: crystal spec
