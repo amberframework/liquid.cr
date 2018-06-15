@@ -7,7 +7,7 @@ module Liquid::Filters
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       if (d = data.as_a?)
-        result = d.compact_map{ |d| d }
+        result = d.reject &.raw.nil?
         JSON.parse(result.to_json)
       else
         data
