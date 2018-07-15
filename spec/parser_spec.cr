@@ -10,6 +10,26 @@ describe Liquid::Parser do
     template.root.children.should eq expected
   end
 
+  it "parses raw blocks" do
+    txt = "PRE {% raw %}test\nIn Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.{% endraw %} POST"
+    template = Parser.parse txt
+    expected = [
+      Block::Raw.new("PRE "),
+      Block::Raw.new("test\nIn Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not."),
+      Block::Raw.new(" POST")
+    ]
+    template.root.children.should eq expected
+
+    txt = "PRE {%- raw -%} RAW  {% endraw %} POST"
+    template = Parser.parse txt
+    expected = [
+      Block::Raw.new("PRE"),
+      Block::Raw.new(" RAW  "),
+      Block::Raw.new("POST")
+    ]
+    template.root.children.should eq expected
+  end
+
   it "should allow to escape statement" do
     txt = "\\{% assign mavar = 12 %}"
     template = Liquid::Parser.parse txt

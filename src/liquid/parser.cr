@@ -3,6 +3,7 @@ require "./blocks"
 module Liquid
   class Parser
     STATEMENT = /^\s*(?<keyword>[a-z]+).*$/
+    ENDRAW_STATEMENT = /(?<!\\){%(?<lstrip>\-?)\s*endraw\s*(?<rstrip>\-?)%}|$/
 
     getter root : Root
 
@@ -135,6 +136,13 @@ module Liquid
           @nodes << block
         when BlockType::Inline
           @nodes.last << block_class.new @buffer
+        when BlockType::Raw
+          if match = @str.match(ENDRAW_STATEMENT, @i)
+            j = match.begin.not_nil!-1
+            @buffer = @str[@i+1..j]
+            @i = match.end.not_nil!-1
+            @nodes.last << block_class.new @buffer
+          end
         end
       else
         raise "Invalid Statement at line #{@current_line}"

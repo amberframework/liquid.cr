@@ -5,6 +5,7 @@ module Liquid::Block
     Inline
     Begin
     End
+    Raw
   end
 
   abstract def type : BlockType
@@ -56,6 +57,14 @@ module Liquid::Block
 
     def self.type
       BlockType::End
+    end
+  end
+
+  abstract class RawBlock < Node
+    extend Block
+
+    def self.type
+      BlockType::Raw
     end
   end
 end

@@ -24,4 +24,5 @@ module Liquid
   BlockRegister.register "increment", Increment, false
   BlockRegister.register "decrement", Decrement, false
   BlockRegister.register "include", Include, false
+  BlockRegister.register "raw", Raw
 end
