@@ -3,7 +3,7 @@ require "./blocks"
 module Liquid
   class Parser
     STATEMENT = /^\s*(?<keyword>[a-z]+).*$/
-    ENDRAW_STATEMENT = /(?<!\\){%(?<lstrip>\-?)\s*endraw\s*(?<rstrip>\-?)%}|$/
+    ENDRAW_STATEMENT = /(?<!\\){%\s*endraw\s*\-?%}|$/
 
     getter root : Root
 

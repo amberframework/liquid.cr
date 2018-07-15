@@ -20,12 +20,12 @@ describe Liquid::Parser do
     ]
     template.root.children.should eq expected
 
-    txt = "PRE {%- raw -%} RAW  {% endraw %} POST"
+    txt = " PRE {%- raw -%} RAW  {% endraw %} POST "
     template = Parser.parse txt
     expected = [
-      Block::Raw.new("PRE"),
+      Block::Raw.new(" PRE"),
       Block::Raw.new(" RAW  "),
-      Block::Raw.new("POST")
+      Block::Raw.new("POST ")
     ]
     template.root.children.should eq expected
   end
