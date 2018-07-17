@@ -1,16 +1,16 @@
+require "./blocks/assign"
 require "./blocks/block"
-require "./blocks/if"
+require "./blocks/capture"
+require "./blocks/comment"
+require "./blocks/decrement"
 require "./blocks/else"
 require "./blocks/elsif"
-require "./blocks/assign"
 require "./blocks/expression"
-require "./blocks/raw"
 require "./blocks/for"
-require "./blocks/capture"
-require "./blocks/increment"
-require "./blocks/decrement"
+require "./blocks/if"
 require "./blocks/include"
-# require "./blocks/decrement"
+require "./blocks/increment"
+require "./blocks/raw"
 
 include Liquid::Block
 
@@ -25,4 +25,5 @@ module Liquid
   BlockRegister.register "decrement", Decrement, false
   BlockRegister.register "include", Include, false
   BlockRegister.register "raw", Raw
+  BlockRegister.register "comment", Comment
 end

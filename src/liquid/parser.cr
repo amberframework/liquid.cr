@@ -3,7 +3,10 @@ require "./blocks"
 module Liquid
   class Parser
     STATEMENT = /^\s*(?<keyword>[a-z]+).*$/
-    ENDRAW_STATEMENT = /(?<!\\){%\s*endraw\s*\-?%}|$/
+    ENDRAW_STATEMENT = {
+      "raw" => /(?<!\\){%\s*endraw\s*\-?%}|$/,
+      "comment" => /(?<!\\){%\s*endcomment\s*\-?%}|$/,
+    }
 
     getter root : Root
 
@@ -136,8 +139,8 @@ module Liquid
           @nodes << block
         when BlockType::Inline
           @nodes.last << block_class.new @buffer
-        when BlockType::Raw
-          if match = @str.match(ENDRAW_STATEMENT, @i)
+        else # when BlockType::Raw, BlockType::RawHidden
+          if match = @str.match(ENDRAW_STATEMENT[match["keyword"]], @i)
             j = match.begin.not_nil!-1
             @buffer = @str[@i+1..j]
             @i = match.end.not_nil!-1

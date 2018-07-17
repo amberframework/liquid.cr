@@ -12,6 +12,11 @@ describe Template do
     tpl.template_path.should eq template_path
   end
 
+  it "shouldn't render comments" do
+    tpl = Parser.parse("PRE{% comment %} raw {% assign mavar = 15 %} text {% endcomment %}POST")
+    tpl.render(Context.new).should eq "PREPOST"
+  end
+
   it "should render from file" do
     filename = "spec/data/include.html"
     file_path = File.dirname(filename)
