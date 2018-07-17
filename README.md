@@ -43,14 +43,20 @@ result = tpl.render ctx
 
 ```
 
-Tags can be escaped :
+Tags can be escaped:
 ``` liquid
 \{% assign myvar = 15 %}
+
+# or
+
+{% raw %}
+{% assign myvar = 15 %}
+{% endraw %}
 ```
-will render `{% assign myvar = 15 %}`
+will both render `{% assign myvar = 15 %}`.
 
 # Blocks
-Cache block ( only support caching using redis ) : https://github.com/TechMagister/liquid-cache.cr
+Cache block (only supports caching using Redis): https://github.com/TechMagister/liquid-cache.cr
 
 # Filters
 - [x] abs
