@@ -110,10 +110,11 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 TODO:
 - [x] Basic For loops
 - [x] Basic If Elsif Else
-- [x] Add variable assignment ( {% assign var = "Hello World" %} )
-- [x] Add support for multiple operator ( no operator precedence support ( for now ))
+- [x] Raw and comment blocks ({% raw %} and {% comment %})
+- [x] Add variable assignment ({% assign var = "Hello World" %})
+- [x] Add support for multiple operator (no operator precedence support (for now))
 - [x] Add support for Array into for loop
-- [x] Add support for Hash into for loop ( {% for key, val in myhash %} )
+- [x] Add support for Hash into for loop ({% for key, val in myhash %})
 - [x] Add support for Float
 - [x] Add iteration over Arrays
 - [x] Improve data interface
