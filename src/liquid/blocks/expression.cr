@@ -74,7 +74,13 @@ module Liquid::Block
             elsif m = @var.match intern(GFLOAT)
               m["floatval"].to_f32
             elsif m = @var.match intern(VAR)
-              if (index = m["arrayindex"]?.try(&.to_i?)) && (array = data.get(m["varbasename"]).try(&.as_a?))
+              if m["method"]? == ".size" && (val = data.get(m["varbasename"].sub(m["method"], "")))
+                if (array = val.as_a?)
+                  array.size
+                elsif (str = val.as_s?)
+                  str.size
+                end
+              elsif (index = m["arrayindex"]?.try(&.to_i?)) && (array = data.get(m["varbasename"]).try(&.as_a?))
                 array[index]?
               else
                 data.get(@var)

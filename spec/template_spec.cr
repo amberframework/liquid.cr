@@ -165,4 +165,16 @@ describe Template do
     tpl.render(ctx).should eq "second, first, third, third"
   end
 
+  it "should support Array#size" do
+    tpl = Template.parse %({{ objects.size }})
+    ctx = Context{"objects" => ["first", "second", "third"]}
+    tpl.render(ctx).should eq "3"
+  end
+
+  it "should support String#size" do
+    tpl = Template.parse %({{ str.size }})
+    ctx = Context{"str" => "12345678"}
+    tpl.render(ctx).should eq "8"
+  end
+
 end
