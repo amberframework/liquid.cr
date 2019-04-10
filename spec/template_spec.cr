@@ -177,4 +177,10 @@ describe Template do
     tpl.render(ctx).should eq "8"
   end
 
+  it "should support combinations of array access and property access" do
+    tpl = Template.parse %({{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }})
+    ctx = Context{"objects" => ["first", ["second-a", "second-b"], "third"]}
+    tpl.render(ctx).should eq "3 2 second-b"
+  end
+
 end

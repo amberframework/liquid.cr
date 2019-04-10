@@ -74,17 +74,7 @@ module Liquid::Block
             elsif m = @var.match intern(GFLOAT)
               m["floatval"].to_f32
             elsif m = @var.match intern(VAR)
-              if m["method"]? == ".size" && (val = data.get(m["varbasename"].sub(m["method"], "")))
-                if (array = val.as_a?)
-                  array.size
-                elsif (str = val.as_s?)
-                  str.size
-                end
-              elsif (index = m["arrayindex"]?.try(&.to_i?)) && (array = data.get(m["varbasename"]).try(&.as_a?))
-                array[index]?
-              else
-                data.get(@var)
-              end
+              data.get(@var) # Context handles . and [] access
             elsif m = @var.match intern(GCMP)
               le = Expression.new(m["left"]).eval data
               re = Expression.new(m["right"]).eval data
