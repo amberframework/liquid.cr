@@ -159,10 +159,16 @@ describe Template do
     tpl.render(ctx).should eq "bbb"
   end
 
-  it "should support array access" do
+  it "should support array access via literal" do
     tpl = Template.parse %({{ objects[1] }}, {{ objects[0] }}, {{ objects[-1] }}, {{ objects[2] }})
     ctx = Context{"objects" => ["first", "second", "third"]}
     tpl.render(ctx).should eq "second, first, third, third"
+  end
+
+  it "should support array access via variable" do
+    tpl = Template.parse %({% assign idx = 2 %}{% assign idx2 = -2 %}{{ objects[idx] }}, {{ objects[idx2] }}, {{ objects[obj.id] }})
+    ctx = Context{"objects" => ["first", "second", "third"], "obj" => Hash{"id" => 1}}
+    tpl.render(ctx).should eq "third, second, second"
   end
 
   it "should support Array#size" do
@@ -178,9 +184,10 @@ describe Template do
   end
 
   it "should support combinations of array access and property access" do
-    tpl = Template.parse %({{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }})
+    tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }})
     ctx = Context{"objects" => ["first", ["second-a", "second-b"], "third"]}
     tpl.render(ctx).should eq "3 2 second-b"
+    ctx.get("myvar").should eq "second-b"
   end
 
 end

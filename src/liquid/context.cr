@@ -23,13 +23,32 @@ module Liquid
     def []?(key : String) : JSON::Any?
       return @inner[key] if @inner[key]?
 
-      # there should not be any nil segments (e.g. asdf..fdsa, .asdf, asdf.)
-      segments = key.split "."
-      return nil if segments.any?(&.nil?)
+      segments = key.split(".", remove_empty: false)
+
+      # there should not be any blank segments (e.g. asdf..fdsa, .asdf, asdf.)
+      return nil if segments.any?(&.blank?)
+
+      # rejoin any segments that got broken in the middle of an array index
+      segments.each_with_index do |segment, i|
+        if segment.includes?("[") && !segment.includes?("]")
+          # join until we find the closing bracket
+          (i+1...segments.size).each do |j|
+            str = segments[j]
+            segments[j] = ""
+            segments[i] = [segments[i], str].join(".")
+            break if str.includes?("]") # found the closing bracket
+          end
+        end
+      end
+
+      # remove any segments that are now blank
+      segments.reject!(&.blank?)
 
       ret : JSON::Any? = nil
 
       segments.each do |k|
+        next unless k
+
         # ignore array index/hash key if present, first handle methods/properties
         if k =~ /^(.*?)(?:\[.*?\])*$/
           name = $1
@@ -59,13 +78,28 @@ module Liquid
         end
 
         while k =~ /\[(.*?)\]/
-          if ($1 =~ /^([-\d]+)$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
+          index = $1
+          if (index =~ /^(\-?\d+)$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
+            # array access via integer literal
             return nil unless array[idx]?
 
             ret = array[idx]
             k = k.sub(/\[#{idx}\]/, "")
-          elsif (hashkey = $1)
-            # TODO: Try to handle hash keys
+          elsif (index =~ /^(\-?[\w\.]+)$/) && (varname = $1) && ret && (array = ret.as_a?)
+            # array access via integer variable
+            invert = false
+            if varname =~ /^\-(.*)$/
+              invert = true
+              varname = $1
+            end
+            if (realidx = self[varname]?.try(&.as_i?)) && (val = array[(invert ? -1 : 1) * realidx]?)
+              ret = val
+              k = k.sub(/\[#{varname}\]/, "")
+            else
+              return nil
+            end
+          elsif (hashkey = $1) # check for quotes?
+            # TODO: Try to handle literal string hash keys
             return nil
 
             # TODO: Need to strip off quote characters on hashkey
