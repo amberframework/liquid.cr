@@ -4,8 +4,8 @@ module Liquid
   VAR      = /[a-z_][a-z_0-9]*(?:\.[a-z_][a-z_0-9]*)*/
 
   STRING      = /"[^"]*"/
-  INT         = /-?[1-9][0-9]*/
-  FLOAT       = /#{INT}\.[0-9]+/
+  INT         = /(?:[0-9]|-[1-9])[0-9]*/
+  FLOAT       = /-?[0-9]+\.[0-9]+/
   TYPE        = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})/
   TYPE_OR_VAR = /(?:#{TYPE})|(?:#{VAR})/
   CMP         = /(?:#{TYPE_OR_VAR}) ?(?:#{OPERATOR}) ?(?:#{TYPE_OR_VAR})/

@@ -12,7 +12,7 @@ module Liquid
       right : Bool?
       proc : BoolOperator
 
-      exp = Exception.new "Invalid Boolean operation "
+      exp = Exception.new "Invalid Boolean operation: #{arr.inspect}"
       raise exp if arr.size < 3 || arr.first.is_a? BoolOperator
       arr.each_index do |i|
         raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) ||
@@ -38,7 +38,7 @@ module Liquid
                when "and" then AND
                when "or"  then OR
                else
-                 raise Exception.new "Invalid Boolean operation"
+                 raise Exception.new "Invalid Boolean operation: #{str}"
                end
     end
 
@@ -98,7 +98,7 @@ module Liquid
 
     def self.check_operator(str : String)
       if !OPS.includes? str
-        raise Exception.new "Invalid comparison operator : #{str}"
+        raise Exception.new "Invalid comparison operator: #{str}"
       end
     end
   end

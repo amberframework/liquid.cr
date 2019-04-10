@@ -71,6 +71,15 @@ describe Template do
     tpl.render(ctx).should eq ""
   end
 
+  it "should render if statement with zero comparison" do
+    tpl = Parser.parse("{% if var > 0 %}true{% endif %}")
+    ctx = Context.new
+    ctx.set("var", 1)
+    tpl.render(ctx).should eq "true"
+    ctx.set("var", 0)
+    tpl.render(ctx).should eq ""
+  end
+
   it "should render if else statement" do
     tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")
     ctx = Context.new
