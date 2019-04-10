@@ -1,7 +1,6 @@
 module Liquid
   OPERATOR = /==|!=|<=|>=|<|>/
-  GVAR     = /[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*/
-  VAR      = /[a-z_][a-z_0-9]*(?:\.[a-z_][a-z_0-9]*)*/
+  VAR      = /(?<varbasename>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(?:\[(?<arrayindex>-?[0-9]+)\])?/
 
   STRING      = /"[^"]*"/
   INT         = /(?:[0-9]|-[1-9])[0-9]*/

@@ -73,8 +73,12 @@ module Liquid::Block
               m["intval"].to_i
             elsif m = @var.match intern(GFLOAT)
               m["floatval"].to_f32
-            elsif @var.match intern(VAR)
-              data.get(@var)
+            elsif m = @var.match intern(VAR)
+              if (index = m["arrayindex"]?.try(&.to_i?)) && (array = data.get(m["varbasename"]).try(&.as_a?))
+                array[index]?
+              else
+                data.get(@var)
+              end
             elsif m = @var.match intern(GCMP)
               le = Expression.new(m["left"]).eval data
               re = Expression.new(m["right"]).eval data

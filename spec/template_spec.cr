@@ -159,4 +159,10 @@ describe Template do
     tpl.render(ctx).should eq "bbb"
   end
 
+  it "should support array access" do
+    tpl = Template.parse %({{ objects[1] }}, {{ objects[0] }}, {{ objects[-1] }}, {{ objects[2] }})
+    ctx = Context{"objects" => ["first", "second", "third"]}
+    tpl.render(ctx).should eq "second, first, third, third"
+  end
+
 end
