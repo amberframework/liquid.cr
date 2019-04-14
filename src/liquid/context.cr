@@ -4,10 +4,13 @@ require "./any"
 module Liquid
   struct Context
     JSON.mapping(
-      inner: Hash(String, JSON::Any)
+      inner: Hash(String, JSON::Any),
+      strict: {type: Bool, default: false}
     )
 
-    def initialize
+    property strict : Bool = false
+
+    def initialize(@strict = false)
       @inner = Hash(String, JSON::Any).new
     end
 
@@ -32,7 +35,7 @@ module Liquid
       segments.each_with_index do |segment, i|
         if segment.includes?("[") && !segment.includes?("]")
           # join until we find the closing bracket
-          (i+1...segments.size).each do |j|
+          (i + 1...segments.size).each do |j|
             str = segments[j]
             segments[j] = ""
             segments[i] = [segments[i], str].join(".")
@@ -121,7 +124,12 @@ module Liquid
     # alias for []?(key)
     @[AlwaysInline]
     def get(key)
-      self[key]?
+      # optional if ? is appended to key; otherwise, follow @strict setting
+      if key =~ /^(.*?)\?$/
+        self[$1]?
+      else
+        @strict ? self[key] : self[key]?
+      end
     end
 
     # alias for []=(key, val)

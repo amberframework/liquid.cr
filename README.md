@@ -123,12 +123,41 @@ TODO:
 - [x] Add increment block
 - [x] Add decrement block
 - [ ] Add "contains" keyword
-- [ ] Add support for Array into expressions
+- [x] Add support for Array into expressions
 - [ ] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
+- [x] Add optional strict mode on Context (see below)
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
+## Context Strict Mode
+
+Enable at initialization:
+```crystal
+ctx = Liquid::Context.new(strict: true)
+```
+
+Or on an existing Context:
+```crystal
+ctx.strict = true
+```
+
+Raises `IndexError` on missing keys (instead of silently emitting nil/blank).
+
+Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
+
+```crystal
+ctx = Liquid::Context.new(strict: true)
+ctx["obj"] = { something: "something" }
+```
+
+```liquid
+{{ missing }}          -> IndexError
+{{ missing? }}         -> nil
+{{ obj.missing }}      -> IndexError
+{{ obj.missing? }}     -> nil
+{{ missing.missing? }} -> nil
+```
 
 ## Contributing
 
@@ -142,3 +171,4 @@ TODO:
 
 - [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer
 - [docelic](https://github.com/docelic) Davor Ocelic
+- [anamba](https://github.com/anamba) Aaron Namba

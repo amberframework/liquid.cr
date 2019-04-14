@@ -190,4 +190,20 @@ describe Template do
     ctx.get("myvar").should eq "second-b"
   end
 
+  it "should respect strict mode on Context" do
+    ctx = Context.new
+    tpl = Template.parse %({{ missing }}{{ obj.missing }})
+    tpl.render(ctx).should eq ""
+
+    ctx.strict = true
+    expect_raises(IndexError) { tpl.render(ctx) }
+
+    ctx["missing"] = "present"
+    ctx["obj"] = { something: "something" } # still didn't define "missing"
+    expect_raises(IndexError) { tpl.render(ctx) }
+
+    ctx["missing"] = "present"
+    ctx["obj"] = { something: "something", missing: "present" }
+    tpl.render(ctx).should eq "presentpresent"
+  end
 end
