@@ -1,9 +1,12 @@
-# liquid
+# liquid - Liquid template engine for Crystal
+
+[![Version](https://img.shields.io/github/tag/anamba/liquid.cr.svg?maxAge=360)](https://github.com/anamba/liquid.cr/releases/latest)
 [![Build Status](https://travis-ci.org/anamba/liquid.cr.svg?branch=master)](https://travis-ci.org/anamba/liquid.cr)
+[![License](https://img.shields.io/github/license/anamba/liquid.cr.svg)](https://github.com/anamba/liquid.cr/blob/master/LICENSE)
 
-Liquid template engine for Crystal.
+Liquid templating language: [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
 
-Liquid templating language : [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
+This is a fork of [TechMagister/liquid.cr](https://github.com/TechMagister/liquid.cr), which was moving too slowly for my needs. I'm open to merging back at some point, and will do my best to maintain compatibility, but for the foreseeable future (through 2019), this fork may be unstable and/or add breaking changes here and there. Still, it includes many useful improvements, so please give it a try and report any issues you find.
 
 ## Installation
 
@@ -169,6 +172,6 @@ ctx["obj"] = { something: "something" }
 
 ## Contributors
 
-- [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer
+- [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer of [original version](https://github.com/TechMagister/liquid.cr)
 - [docelic](https://github.com/docelic) Davor Ocelic
 - [anamba](https://github.com/anamba) Aaron Namba
