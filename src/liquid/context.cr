@@ -18,7 +18,7 @@ module Liquid
       if (ret = self[key]?)
         ret
       else
-        raise IndexError.new
+        raise KeyError.new("Missing context key: \"#{key}\"")
       end
     end
 
@@ -80,35 +80,42 @@ module Liquid
           end
         end
 
-        while k =~ /\[(.*?)\]/
+        while k =~ /\[((#{STRING})|(#{INT})|(#{VAR}))\]/
           index = $1
-          if (index =~ /^(\-?\d+)$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
+          # puts index
+          if (index =~ /^(\-?#{INT})$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
             # array access via integer literal
             return nil unless array[idx]?
 
             ret = array[idx]
-            k = k.sub(/\[#{idx}\]/, "")
-          elsif (index =~ /^(\-?[\w\.]+)$/) && (varname = $1) && ret && (array = ret.as_a?)
+            k = k.sub("[#{index}]", "")
+          elsif (match = index.match(GSTRING)) && ret && (hash = ret.as_h?)
+            # hash access via string literal
+            hashkey = match["str"]
+            return nil unless hash[hashkey]?
+
+            ret = hash[hashkey]
+            k = k.sub("[#{index}]", "")
+          elsif (index =~ /^\-?(#{VAR})$/) && (varname = $1) && ret && (array = ret.as_a?)
             # array access via integer variable
-            invert = false
-            if varname =~ /^\-(.*)$/
-              invert = true
-              varname = $1
-            end
+            invert = (index[0] == '-')
             if (realidx = self[varname]?.try(&.as_i?)) && (val = array[(invert ? -1 : 1) * realidx]?)
               ret = val
-              k = k.sub(/\[#{varname}\]/, "")
+              k = k.sub("[#{index}]", "")
             else
               return nil
             end
-          elsif (hashkey = $1) # check for quotes?
-            # TODO: Try to handle literal string hash keys
+          elsif (varname = index) && ret && (hash = ret.as_h?)
+            # hash access via string variable
+            if (realkey = self[varname]?.try(&.as_s?)) && (val = hash[realkey]?)
+              ret = val
+              k = k.sub("[#{index}]", "")
+            else
+              return nil
+            end
+          else
+            # hmm, we failed to match any known indexing scheme
             return nil
-
-            # TODO: Need to strip off quote characters on hashkey
-            return nil unless ret && (hash = ret.as_h?) && hash[hashkey]?
-            ret = hash[hashkey]
-            k = k.sub(/\[#{hashkey}\]/, "")
           end
         end
       end

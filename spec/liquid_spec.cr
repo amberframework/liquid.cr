@@ -44,10 +44,10 @@ describe Liquid do
 
     it "raises on missing key in strict mode" do
       ctx = Context.new(strict: true)
-      expect_raises(IndexError) { ctx.get("missing") }
-      expect_raises(IndexError) { ctx.get("obj.missing") }
+      expect_raises(KeyError) { ctx.get("missing") }
+      expect_raises(KeyError) { ctx.get("obj.missing") }
       ctx["obj"] = {something: "something"}
-      expect_raises(IndexError) { ctx.get("obj.missing") }
+      expect_raises(KeyError) { ctx.get("obj.missing") }
     end
 
     it "returns nil for missing key in strict mode with ?" do

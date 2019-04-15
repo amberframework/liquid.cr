@@ -203,10 +203,10 @@ describe Template do
     tpl.render(ctx).should eq "8"
   end
 
-  it "should support combinations of array access and property access" do
-    tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }})
-    ctx = Context{"objects" => ["first", ["second-a", "second-b"], "third"]}
-    tpl.render(ctx).should eq "3 2 second-b"
+  it "should support combinations of array/hash access and property access" do
+    tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }} {{ hash['first'] }} {{ hash[first] }} {{ hash[objects[0]] }})
+    ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => { "first" => "val" }}
+    tpl.render(ctx).should eq "3 2 second-b val val val"
     ctx.get("myvar").should eq "second-b"
   end
 
@@ -216,11 +216,11 @@ describe Template do
     tpl.render(ctx).should eq ""
 
     ctx.strict = true
-    expect_raises(IndexError) { tpl.render(ctx) }
+    expect_raises(KeyError) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = {something: "something"} # still didn't define "missing"
-    expect_raises(IndexError) { tpl.render(ctx) }
+    expect_raises(KeyError) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = {something: "something", missing: "present"}

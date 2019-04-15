@@ -126,7 +126,8 @@ TODO:
 - [x] Add increment block
 - [x] Add decrement block
 - [ ] Add "contains" keyword
-- [x] Add support for Array into expressions
+- [x] Add support for Array in expressions
+- [x] Add support for Hash in expressions
 - [ ] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
@@ -145,7 +146,7 @@ Or on an existing Context:
 ctx.strict = true
 ```
 
-Raises `IndexError` on missing keys (instead of silently emitting nil/blank).
+Raises `KeyError` on missing keys (instead of silently emitting nil/blank).
 
 Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
 
@@ -155,9 +156,9 @@ ctx["obj"] = { something: "something" }
 ```
 
 ```liquid
-{{ missing }}          -> IndexError
+{{ missing }}          -> KeyError
 {{ missing? }}         -> nil
-{{ obj.missing }}      -> IndexError
+{{ obj.missing }}      -> KeyError
 {{ obj.missing? }}     -> nil
 {{ missing.missing? }} -> nil
 ```
