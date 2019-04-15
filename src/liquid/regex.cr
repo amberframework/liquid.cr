@@ -2,7 +2,9 @@ module Liquid
   OPERATOR = /==|!=|<=|>=|<|>/
   VAR      = /(?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<arrayindex>-?[\w\.]+)\]))*\??/
 
-  STRING      = /"[^"]*"/
+  DQSTRING    = /"[^"]*"/
+  SQSTRING    = /'[^']*'/
+  STRING      = /(?:#{DQSTRING})|(?:#{SQSTRING})/
   INT         = /(?:[0-9]|-[1-9])[0-9]*/
   FLOAT       = /-?[0-9]+\.[0-9]+/
   TYPE        = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})/
@@ -10,7 +12,7 @@ module Liquid
   CMP         = /(?:#{TYPE_OR_VAR}) ?(?:#{OPERATOR}) ?(?:#{TYPE_OR_VAR})/
   GCMP        = /(?<left>#{TYPE_OR_VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{TYPE_OR_VAR})/
 
-  GSTRING = /^"(?<str>[^"]*)"$/
+  GSTRING = /^(?:"(?<str>[^"]*)")|(?:'(?<str>[^']*)')$/
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 

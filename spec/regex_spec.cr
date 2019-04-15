@@ -10,15 +10,15 @@ module Liquid
     end
 
     it "should match String, int and float" do
-      ok = ["\"\"", "\"not empty string\"", "12", "-12", "15.68", "-20.36"]
-      err = ["\"\"\"", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-"]
+      ok = ["\"\"", "''", "'not empty string'", "\"not empty string\"", "0", "0.0", "12", "-12", "15.68", "-20.36"]
+      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-"]
       ok.each &.match(/^#{TYPE}$/).should_not be_nil
       err.each &.match(/^#{TYPE}$/).should be_nil
     end
 
     it "should match a type or a var" do
-      ok = ["\"\"", "\"not empty string\"", "12", "-12", "15.68", "-20.36", "ma_var"]
-      err = ["\"\"\"", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-", "not-me", "-troll"]
+      ok = ["\"\"", "''", "'not empty string'", "\"not empty string\"", "0", "0.0", "12", "-12", "15.68", "-20.36", "ma_var"]
+      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-", "not-me", "-troll"]
       ok.each &.match(/^#{TYPE_OR_VAR}$/).should_not be_nil
       err.each &.match(/^#{TYPE_OR_VAR}$/).should be_nil
     end

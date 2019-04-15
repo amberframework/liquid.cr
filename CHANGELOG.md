@@ -2,6 +2,10 @@
 
 Arranged in reverse chronological order (latest changes on top).
 
+## Unreleased
+
+* [FIXED] Accept single quoted strings
+
 ## v0.4.0 - 2019-04-15
 
 * First public release as anamba/liquid.cr

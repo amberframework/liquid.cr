@@ -102,10 +102,30 @@ describe Template do
     ctx = Context.new
     ctx.set "kenny.sick", false
     ctx.set "kenny.dead", true
+    ctx.set "kenny.state", "dead"
 
     tpl = Parser.parse txt
     result = tpl.render ctx
     result.should eq "\n    \n      You killed Kenny!  You bastard!!!\n    \n    "
+  end
+
+  it "should render if elsif else statement - variant 2" do
+    txt = <<-EOT
+    {%- if kenny.state == \"sick\" -%}
+      Kenny is sick.
+    {%- elsif kenny.state == 'dead' -%}
+      You killed Kenny!  You bastard!!!
+    {%- else -%}
+      Kenny looks okay --- so far
+    {%- endif -%}
+    EOT
+
+    ctx = Context.new
+    ctx.set "kenny.state", "dead"
+
+    tpl = Parser.parse txt
+    result = tpl.render ctx
+    result.should eq "You killed Kenny!  You bastard!!!"
   end
 
   it "should render captured variables" do
@@ -199,11 +219,11 @@ describe Template do
     expect_raises(IndexError) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
-    ctx["obj"] = { something: "something" } # still didn't define "missing"
+    ctx["obj"] = {something: "something"} # still didn't define "missing"
     expect_raises(IndexError) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
-    ctx["obj"] = { something: "something", missing: "present" }
+    ctx["obj"] = {something: "something", missing: "present"}
     tpl.render(ctx).should eq "presentpresent"
   end
 end
