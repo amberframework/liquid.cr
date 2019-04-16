@@ -6,7 +6,9 @@ Arranged in reverse chronological order (latest changes on top).
 
 * [NEW] Supports hash access, via string literal or string variable
 * [FIXED] Accept single quoted strings
+* [FIXED] Accept a wider range of complex boolean expressions
 * [CHANGED] Strict mode raises KeyError instead of IndexError on missing key
+* [ADDED] Accept &&/|| in addition to and/or
 
 ## v0.4.0 - 2019-04-15
 

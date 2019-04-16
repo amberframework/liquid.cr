@@ -81,7 +81,7 @@ describe Template do
   end
 
   it "should render if else statement" do
-    tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")
+    tpl = Parser.parse("{% if true and var == true %}true{% else %}false{% endif %}")
     ctx = Context.new
     ctx.set("var", true)
     tpl.render(ctx).should eq "true"
@@ -205,7 +205,7 @@ describe Template do
 
   it "should support combinations of array/hash access and property access" do
     tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }} {{ hash['first'] }} {{ hash[first] }} {{ hash[objects[0]] }})
-    ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => { "first" => "val" }}
+    ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => {"first" => "val"}}
     tpl.render(ctx).should eq "3 2 second-b val val val"
     ctx.get("myvar").should eq "second-b"
   end

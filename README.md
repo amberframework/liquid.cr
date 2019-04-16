@@ -163,6 +163,12 @@ ctx["obj"] = { something: "something" }
 {{ missing.missing? }} -> nil
 ```
 
+## Note on order of operations in complex expressions ##
+
+Currently, comparison operators are evaluated before and/or. Other than that, evaluations are evaluated from left to right. Parentheses are not supported.
+
+Eventually, this will be fixed to evaluate expressions in a way that mirrors Crystal itself, but for now, it would be best to simply avoid writing complex expressions.
+
 ## Contributing
 
 1. Fork it ( https://github.com/anamba/liquid.cr/fork )

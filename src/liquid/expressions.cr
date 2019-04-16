@@ -13,11 +13,7 @@ module Liquid
       proc : BoolOperator
 
       exp = Exception.new "Invalid Boolean operation: #{arr.inspect}"
-      raise exp if arr.size < 3 || arr.first.is_a? BoolOperator
-      arr.each_index do |i|
-        raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) ||
-                     (i % 2 == 1 && arr[i].is_a? Expression)
-      end
+      raise exp if arr.size < 3
       left = nil
       i = 1
       while i < arr.size
@@ -34,9 +30,9 @@ module Liquid
     end
 
     def initialize(str : String)
-      @inner = case str
-               when "and" then AND
-               when "or"  then OR
+      @inner = case str.strip.downcase
+               when "and", "&&" then AND
+               when "or", "||"  then OR
                else
                  raise Exception.new "Invalid Boolean operation: #{str}"
                end

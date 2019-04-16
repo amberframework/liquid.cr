@@ -3,7 +3,6 @@ require "./spec_helper"
 describe Liquid do
   describe Block do
     describe If do
-
       it "should add elsif node" do
         ifnode = If.new "if true == true"
         elsifnode = ElsIf.new "elsif true == false"
@@ -87,10 +86,10 @@ describe Liquid do
         ctx = Context.new
         template_name = "spec/data/color.liquid"
         template_vars = {
-          "string" => "\"green\"",
+          "string"  => "\"green\"",
           "integer" => 20,
-          "float" => 3.0,
-          "bool" => true,
+          "float"   => 3.0,
+          "bool"    => true,
         }
 
         parse_text = "include \"#{template_name}\""
@@ -214,13 +213,16 @@ describe Liquid do
         expr = Expression.new "true == false"
         expr2 = Expression.new "true != false"
         expr3 = Expression.new "var != 15"
+        expr4 = Expression.new "str == 'asdf'"
 
         ctx = Context.new
         ctx.set "var", 16
+        ctx.set "str", "asdf"
 
         expr.eval(ctx).should be_false
         expr2.eval(ctx).should be_true
         expr3.eval(ctx).should be_true
+        expr4.eval(ctx).should be_true
       end
       # it "should eval an operation with contains keyword" do
       #   expr = Expression.new "myarr contains another"
@@ -232,12 +234,13 @@ describe Liquid do
       it "should eval an multiple operation" do
         expr = Expression.new "test == false or some == true or another == 10"
         expr2 = Expression.new "test != false or some == false or another == 10"
-        expr3 = Expression.new "test != false and some != false and another == 15"
+        expr3 = Expression.new "test != false and some != false and another == 15 and str == 'asdf'"
 
         ctx = Context.new
         ctx.set "test", true
         ctx.set "some", true
         ctx.set "another", 15
+        ctx.set "str", "asdf"
 
         expr.eval(ctx).should be_true
         expr2.eval(ctx).should be_true
