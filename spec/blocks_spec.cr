@@ -217,6 +217,7 @@ describe Liquid do
         expr4 = Expression.new "str == 'asdf'"
         expr5 = Expression.new "!false && !flag"
         expr5a = Expression.new "!flag && !false"
+        expr6 = Expression.new "missing?"
 
         ctx = Context.new(strict: true)
         ctx.set "var", 16
@@ -230,6 +231,7 @@ describe Liquid do
         expr4.eval(ctx).should be_true
         expr5.eval(ctx).should be_true
         expr5a.eval(ctx).should be_true
+        expr6.eval(ctx).raw.should be_nil # return value is JSON::Any which is not nil; need to check #raw instead
       end
       # it "should eval an operation with contains keyword" do
       #   expr = Expression.new "myarr contains another"

@@ -14,9 +14,10 @@ module Liquid
       @inner = Hash(String, JSON::Any).new
     end
 
-    def parse_error(key, strict : Bool)
+    def parse_error(key, strict : Bool, message : String? = nil)
+      message ||= "Parse error: \"#{key}\""
       if strict
-        raise Exception.new("Parse error: \"#{key}\"")
+        raise Exception.new(message)
       else
         nil
       end
@@ -167,16 +168,16 @@ module Liquid
           if (num = ret.as_i?) || (num = ret.as_f?)
             ret = JSON::Any.new(-1 * num)
           else
-            raise "Couldn't interpret #{ret} as numeric value (#{key})"
+            return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as numeric value (#{key})")
           end
         when "!"
           if !(bool = ret.as_bool?).nil? # booleans are tricky, check for nil specifically
             ret = JSON::Any.new(!bool)
           else
-            raise "Couldn't interpret #{ret} as boolean value (#{key})"
+            return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as boolean value (#{key})")
           end
         else
-          raise "Unknown prefix operator #{prefix}"
+          return parse_error(key, true, "Parse error: Unknown prefix operator #{prefix}")
         end
       end if ret
 

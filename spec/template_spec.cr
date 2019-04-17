@@ -128,6 +128,26 @@ describe Template do
     result.should eq "You killed Kenny!  You bastard!!!"
   end
 
+  it "should render if statement - variant 3" do
+    txt = <<-EOT
+    {%- if mykey? -%}
+      Key present
+    {%- else -%}
+      Key missing
+    {%- endif -%}
+    EOT
+
+    ctx = Context.new(strict: true)
+
+    tpl = Parser.parse txt
+    result = tpl.render ctx
+    result.should eq "Key missing"
+
+    ctx["mykey"] = "!"
+    result = tpl.render ctx
+    result.should eq "Key present"
+  end
+
   it "should render captured variables" do
     tpl = Template.parse "{% capture mavar %}Hello World!{% endcapture %}{{mavar}}"
     tpl.render(Context.new).should eq "Hello World!"
