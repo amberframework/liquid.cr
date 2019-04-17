@@ -169,6 +169,15 @@ module Liquid
         data.set "loop.first", x == start
         data.set "loop.last", x == stop
         data.set "loop.length", stop - start
+
+        # for compatibility with Shopify liquid
+        data.set "forloop.length", stop - start
+        data.set "forloop.index", i + 1
+        data.set "forloop.index0", i
+        data.set "forloop.rindex", stop - start - i + 1
+        data.set "forloop.rindex0", stop - start - i
+        data.set "forloop.first", x == start
+        data.set "forloop.last", x == stop
         node.children.each &.accept(visitor)
         i += 1
       end
@@ -189,6 +198,15 @@ module Liquid
           data.set "loop.first", i == 0
           data.set "loop.last", i == stop
           data.set "loop.length", stop
+
+          # for compatibility with Shopify liquid
+          data.set "forloop.length", stop
+          data.set "forloop.index", i + 1
+          data.set "forloop.index0", i
+          data.set "forloop.rindex", stop - i + 1
+          data.set "forloop.rindex0", stop - i
+          data.set "forloop.first", i == 0
+          data.set "forloop.last", i == stop
           node.children.each &.accept(visitor)
           i += 1
         end

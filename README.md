@@ -128,15 +128,18 @@ TODO:
 - [x] Add iteration over Arrays
 - [x] Improve data interface
 - [x] Add Filter support
-- [x] Add capture block
-- [x] Add increment block
-- [x] Add decrement block
+- [x] Add `capture` block
+- [x] Add `increment` block
+- [x] Add `decrement` block
 - [x] Add support for Array in expressions
 - [x] Add support for Hash in expressions
 - [x] Add "secret" `empty` Array (`[]`) for use in comparisons (equivalent to `#blank` helper method)
 - [ ] Add `contains` keyword
+- [ ] Add `cycle` keyword
 - [ ] Add `starts_with` keyword (new)
 - [ ] Add `ends_with` keyword (new)
+- [ ] Add `continue` keyword
+- [ ] Add `break` keyword
 - [ ] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
