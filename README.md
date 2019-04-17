@@ -134,7 +134,7 @@ TODO:
 - [x] Add support for Array in expressions
 - [x] Add support for Hash in expressions
 - [x] Add "secret" `empty` Array (`[]`) for use in comparisons (equivalent to `#blank` helper method)
-- [ ] Add `contains` keyword
+- [x] Add `contains` operator
 - [ ] Add `cycle` keyword
 - [ ] Add `starts_with` keyword (new)
 - [ ] Add `ends_with` keyword (new)

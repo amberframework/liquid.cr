@@ -1,5 +1,5 @@
 module Liquid
-  OPERATOR = /==|!=|<=|>=|<|>/
+  OPERATOR = /==|!=|<=|>=|<|>|contains/
 
   DQSTRING = /"[^"]*"/
   SQSTRING = /'[^']*'/
@@ -28,5 +28,6 @@ module Liquid
   BOOLEXPR = /\s*?!?(?<bool>#{BOOL})\s*?/
   EXPR     = /(?:#{CMPEXPR})|(?:#{BOOLEXPR})|(?:#{VAR})/
 
-  MULTIPLE_EXPR = /(?:(?<boolop>(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)))?(?<expr>#{EXPR})/
+  BOOLOP = /(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)/
+  MULTIPLE_EXPR = /(?:(?<boolop>(?:#{BOOLOP})))?(?<expr>#{EXPR})/
 end

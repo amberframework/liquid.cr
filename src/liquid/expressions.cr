@@ -53,6 +53,7 @@ module Liquid
       ">=",
       "<",
       ">",
+      "contains",
     ]
 
     def self.process(operator : String, left : Any, right : Any) : Any
@@ -84,6 +85,40 @@ module Liquid
                 left_t < right_t
               when ">"
                 left_t > right_t
+              end
+        Any.new res
+      elsif (left_a = left.as_a?) && (right_a = right.as_a?)
+        res = case operator
+              # when "<="
+              #   left_a <= right_a
+              # when ">="
+              #   left_a >= right_a
+              # when "<"
+              #   left_a < right_a
+              # when ">"
+              #   left_a > right_a
+              when "contains"
+                left_a.includes?(right_a)
+              end
+        Any.new res
+      elsif (left_s = left.as_s?) && (right_s = right.as_s?)
+        res = case operator
+              when "<="
+                left_s <= right_s
+              when ">="
+                left_s >= right_s
+              when "<"
+                left_s < right_s
+              when ">"
+                left_s > right_s
+              when "contains"
+                left_s.includes?(right_s)
+              end
+        Any.new res
+      elsif (left_a = left.as_a?) && (right_raw = right.raw)
+        res = case operator
+              when "contains"
+                left_a.includes?(right_raw)
               end
         Any.new res
       else

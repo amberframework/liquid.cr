@@ -269,6 +269,22 @@ describe Template do
     tpl.render(ctx).should eq ""
   end
 
+  it "should support contains for String, Array values" do
+    tpl = Template.parse %({% if var contains 'asdf' %}yep{% else %}nope{% endif %})
+    ctx = Context{"var" => "123"}
+    tpl.render(ctx).should eq "nope"
+    ctx = Context{"var" => "123asdffdsa321"}
+    tpl.render(ctx).should eq "yep"
+    ctx = Context{"var" => [] of String}
+    tpl.render(ctx).should eq "nope"
+    ctx = Context{"var" => ["asdf"]}
+    tpl.render(ctx).should eq "yep"
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq "nope"
+    # ctx = Context{"var" => {"asdf" => "val1"}}
+    # tpl.render(ctx).should eq "yep"
+  end
+
   it "should support combinations of array/hash access and property access" do
     tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }} {{ hash['first'] }} {{ hash[first] }} {{ hash[objects[0]] }})
     ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => {"first" => "val"}}
