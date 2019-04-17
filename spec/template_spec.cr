@@ -223,6 +223,26 @@ describe Template do
     tpl.render(ctx).should eq "8"
   end
 
+  it "should support #blank?" do
+    tpl = Template.parse %({% if str.blank? %}blank{% endif %})
+    ctx = Context{"str" => "12345678"}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"str" => ""}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"notstr" => ""}
+    tpl.render(ctx).should eq "blank"
+  end
+
+  it "should support #present?" do
+    tpl = Template.parse %({% if str.present? %}present{% endif %})
+    ctx = Context{"str" => "12345678"}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"str" => ""}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"notstr" => ""}
+    tpl.render(ctx).should eq ""
+  end
+
   it "should support combinations of array/hash access and property access" do
     tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }} {{ hash['first'] }} {{ hash[first] }} {{ hash[objects[0]] }})
     ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => {"first" => "val"}}

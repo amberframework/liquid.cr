@@ -10,6 +10,7 @@ Arranged in reverse chronological order (latest changes on top).
 * [CHANGED] Strict mode raises KeyError, IndexError, and Exception depending on situation
 * [ADDED] Accept &&/|| in addition to and/or
 * [ADDED] Allow use of - (negative) and ! (not) in expressions with literals and variables
+* [ADDED] Added #present and #blank helper methods
 
 ## v0.4.0 - 2019-04-15
 

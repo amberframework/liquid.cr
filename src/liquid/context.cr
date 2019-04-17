@@ -85,16 +85,21 @@ module Liquid
         if k =~ /^(.*?)(?:\[.*?\])*$/
           name = $1
           if ret
+            # handle a selection of convenience methods
+            # wrap values in JSON::Any to make sure the return type is always the same
             case name
+            when "present"
+              ret = JSON::Any.new(ret.raw.to_s != "")
+            when "blank"
+              ret = JSON::Any.new(ret.raw.to_s == "")
             when "size"
-              # need to wrap values in JSON::Any. little weird, but necessary to make sure the return type is always the same
               if (array = ret.as_a?)
                 ret = JSON::Any.new(array.size)
               elsif (str = ret.as_s?)
                 ret = JSON::Any.new(str.size)
               end
             else
-              # if not a method, then it's a property
+              # if not a method, then it's a property (implemented as JSON hash member)
               if (hash = ret.as_h?)
                 return key_missing(key, strict) unless hash.has_key?(k)
 
@@ -108,7 +113,12 @@ module Liquid
             if @inner.has_key?(name)
               ret = @inner[name]
             else
-              return key_missing(key, strict)
+              if strict
+                return key_missing(key, strict)
+              else
+                # keep going, in case we're ultimately just doing a #blank check
+                ret = JSON::Any.new(nil)
+              end
             end
           end
         end
@@ -180,6 +190,9 @@ module Liquid
           return parse_error(key, true, "Parse error: Unknown prefix operator #{prefix}")
         end
       end if ret
+
+      # unwrap if it's just a nil inside a JSON::Any (note: Expression sometimes re-wraps it)
+      ret = nil if ret && ret.raw.nil?
 
       ret
     end
