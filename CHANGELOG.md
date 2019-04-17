@@ -11,6 +11,7 @@ Arranged in reverse chronological order (latest changes on top).
 * [ADDED] Accept &&/|| in addition to and/or
 * [ADDED] Allow use of - (negative) and ! (not) in expressions with literals and variables
 * [ADDED] Added #present and #blank helper methods
+* [ADDED] Added "secret" empty array ([]) for use in comparisons
 
 ## v0.4.0 - 2019-04-15
 

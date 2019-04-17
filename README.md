@@ -110,7 +110,8 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 
 # Helper Methods
 - [x] size (for Array and String)
-- [x] present / blank
+- [x] present / blank (added)
+- [ ] first / last
 
 ## Development
 
@@ -130,9 +131,12 @@ TODO:
 - [x] Add capture block
 - [x] Add increment block
 - [x] Add decrement block
-- [ ] Add "contains" keyword
 - [x] Add support for Array in expressions
 - [x] Add support for Hash in expressions
+- [x] Add "secret" `empty` Array (`[]`) for use in comparisons (equivalent to `#blank` helper method)
+- [ ] Add `contains` keyword
+- [ ] Add `starts_with` keyword (new)
+- [ ] Add `ends_with` keyword (new)
 - [ ] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
@@ -140,6 +144,8 @@ TODO:
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
 ## Context Strict Mode
+
+NOTE: Will eventually use this to implement a `strict_variables` rendering flag (planning to implement `strict_filters` as well).
 
 Enable at initialization:
 ```crystal

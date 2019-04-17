@@ -223,6 +223,16 @@ describe Template do
     tpl.render(ctx).should eq "8"
   end
 
+  it "should pre-initialize context with special `empty` array" do
+    tpl = Template.parse %({% if array == empty %}empty{% endif %})
+    ctx = Context.new
+    tpl.render(ctx).should eq "" # here array is nil, not empty
+    ctx["array"] = [] of String
+    tpl.render(ctx).should eq "empty"
+    ctx["array"] = ["val1"]
+    tpl.render(ctx).should eq ""
+  end
+
   it "should support #blank?" do
     tpl = Template.parse %({% if var.blank? %}blank{% endif %})
     ctx = Context{"var" => "12345678"}

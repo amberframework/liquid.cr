@@ -12,6 +12,7 @@ module Liquid
 
     def initialize(@strict = false)
       @inner = Hash(String, JSON::Any).new
+      self["empty"] = [] of String
     end
 
     def parse_error(key, strict : Bool, message : String? = nil)
