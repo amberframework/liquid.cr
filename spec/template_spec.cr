@@ -224,22 +224,38 @@ describe Template do
   end
 
   it "should support #blank?" do
-    tpl = Template.parse %({% if str.blank? %}blank{% endif %})
-    ctx = Context{"str" => "12345678"}
+    tpl = Template.parse %({% if var.blank? %}blank{% endif %})
+    ctx = Context{"var" => "12345678"}
     tpl.render(ctx).should eq ""
-    ctx = Context{"str" => ""}
+    ctx = Context{"var" => ""}
     tpl.render(ctx).should eq "blank"
-    ctx = Context{"notstr" => ""}
+    ctx = Context{"var" => [] of String}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"var" => ["val1"]}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"var" => {"key1" => "val1"}}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"notvar" => ""}
     tpl.render(ctx).should eq "blank"
   end
 
   it "should support #present?" do
-    tpl = Template.parse %({% if str.present? %}present{% endif %})
-    ctx = Context{"str" => "12345678"}
+    tpl = Template.parse %({% if var.present? %}present{% endif %})
+    ctx = Context{"var" => "12345678"}
     tpl.render(ctx).should eq "present"
-    ctx = Context{"str" => ""}
+    ctx = Context{"var" => [] of String}
     tpl.render(ctx).should eq ""
-    ctx = Context{"notstr" => ""}
+    ctx = Context{"var" => ["val1"]}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => {"key1" => "val1"}}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"var" => ""}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"notvar" => ""}
     tpl.render(ctx).should eq ""
   end
 

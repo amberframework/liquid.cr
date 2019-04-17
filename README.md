@@ -108,6 +108,10 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 - [ ] uniq
 - [x] upcase | uppercase
 
+# Helper Methods
+- [x] size (for Array and String)
+- [x] present / blank
+
 ## Development
 
 TODO:

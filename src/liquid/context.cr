@@ -89,9 +89,21 @@ module Liquid
             # wrap values in JSON::Any to make sure the return type is always the same
             case name
             when "present"
-              ret = JSON::Any.new(ret.raw.to_s != "")
+              if (array = ret.as_a?)
+                ret = JSON::Any.new(array.size > 0)
+              elsif (hash = ret.as_h?)
+                ret = JSON::Any.new(hash.keys.size > 0)
+              else
+                ret = JSON::Any.new(ret.raw.to_s.size > 0)
+              end
             when "blank"
-              ret = JSON::Any.new(ret.raw.to_s == "")
+              if (array = ret.as_a?)
+                ret = JSON::Any.new(array.size == 0)
+              elsif (hash = ret.as_h?)
+                ret = JSON::Any.new(hash.keys.size == 0)
+              else
+                ret = JSON::Any.new(ret.raw.to_s.size == 0)
+              end
             when "size"
               if (array = ret.as_a?)
                 ret = JSON::Any.new(array.size)
@@ -105,7 +117,7 @@ module Liquid
 
                 ret = hash[k]
               else
-                return parse_error(key, strict)
+                return parse_error(key, strict, "Parse error: Tried to access property of a non-hash object (#{key})")
               end
             end
           else
