@@ -33,7 +33,7 @@ module Liquid
 
     def key_missing(key, strict : Bool)
       if strict
-        raise KeyError.new("Missing context key: \"#{key}\"")
+        raise KeyError.new("Key does not exist in context: \"#{key}\"")
       else
         nil
       end
@@ -117,7 +117,7 @@ module Liquid
 
                 ret = hash[k]
               else
-                return parse_error(key, strict, "Parse error: Tried to access property of a non-hash object (#{key})")
+                return parse_error(key, strict, "Parse error: Tried to access property of a non-hash object (#{key} -> #{ret.inspect})")
               end
             end
           else
