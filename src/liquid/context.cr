@@ -14,17 +14,39 @@ module Liquid
       @inner = Hash(String, JSON::Any).new
     end
 
-    def [](key : String)
-      if (ret = self[key]?)
-        ret
+    def parse_error(key, strict : Bool)
+      if strict
+        raise Exception.new("Parse error: \"#{key}\"")
       else
+        nil
+      end
+    end
+
+    def index_error(key, strict : Bool)
+      if strict
+        raise IndexError.new("Array index out of bounds: \"#{key}\"")
+      else
+        nil
+      end
+    end
+
+    def key_missing(key, strict : Bool)
+      if strict
         raise KeyError.new("Missing context key: \"#{key}\"")
+      else
+        nil
       end
     end
 
     # key can include . (property/method access) and/or [] (array index)
-    def []?(key : String) : JSON::Any?
-      return @inner[key] if @inner[key]?
+    @[AlwaysInline]
+    def get(key, strict : Bool = @strict)
+      return @inner[key] if @inner.has_key?(key)
+
+      if key =~ /^(.*?)\?$/
+        key = $1
+        strict = false
+      end
 
       prefixes = [] of String
       if key =~ /^([-!]+)(.*?)$/
@@ -35,7 +57,7 @@ module Liquid
       segments = key.split(".", remove_empty: false)
 
       # there should not be any blank segments (e.g. asdf..fdsa, .asdf, asdf.)
-      return nil if segments.any?(&.blank?)
+      return parse_error(key, strict) if segments.any?(&.blank?)
 
       # rejoin any segments that got broken in the middle of an array index
       segments.each_with_index do |segment, i|
@@ -72,17 +94,21 @@ module Liquid
               end
             else
               # if not a method, then it's a property
-              if (hash = ret.as_h?) && hash[k]?
+              if (hash = ret.as_h?)
+                return key_missing(key, strict) unless hash.has_key?(k)
+
                 ret = hash[k]
               else
-                # could not find property
-                return nil
+                return parse_error(key, strict)
               end
             end
           else
             # first time through ret = nil, name should correspond to a top level key in @inner
-            ret = @inner[name]?
-            return nil unless ret
+            if @inner.has_key?(name)
+              ret = @inner[name]
+            else
+              return key_missing(key, strict)
+            end
           end
         end
 
@@ -91,37 +117,45 @@ module Liquid
           # puts index
           if (index =~ /^(\-?#{INT})$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
             # array access via integer literal
-            return nil unless array[idx]?
+            return index_error(key, strict) unless (-array.size..array.size).includes?(idx)
 
             ret = array[idx]
             k = k.sub("[#{index}]", "")
           elsif (match = index.match(GSTRING)) && ret && (hash = ret.as_h?)
             # hash access via string literal
             hashkey = match["str"]
-            return nil unless hash[hashkey]?
+            if hash.has_key?(hashkey)
+              ret = hash[hashkey]
+            else
+              return key_missing(key, strict)
+            end
 
-            ret = hash[hashkey]
             k = k.sub("[#{index}]", "")
           elsif (index =~ /^\-?(#{VAR})$/) && (varname = $1) && ret && (array = ret.as_a?)
             # array access via integer variable
             invert = (index[0] == '-')
-            if (realidx = self[varname]?.try(&.as_i?)) && (val = array[(invert ? -1 : 1) * realidx]?)
-              ret = val
+            if (realidx = self[varname]?.try(&.as_i?))
+              realidx *= invert ? -1 : 1
+              return index_error(key, strict) unless (-array.size..array.size).includes?(realidx)
+
+              ret = array[realidx]
               k = k.sub("[#{index}]", "")
             else
-              return nil
+              return key_missing(key, strict)
             end
           elsif (varname = index) && ret && (hash = ret.as_h?)
             # hash access via string variable
-            if (realkey = self[varname]?.try(&.as_s?)) && (val = hash[realkey]?)
-              ret = val
+            if (realkey = self[varname]?.try(&.as_s?))
+              return key_missing(key, strict) unless hash.has_key?(realkey)
+
+              ret = hash[realkey]
               k = k.sub("[#{index}]", "")
             else
-              return nil
+              return parse_error(key, strict)
             end
           else
             # hmm, we failed to match any known indexing scheme
-            return nil
+            return parse_error(key, strict)
           end
         end
       end
@@ -149,20 +183,17 @@ module Liquid
       ret
     end
 
+    def [](key : String) : JSON::Any
+      get(key, strict: true).not_nil!
+    end
+
+    def []?(key : String) : JSON::Any?
+      get(key, strict: false)
+    end
+
     @[AlwaysInline]
     def []=(key, value)
       @inner[key] = Any.from_json value.to_json
-    end
-
-    # alias for []?(key)
-    @[AlwaysInline]
-    def get(key)
-      # optional if ? is appended to key; otherwise, follow @strict setting
-      if key =~ /^(.*?)\?$/
-        self[$1]?
-      else
-        @strict ? self[key] : self[key]?
-      end
     end
 
     # alias for []=(key, val)

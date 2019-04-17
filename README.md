@@ -112,7 +112,8 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 
 TODO:
 - [x] Basic For loops
-- [x] Basic If Elsif Else
+- [x] if/elsif/else/endif
+- [ ] unless/endunless
 - [x] Raw and comment blocks ({% raw %} and {% comment %})
 - [x] Add variable assignment ({% assign var = "Hello World" %})
 - [x] Add support for multiple operator (no operator precedence support (for now))
@@ -146,7 +147,7 @@ Or on an existing Context:
 ctx.strict = true
 ```
 
-Raises `KeyError` on missing keys (instead of silently emitting nil/blank).
+Raises `KeyError` on missing keys and `IndexError` on array out of bounds errors instead of silently emitting `nil`.
 
 Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
 
