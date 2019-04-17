@@ -9,6 +9,7 @@ Arranged in reverse chronological order (latest changes on top).
 * [FIXED] Accept a wider range of complex boolean expressions
 * [CHANGED] Strict mode raises KeyError instead of IndexError on missing key
 * [ADDED] Accept &&/|| in addition to and/or
+* [ADDED] Allow use of - (negative) and ! (not) in expressions with literals and variables
 
 ## v0.4.0 - 2019-04-15
 

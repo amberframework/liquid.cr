@@ -4,12 +4,12 @@ module Liquid
   DQSTRING = /"[^"]*"/
   SQSTRING = /'[^']*'/
   STRING   = /(?:#{DQSTRING})|(?:#{SQSTRING})/
-  INT      = /(?:0|(?:-?[1-9][0-9]*))/
-  FLOAT    = /-?[0-9]+\.[0-9]+/
-  BOOL     = /(?:false)|(?:true)|(?:[01])|(?:nil)/
+  INT      = /(?:0|(?:-*[1-9][0-9]*))/
+  FLOAT    = /-*[0-9]+\.[0-9]+/
+  BOOL     = /(?:false)|(?:true)/
   TYPE     = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})|(?:#{BOOL})/
 
-  VAR = /((?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<index>(?:#{STRING})|(?:#{INT})|(?1))\]))*\??)/
+  VAR = /([-!]*(?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<index>(?:#{STRING})|(?:#{INT})|(?1))\]))*\??)/
 
   TYPE_OR_VAR = /(?:#{TYPE})|(?:#{VAR})/
   CMP         = /(?:#{TYPE_OR_VAR})\s*(?:#{OPERATOR})\s*(?:#{TYPE_OR_VAR})/
@@ -25,8 +25,8 @@ module Liquid
   GFILTERED = /(?<first>#{TYPE_OR_VAR})(\s?\|\s?(#{FILTER}))+/
 
   CMPEXPR  = /\s*?#{GCMP}\s*?/
-  BOOLEXPR = /\s*?(?<bool>#{BOOL})\s*?/
-  EXPR     = /(?:#{CMPEXPR})|(?:#{BOOLEXPR})/
+  BOOLEXPR = /\s*?!?(?<bool>#{BOOL})\s*?/
+  EXPR     = /(?:#{CMPEXPR})|(?:#{BOOLEXPR})|(?:#{VAR})/
 
-  MULTIPLE_EXPR = /(?:(?<boolop>(\s+or|and\s+)|(\s*&&|\|\|\s*)))?(?<expr>#{EXPR})/
+  MULTIPLE_EXPR = /(?:(?<boolop>(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)))?(?<expr>#{EXPR})/
 end

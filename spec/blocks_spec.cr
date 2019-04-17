@@ -213,16 +213,23 @@ describe Liquid do
         expr = Expression.new "true == false"
         expr2 = Expression.new "true != false"
         expr3 = Expression.new "var != 15"
+        expr3a = Expression.new "-var == -16"
         expr4 = Expression.new "str == 'asdf'"
+        expr5 = Expression.new "!false && !flag"
+        expr5a = Expression.new "!flag && !false"
 
-        ctx = Context.new
+        ctx = Context.new(strict: true)
         ctx.set "var", 16
         ctx.set "str", "asdf"
+        ctx.set "flag", false
 
         expr.eval(ctx).should be_false
         expr2.eval(ctx).should be_true
         expr3.eval(ctx).should be_true
+        expr3a.eval(ctx).should be_true
         expr4.eval(ctx).should be_true
+        expr5.eval(ctx).should be_true
+        expr5a.eval(ctx).should be_true
       end
       # it "should eval an operation with contains keyword" do
       #   expr = Expression.new "myarr contains another"

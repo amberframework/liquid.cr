@@ -65,9 +65,9 @@ module Liquid::Block
     end
 
     def eval(data) : Any
-      ret = if @var == "true"
+      ret = if @var == "true" || @var == "!false"
               true
-            elsif @var == "false"
+            elsif @var == "false" || @var == "!true"
               false
             elsif @var == "nil"
               nil

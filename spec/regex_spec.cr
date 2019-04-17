@@ -11,20 +11,20 @@ module Liquid
 
     it "should match String, int and float" do
       ok = ["\"\"", "''", "'not empty string'", "\"not empty string\"", "0", "0.0", "12", "-12", "15.68", "-20.36"]
-      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-"]
+      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "54.54.5", "115-"]
       ok.each &.match(/^#{TYPE}$/).should_not be_nil
       err.each &.match(/^#{TYPE}$/).should be_nil
     end
 
     it "should match a type or a var" do
       ok = ["\"\"", "''", "'not empty string'", "\"not empty string\"", "0", "0.0", "12", "-12", "15.68", "-20.36", "ma_var"]
-      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "--545", "54.54.5", "115-", "not-me", "-troll"]
+      err = ["\"\"\"", "'", "'''", "'don't'", "\"doo bi \" YOLO \" doop\"", "54.54.5", "115-", "not-me"]
       ok.each &.match(/^#{TYPE_OR_VAR}$/).should_not be_nil
       err.each &.match(/^#{TYPE_OR_VAR}$/).should be_nil
     end
 
     it "should match a comparison" do
-      ok = ["a == b", "sdf != fds", "dd < 12", "true > false", "hh==hh", "12 <= var"]
+      ok = ["a == !b", "!-a == ---b", "!--a == !!b", "sdf != fds", "dd < 12", "true > false", "hh==hh", "12 <= var"]
       err = ["a = b", "dfs ! fff", "ddd=ddd", "12>"]
       ok.each &.match(/^#{CMP}$/).should_not be_nil
       err.each &.match(/^#{CMP}$/).should be_nil

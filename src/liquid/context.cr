@@ -26,6 +26,12 @@ module Liquid
     def []?(key : String) : JSON::Any?
       return @inner[key] if @inner[key]?
 
+      prefixes = [] of String
+      if key =~ /^([-!]+)(.*?)$/
+        prefixes = $1.split(//)
+        key = $2
+      end
+
       segments = key.split(".", remove_empty: false)
 
       # there should not be any blank segments (e.g. asdf..fdsa, .asdf, asdf.)
@@ -119,6 +125,26 @@ module Liquid
           end
         end
       end
+
+      # apply prefixes in reverse order
+      prefixes.reverse.each do |prefix|
+        case prefix
+        when "-"
+          if (num = ret.as_i?) || (num = ret.as_f?)
+            ret = JSON::Any.new(-1 * num)
+          else
+            raise "Couldn't interpret #{ret} as numeric value (#{key})"
+          end
+        when "!"
+          if !(bool = ret.as_bool?).nil? # booleans are tricky, check for nil specifically
+            ret = JSON::Any.new(!bool)
+          else
+            raise "Couldn't interpret #{ret} as boolean value (#{key})"
+          end
+        else
+          raise "Unknown prefix operator #{prefix}"
+        end
+      end if ret
 
       ret
     end
