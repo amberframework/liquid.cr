@@ -43,12 +43,12 @@ module Liquid
     # key can include . (property/method access) and/or [] (array index)
     @[AlwaysInline]
     def get(key, strict : Bool = @strict)
-      return @inner[key] if @inner.has_key?(key)
-
       if key =~ /^(.*?)\?$/
         key = $1
         strict = false
       end
+
+      return @inner[key] if @inner.has_key?(key)
 
       prefixes = [] of String
       if key =~ /^([-!]+)(.*?)$/
@@ -192,26 +192,26 @@ module Liquid
       prefixes.reverse.each do |prefix|
         case prefix
         when "-"
-          if (num = ret.as_i?) || (num = ret.as_f?)
+          if ret && ((num = ret.as_i?) || (num = ret.as_f?))
             ret = JSON::Any.new(-1 * num)
           else
-            return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as numeric value (#{key})")
+            return parse_error(key, true, "Parse error: Couldn't interpret #{ret.inspect} as numeric value (#{key})")
           end
         when "!"
           # booleans are tricky... first, treat nil as false
           # next, check to see whether it can be interpret as bool (check for nil
           # specifically, to avoid returning parse error on false value)
-          if ret.raw.nil?
-            ret = JSON::Any.new(false)
+          if ret.nil? || ret.raw.nil?
+            ret = JSON::Any.new(true)
           elsif !(bool = ret.as_bool?).nil?
             ret = JSON::Any.new(!bool)
           else
-            return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as boolean value (#{key})")
+            return parse_error(key, true, "Parse error: Couldn't interpret #{ret.inspect} as boolean value (#{key})")
           end
         else
           return parse_error(key, true, "Parse error: Unknown prefix operator #{prefix}")
         end
-      end if ret
+      end
 
       # unwrap if it's just a nil inside a JSON::Any (note: Expression sometimes re-wraps it)
       ret = nil if ret && ret.raw.nil?

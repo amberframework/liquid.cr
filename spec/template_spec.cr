@@ -157,7 +157,12 @@ describe Template do
     {%- if mykey? -%}
       Key present
     {%- else -%}
-      Key missing
+      Key absent
+    {%- endif -%}
+    {%- if !mykey? -%}
+      Key absent
+    {%- else -%}
+      Key present
     {%- endif -%}
     EOT
 
@@ -165,11 +170,11 @@ describe Template do
 
     tpl = Parser.parse txt
     result = tpl.render ctx
-    result.should eq "Key missing"
+    result.should eq "Key absentKey absent"
 
-    ctx["mykey"] = "!"
+    ctx["mykey"] = true
     result = tpl.render ctx
-    result.should eq "Key present"
+    result.should eq "Key presentKey present"
   end
 
   it "should render captured variables" do
