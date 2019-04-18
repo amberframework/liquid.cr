@@ -83,9 +83,9 @@ module Liquid
         @buffer = @buffer.rstrip if @rstrip
         @nodes.last << Block::Raw.new @buffer
         @buffer = ""
-        @lstrip = false
-        @rstrip = false
       end
+      @lstrip = false
+      @rstrip = false
     end
 
     def consume_expression
