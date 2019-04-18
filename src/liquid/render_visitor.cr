@@ -210,6 +210,32 @@ module Liquid
           node.children.each &.accept(visitor)
           i += 1
         end
+      elsif (hash = val.eval(data).as_h?)
+        visitor = RenderVisitor.new data, @io
+        i = 0
+        stop = hash.keys.size
+        hash.each do |k, v|
+          val = [k, v]
+          data.set node.loop_var, val
+          data.set "loop.index", i + 1
+          data.set "loop.index0", i
+          data.set "loop.revindex", stop - i + 1
+          data.set "loop.revindex0", stop - i
+          data.set "loop.first", i == 0
+          data.set "loop.last", i == stop
+          data.set "loop.length", stop
+
+          # for compatibility with Shopify liquid
+          data.set "forloop.length", stop
+          data.set "forloop.index", i + 1
+          data.set "forloop.index0", i
+          data.set "forloop.rindex", stop - i + 1
+          data.set "forloop.rindex0", stop - i
+          data.set "forloop.first", i == 0
+          data.set "forloop.last", i == stop
+          node.children.each &.accept(visitor)
+          i += 1
+        end
       else
         raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
       end

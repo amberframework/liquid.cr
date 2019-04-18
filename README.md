@@ -123,7 +123,8 @@ TODO:
 - [x] Add variable assignment ({% assign var = "Hello World" %})
 - [x] Add support for multiple operator (no operator precedence support (for now))
 - [x] Add support for Array into for loop
-- [x] Add support for Hash into for loop ({% for key, val in myhash %})
+- [x] Add support for Hash into for loop (`{% for val in myhash %}`, access as `val[0]` and `val[1]`)
+- [ ] Add support for Hash into for loop ({% for key, val in myhash %}) (new)
 - [x] Add support for Float
 - [x] Add iteration over Arrays
 - [x] Improve data interface

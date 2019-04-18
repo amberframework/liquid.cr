@@ -52,6 +52,30 @@ describe Template do
     tpl.render(ctx).should eq "\n    Got : 1\n    \n    Got : 12.2\n    \n    Got : here\n    "
   end
 
+  it "should render for loop when iterating over a hash by value (key+value array)" do
+    tpl = Parser.parse <<-EOT
+    {%- for v in myhash -%}
+      Got : {{v[0]}} => {{v[1]}}
+    {%- endfor -%}
+    EOT
+
+    ctx = Context.new
+    ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
+    tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
+  end
+
+  # it "should render for loop when iterating over a hash by key, value" do
+  #   tpl = Parser.parse <<-EOT
+  #   {%- for k, v in myhash -%}
+  #     Got : {{k}} => {{v}}
+  #   {%- endfor -%}
+  #   EOT
+
+  #   ctx = Context.new
+  #   ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
+  #   tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
+  # end
+
   it "should render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new

@@ -194,7 +194,12 @@ module Liquid
             return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as numeric value (#{key})")
           end
         when "!"
-          if !(bool = ret.as_bool?).nil? # booleans are tricky, check for nil specifically
+          # booleans are tricky... first, treat nil as false
+          # next, check to see whether it can be interpret as bool (check for nil
+          # specifically, to avoid returning parse error on false value)
+          if ret.raw.nil?
+            ret = JSON::Any.new(false)
+          elsif !(bool = ret.as_bool?).nil?
             ret = JSON::Any.new(!bool)
           else
             return parse_error(key, true, "Parse error: Couldn't interpret #{ret} as boolean value (#{key})")

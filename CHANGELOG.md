@@ -14,6 +14,7 @@ Arranged in reverse chronological order (latest changes on top).
 * [ADDED] Added "secret" empty array ([]) for use in comparisons
 * [ADDED] Added shopify liquid loop variables
 * [ADDED] Implemented contains operator
+* [ADDED] Implemented for loop over hash by array of key+value (for v in hash, where v[0] = key, v[1] = value)
 
 ## v0.4.0 - 2019-04-15
 
