@@ -175,7 +175,7 @@ module Liquid
               ret = hash[realkey]
               k = k.sub("[#{index}]", "")
             else
-              return parse_error(key, strict)
+              return parse_error(key, strict, "#{key}: Could not resolve hash key `#{varname}` to String value")
             end
           else
             # hmm, we failed to match any known indexing scheme
