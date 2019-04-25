@@ -228,6 +228,12 @@ describe Template do
     tpl.render(ctx).should eq "bbb"
   end
 
+  it "should render replace filter 2" do
+    tpl = Template.parse %({{var | replace: "a,b", "b,c"}})
+    ctx = Context{"var" => "a,b a,b a,b"}
+    tpl.render(ctx).should eq "b,c b,c b,c"
+  end
+
   it "should support array access via literal" do
     tpl = Template.parse %({{ objects[1] }}, {{ objects[0] }}, {{ objects[-1] }}, {{ objects[2] }})
     ctx = Context{"objects" => ["first", "second", "third"]}

@@ -1,8 +1,8 @@
 module Liquid
   OPERATOR = /==|!=|<=|>=|<|>|contains/
 
-  DQSTRING = /"[^"]*"/
-  SQSTRING = /'[^']*'/
+  DQSTRING = /"([^"]|\\")*"/
+  SQSTRING = /'([^']|\\')*'/
   STRING   = /(?:#{DQSTRING})|(?:#{SQSTRING})/
   INT      = /(?:0|(?:-*[1-9][0-9]*))/
   FLOAT    = /-*[0-9]+\.[0-9]+/
@@ -19,10 +19,9 @@ module Liquid
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 
-  FILTER    = /#{VAR}(?::\s*#{TYPE_OR_VAR}(?:,\s*#{TYPE_OR_VAR})*)?/
-  GFILTER   = /(?<filter>#{VAR})(?::\s*(?<args>#{TYPE_OR_VAR}(?:,\s*#{TYPE_OR_VAR})*))?/
-  FILTERED  = /#{TYPE_OR_VAR}(?:\s?\|\s?#{FILTER})+/
-  GFILTERED = /(?<first>#{TYPE_OR_VAR})(\s?\|\s?(#{FILTER}))+/
+  FILTER_ARGS = /(?<filterarg>#{TYPE_OR_VAR})(?:,\s*(?<filterarg>#{TYPE_OR_VAR}))*/
+  GFILTER     = /(?<filter>#{VAR})(?::\s*(?<args>#{FILTER_ARGS}))?/
+  GFILTERED   = /(?<first>#{TYPE_OR_VAR})(\s*\|\s*(#{GFILTER}))+/
 
   CMPEXPR  = /\s*?#{GCMP}\s*?/
   BOOLEXPR = /\s*?!?(?<bool>#{BOOL})\s*?/

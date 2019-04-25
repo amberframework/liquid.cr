@@ -55,7 +55,7 @@ module Liquid::Block
       if m = @var.match GSTRING
         @children << Block::Raw.new m["str"]
       end
-      if @var.match intern(FILTERED)
+      if @var.match intern(GFILTERED)
         @children << Filtered.new @var
       end
     end

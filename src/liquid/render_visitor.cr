@@ -99,15 +99,21 @@ module Liquid
         matches.shift
       end
       matches.each do |fm|
-        if filter = Filters::FilterRegister.get fm["filter"]
-          args : Array(Expression)?
-          args = nil
+        if (filter_name = Filters::FilterRegister.get fm["filter"])
+          filter_args : Array(Expression)? = nil
           if (margs = fm["args"]?)
-            args = Array(Expression).new
-            splitted = margs.split(',').map &.strip
-            splitted.each { |m| args << Expression.new(m) }
+            filter_args = Array(Expression).new
+            if (argmatches = margs.match(/^#{FILTER_ARGS}$/))
+              # find all captures named "filterarg"
+              name_table = argmatches.regex.name_table
+              (0...argmatches.size).each do |i|
+                if name_table[i]? == "filterarg" && (arg = argmatches[i]?)
+                  filter_args << Expression.new(arg)
+                end
+              end
+            end
           end
-          node.filters << {filter, args}
+          node.filters << {filter_name, filter_args}
         else
           raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
         end
