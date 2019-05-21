@@ -108,8 +108,12 @@ module Liquid
             when "size"
               if (array = ret.as_a?)
                 ret = JSON::Any.new(array.size)
+              elsif (hash = ret.as_h?)
+                ret = JSON::Any.new(hash.keys.size)
               elsif (str = ret.as_s?)
                 ret = JSON::Any.new(str.size)
+              else
+                return parse_error(key, strict, "Parse error: Tried to call #size on something other than a String, Array or Hash (#{key} -> #{ret.inspect})")
               end
             else
               # if not a method, then it's a property (implemented as JSON hash member)

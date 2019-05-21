@@ -241,6 +241,12 @@ describe Template do
     tpl.render(ctx).should eq "3"
   end
 
+  it "should support Hash#size" do
+    tpl = Template.parse %({{ objects.size }})
+    ctx = Context{"objects" => {"first" => "1st", "second" => "2nd", "third" => "3rd"}}
+    tpl.render(ctx).should eq "3"
+  end
+
   it "should support String#size" do
     tpl = Template.parse %({{ str.size }})
     ctx = Context{"str" => "12345678"}

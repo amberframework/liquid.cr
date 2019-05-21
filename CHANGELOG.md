@@ -4,6 +4,8 @@ Arranged in reverse chronological order (latest changes on top).
 
 ## Unreleased
 
+* [FIXED] Filters within loops no longer applied once per each completed loop iteration
+* [NEW] Support Hash#size
 * [NEW] Supports hash access, via string literal or string variable
 * [FIXED] Accept single quoted strings
 * [FIXED] Accept a wider range of complex boolean expressions
@@ -22,4 +24,4 @@ Arranged in reverse chronological order (latest changes on top).
 * [NEW] Added optional strict mode for Context
 * [NEW] Support array access, via integer literal or integer variable
 * [NEW] Support Array#size and String#size
-* [FIXED] Treat zero as a valid integer to fix comparison w/zero, e.g. `{% if array.size > 0 %}` 
+* [FIXED] Treat zero as a valid integer to fix comparison w/zero, e.g. `{% if array.size > 0 %}`
