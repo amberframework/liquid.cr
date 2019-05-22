@@ -38,21 +38,21 @@ module Liquid
     end
 
     it "should match filters with multiple arguments" do
-      str = "filtered | filter: arg1, arg2"
+      str = "filtered | filter: arg1, arg2, arg3"
       matches = str.match(/^#{GFILTERED}$/).not_nil!
       matches[0].should eq str
       matches["first"].should eq "filtered"
       matches["filter"].should eq "filter"
-      matches["args"].should eq "arg1, arg2"
+      matches["args"].should eq "arg1, arg2, arg3"
     end
 
     it "should match filters with multiple arguments 2" do
-      str = "filtered | filter: \"a,b\", 'c, d'"
+      str = "filtered | filter: \"a,b\", 'c, d', e"
       matches = str.match(/^#{GFILTERED}$/).not_nil!
       matches[0].should eq str
       matches["first"].should eq "filtered"
       matches["filter"].should eq "filter"
-      matches["args"].should eq "\"a,b\", 'c, d'"
+      matches["args"].should eq "\"a,b\", 'c, d', e"
     end
 
     it "should match a string" do

@@ -4,8 +4,10 @@ Arranged in reverse chronological order (latest changes on top).
 
 ## Unreleased
 
-* [FIXED] Filters within loops no longer applied once per each completed loop iteration
 * [NEW] Support Hash#size
+* [NEW] Support Array literals
+* [FIXED] Filters within loops no longer applied once per each completed loop iteration
+* [FIXED] Filters can now take more than two arguments
 * [NEW] Supports hash access, via string literal or string variable
 * [FIXED] Accept single quoted strings
 * [FIXED] Accept a wider range of complex boolean expressions

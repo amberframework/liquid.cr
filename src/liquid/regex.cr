@@ -7,7 +7,9 @@ module Liquid
   INT      = /(?:0|(?:-*[1-9][0-9]*))/
   FLOAT    = /-*[0-9]+\.[0-9]+/
   BOOL     = /(?:false)|(?:true)/
-  TYPE     = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})|(?:#{BOOL})/
+  SCALAR   = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})|(?:#{BOOL})/
+  ARRAY    = /\[(#{SCALAR}(?:\s*,\s*#{SCALAR})*)\]/
+  TYPE     = /(?:#{SCALAR})|(?:#{ARRAY})/
 
   VAR = /([-!]*(?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<index>(?:#{STRING})|(?:#{INT})|(?1))\]))*\??)/
 
@@ -19,7 +21,8 @@ module Liquid
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 
-  FILTER_ARGS = /(?<filterarg>#{TYPE_OR_VAR})(?:,\s*(?<filterarg>#{TYPE_OR_VAR}))*/
+  FILTER_ARG  = TYPE_OR_VAR
+  FILTER_ARGS = /#{FILTER_ARG}(?:,\s*#{FILTER_ARG})*/
   GFILTER     = /(?<filter>#{VAR})(?::\s*(?<args>#{FILTER_ARGS}))?/
   GFILTERED   = /(?<first>#{TYPE_OR_VAR})(\s*\|\s*(#{GFILTER}))+/
 

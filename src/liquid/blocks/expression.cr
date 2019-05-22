@@ -77,6 +77,16 @@ module Liquid::Block
               m["intval"].to_i
             elsif m = @var.match intern(GFLOAT)
               m["floatval"].to_f32
+            elsif m = @var.match intern(ARRAY) # scalars only for now; no variables allowed
+              str = $1
+              scalars = Array(Expression).new
+              while str =~ /^(#{SCALAR})/
+                match = $1
+                scalars << Expression.new(match)
+                str = str.sub(match, "")
+                str = str.sub(/^\s*,\s*/, "")
+              end
+              scalars.map { |s| s.eval(data) }
             elsif m = @var.match intern(VAR)
               data.get(@var) # Context handles . and [] access
             elsif m = @var.match intern(GCMP)

@@ -349,4 +349,10 @@ describe Template do
     ctx["obj"] = {something: "something", missing: "present"}
     tpl.render(ctx).should eq "presentpresent"
   end
+
+  it "filter should receive all args, in order" do
+    ctx = Context.new
+    tpl = Template.parse %({{ "" | arg_test: '1', "2", 3, 4.0, [5] }})
+    tpl.render(ctx).should eq "1, 2, 3, 4.0, [5]"
+  end
 end

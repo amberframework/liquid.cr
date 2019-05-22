@@ -103,13 +103,12 @@ module Liquid
           filter_args : Array(Expression)? = nil
           if (margs = fm["args"]?)
             filter_args = Array(Expression).new
-            if (argmatches = margs.match(/^#{FILTER_ARGS}$/))
-              # find all captures named "filterarg"
-              name_table = argmatches.regex.name_table
-              (0...argmatches.size).each do |i|
-                if name_table[i]? == "filterarg" && (arg = argmatches[i]?)
-                  filter_args << Expression.new(arg)
-                end
+            if margs.match(/^#{FILTER_ARGS}$/)
+              while margs =~ /^(#{FILTER_ARG})/
+                match = $1
+                filter_args << Expression.new(match)
+                margs = margs.sub(match, "")
+                margs = margs.sub(/^\s*,\s*/, "")
               end
             end
           end
