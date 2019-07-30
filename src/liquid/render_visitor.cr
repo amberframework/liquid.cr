@@ -139,10 +139,10 @@ module Liquid
 
     def visit(node : Include)
       filename = if @template_path != nil
-          File.join(@template_path.not_nil!, node.template_name)
-        else
-          node.template_name
-        end
+                   File.join(@template_path.not_nil!, node.template_name)
+                 else
+                   node.template_name
+                 end
 
       if node.template_vars != nil
         node.template_vars.each do |key, value|

@@ -323,7 +323,7 @@ describe Liquid::Filters do
   describe Split do
     it "split a string into an array" do
       Split.filter(Any.new("John, Paul, George, Ringo"), [Any.new ", "])
-           .should eq ["John", "Paul", "George", "Ringo"]
+        .should eq ["John", "Paul", "George", "Ringo"]
     end
   end
 

@@ -2,9 +2,9 @@ require "./blocks"
 
 module Liquid
   class Parser
-    STATEMENT = /^\s*(?<keyword>[a-z]+).*$/
+    STATEMENT        = /^\s*(?<keyword>[a-z]+).*$/
     ENDRAW_STATEMENT = {
-      "raw" => /(?<!\\){%\s*endraw\s*\-?%}|$/,
+      "raw"     => /(?<!\\){%\s*endraw\s*\-?%}|$/,
       "comment" => /(?<!\\){%\s*endcomment\s*\-?%}|$/,
     }
 
@@ -90,7 +90,7 @@ module Liquid
 
     def consume_expression
       while @i < @str.size - 1
-        if @str[@i] == '-' && @str[@i+1] == '}' && @str[@i + 2] == '}'
+        if @str[@i] == '-' && @str[@i + 1] == '}' && @str[@i + 2] == '}'
           @lstrip = true
           @i += 2
           break
@@ -114,7 +114,7 @@ module Liquid
     # Consume a statement
     def consume_statement
       while @i < @str.size - 1
-        if @str[@i] == '-' && @str[@i+1] == '%' && @str[@i + 2] == '}'
+        if @str[@i] == '-' && @str[@i + 1] == '%' && @str[@i + 2] == '}'
           @lstrip = true
           @i += 2
           break
@@ -141,9 +141,9 @@ module Liquid
           @nodes.last << block_class.new @buffer
         else # when BlockType::Raw, BlockType::RawHidden
           if match = @str.match(ENDRAW_STATEMENT[match["keyword"]], @i)
-            j = match.begin.not_nil!-1
-            @buffer = @str[@i+1..j]
-            @i = match.end.not_nil!-1
+            j = match.begin.not_nil! - 1
+            @buffer = @str[@i + 1..j]
+            @i = match.end.not_nil! - 1
             @nodes.last << block_class.new @buffer
           end
         end

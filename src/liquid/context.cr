@@ -3,7 +3,6 @@ require "./any"
 
 module Liquid
   struct Context
-
     JSON.mapping(
       inner: Hash(String, JSON::Any)
     )

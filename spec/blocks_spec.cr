@@ -3,7 +3,6 @@ require "./spec_helper"
 describe Liquid do
   describe Block do
     describe If do
-
       it "should add elsif node" do
         ifnode = If.new "if true == true"
         elsifnode = ElsIf.new "elsif true == false"
@@ -87,10 +86,10 @@ describe Liquid do
         ctx = Context.new
         template_name = "spec/data/color.liquid"
         template_vars = {
-          "string" => "\"green\"",
+          "string"  => "\"green\"",
           "integer" => 20,
-          "float" => 3.0,
-          "bool" => true,
+          "float"   => 3.0,
+          "bool"    => true,
         }
 
         parse_text = "include \"#{template_name}\""

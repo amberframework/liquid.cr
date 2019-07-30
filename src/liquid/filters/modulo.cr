@@ -5,7 +5,6 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      
       # raise error if user doesn't provide an argument to divide by
       raise FilterArgumentException.new "modulo filter expects one argument" unless args && args.first?
 
@@ -26,7 +25,6 @@ module Liquid::Filters
 
     # convert left & right values to either an int or float and get modulo
     protected def self.divide_by_any(l : Any, r : Any)
-
       # crystal can't divide an int by a float so we have to exit here
       if l.raw.is_a?(Int) && !r.raw.is_a?(Int)
         return nil
@@ -38,11 +36,11 @@ module Liquid::Filters
         left = l.as_i
         right = r.as_i
         _, modulo = left.divmod(right)
-      else  
+      else
         left = l.as_f
         if r.raw.is_a?(Int)
           right = r.as_i
-        else  
+        else
           right = r.as_f
         end
         _, modulo = left.divmod(right)

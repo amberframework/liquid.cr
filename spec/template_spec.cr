@@ -149,5 +149,4 @@ describe Template do
     ctx = Context{"var" => "aaa"}
     tpl.render(ctx).should eq "bbb"
   end
-
 end

@@ -7,7 +7,7 @@ module Liquid::Filters
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       # raise error if user doesn't provide an argument to divided by
       raise FilterArgumentException.new "slice filter expects at least one argument" unless args && args.first?
-      
+
       # raise error if user doesn't provide an argument to divided by
       raise FilterArgumentException.new "slice filter expects argument to be an integer" unless args.first.raw.is_a?(Int)
 
@@ -29,7 +29,6 @@ module Liquid::Filters
         data
       end
     end
-
   end
 
   FilterRegister.register "slice", StrSlice
