@@ -2,12 +2,12 @@ require "./base"
 
 module Liquid::Filters
   # floor
-  # 
+  #
   # floors a string or float value and returns the value floor'd
-  # 
+  #
   # Input
   # {{ "1.34" | floor }}
-  # 
+  #
   # Output
   # 1.0
   class Floor

@@ -16,7 +16,7 @@ describe Liquid::Parser do
     expected = [
       Block::Raw.new("PRE "),
       Block::Raw.new("test\nIn Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not."),
-      Block::Raw.new(" POST")
+      Block::Raw.new(" POST"),
     ]
     template.root.children.should eq expected
 
@@ -25,7 +25,7 @@ describe Liquid::Parser do
     expected = [
       Block::Raw.new(" PRE"),
       Block::Raw.new(" RAW  "),
-      Block::Raw.new("POST ")
+      Block::Raw.new("POST "),
     ]
     template.root.children.should eq expected
   end

@@ -40,7 +40,7 @@ module Liquid::Block
   abstract class InlineBlock < Node
     extend Block
 
-    def self.type
+    def self.type : BlockType
       BlockType::Inline
     end
   end
@@ -48,7 +48,7 @@ module Liquid::Block
   abstract class BeginBlock < Node
     extend Block
 
-    def self.type
+    def self.type : BlockType
       BlockType::Begin
     end
   end
@@ -56,7 +56,7 @@ module Liquid::Block
   abstract class EndBlock < Node
     extend Block
 
-    def self.type
+    def self.type : BlockType
       BlockType::End
     end
   end
@@ -64,7 +64,7 @@ module Liquid::Block
   abstract class RawBlock < Node
     extend Block
 
-    def self.type
+    def self.type : BlockType
       BlockType::Raw
     end
   end
@@ -72,7 +72,7 @@ module Liquid::Block
   abstract class RawHiddenBlock < Node
     extend Block
 
-    def self.type
+    def self.type : BlockType
       BlockType::RawHidden
     end
   end

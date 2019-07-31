@@ -3,7 +3,7 @@ require "../regex"
 
 module Liquid::Block
   class Include < InlineBlock
-    INCLUDE = /^include(\s+)(?<template_name>#{STRING})(\s+with\s+(?<value>#{TYPE_OR_VAR}))?/
+    INCLUDE      = /^include(\s+)(?<template_name>#{STRING})(\s+with\s+(?<value>#{TYPE_OR_VAR}))?/
     INCLUDE_VARS = /\s*\,\s*(?<varname>#{VAR})\s*\:\s*(?<value>#{TYPE_OR_VAR})/
 
     @template_name : String

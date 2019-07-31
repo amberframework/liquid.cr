@@ -2,7 +2,6 @@ require "./base"
 require "inflector"
 
 module Liquid::Filters
-
   # downcase
   #
   # Lowercases all characters of a string.
@@ -80,7 +79,6 @@ module Liquid::Filters
       end
     end
   end
-
 
   FilterRegister.register "downcase", Downcase
   FilterRegister.register "camelcase", CamelCase
