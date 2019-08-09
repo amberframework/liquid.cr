@@ -1,11 +1,11 @@
 name: liquid
-version: 0.3.0
+version: 0.3.1
 
 authors:
   - Arnaud Fernandés <arnaud.fernandes@laposte.net>
 
 
-crystal: 0.25.0
+crystal: 0.29.0
 
 license: MIT
 
