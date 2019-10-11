@@ -40,7 +40,7 @@ module Liquid::Filters
       if (time = data.as_t?)
         Any.new time.to_s format
       elsif (d = data.as_s?) && d == "now"
-        Any.new Time.now.to_s format
+        Any.new Time.utc.to_s format
       else
         data
       end
