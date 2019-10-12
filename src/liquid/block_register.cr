@@ -1,9 +1,9 @@
 class Liquid::BlockRegister
-  @@inner = Hash(String, Block).new
+  @@inner = Hash(String, Liquid::Block).new
 
-  def self.register(name : String, block : Block, has_end = true)
+  def self.register(name : String, block : Liquid::Block, has_end = true)
     @@inner[name] = block
-    @@inner["end#{name}"] = EndBlock if has_end
+    @@inner["end#{name}"] = Liquid::Block::EndBlock if has_end
   end
 
   def self.for_name(name : String)

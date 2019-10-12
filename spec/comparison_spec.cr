@@ -14,8 +14,8 @@ describe Liquid::BinOperator do
   end
 
   it "should compare Time" do
-    BinOperator.process("<=", Any.new(Time.now), Any.new(Time.now)).should eq Any.new true
-    t = Time.now
+    BinOperator.process("<=", Any.new(Time.utc), Any.new(Time.utc)).should eq Any.new true
+    t = Time.utc
     BinOperator.process("==", Any.new(t), Any.new(t)).should eq Any.new true
   end
 end

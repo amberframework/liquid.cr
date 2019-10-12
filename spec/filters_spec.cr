@@ -100,10 +100,10 @@ describe Liquid::Filters do
 
   describe Date do
     it "should format the date" do
-      time = Time.new(2016, 2, 15, 10, 20, 30) # => 2016-02-15 10:20:30 UTC
+      time = Time.utc(2016, 2, 15, 10, 20, 30) # => 2016-02-15 10:20:30 UTC
       Date.filter(Any.new(time), Array{Any.new "%a, %b %d, %y"}).should eq "Mon, Feb 15, 16"
       Date.filter(Any.new(time), Array{Any.new "%Y"}).should eq "2016"
-      Date.filter(Any.new("now"), Array{Any.new "%Y-%m-%d %H:%M"}).should eq Time.now.to_s "%Y-%m-%d %H:%M"
+      Date.filter(Any.new("now"), Array{Any.new "%Y-%m-%d %H:%M"}).should eq Time.utc.to_s "%Y-%m-%d %H:%M"
     end
   end
 
@@ -118,7 +118,7 @@ describe Liquid::Filters do
 
   describe DividedBy do
     it "should divide Number's by the appropriate value and not matching 0" do
-      DividedBy.filter(Any.new(10), Array{Any.new 4}).should eq 2
+      DividedBy.filter(Any.new(10), Array{Any.new 4}).should eq 2.5
       DividedBy.filter(Any.new(10), Array{Any.new 4.0}).should eq 2.5
       DividedBy.filter(Any.new(10.0), Array{Any.new 4}).should eq 2.5
       DividedBy.filter(Any.new(10.0), Array{Any.new 4.0}).should eq 2.5
