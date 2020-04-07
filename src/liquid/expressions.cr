@@ -76,6 +76,8 @@ module Liquid
                 left_raw < right_raw
               when ">"
                 left_raw > right_raw
+              else
+                # TODO? invalid operator
               end
         Any.new res
       elsif (left_t = left.as_t?) && (right_t = right.as_t?)
@@ -88,6 +90,8 @@ module Liquid
                 left_t < right_t
               when ">"
                 left_t > right_t
+              else
+                # TODO? invalid operator
               end
         Any.new res
       else
