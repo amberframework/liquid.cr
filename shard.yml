@@ -5,7 +5,7 @@ authors:
   - Arnaud Fernandés <arnaud.fernandes@laposte.net>
 
 
-crystal: 0.31.1
+crystal: 0.35.0
 
 license: MIT
 

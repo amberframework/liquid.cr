@@ -39,9 +39,9 @@ module Liquid
         context = "context"
         io.puts <<-EOF
 context = Liquid::Context.new
-\{% for var in @type.instance_vars %}
-    context.set \{{var.id.stringify}}, @\{{var.id}}
-\{% end %}
+{% for var in @type.instance_vars %}
+    context.set {{var.id.stringify}}, @{{var.id}}
+{% end %}
 EOF
       end
 
