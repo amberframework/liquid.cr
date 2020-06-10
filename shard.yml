@@ -12,4 +12,7 @@ license: MIT
 dependencies:
   inflector:
     github: phoffer/inflector.cr
-    version: "~> 0.1.8"
+    version: ~> 0.1.8
+  json_mapping:
+    github: crystal-lang/json_mapping.cr
+    version: ~> 0.1.0
