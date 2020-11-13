@@ -13,13 +13,13 @@ module Liquid::Block
     @first : Expression
     @filters : Array(Tuple(Filters::Filter, Array(Expression)?))
 
-    def initialize(str)
-      @raw = str
-      if match = str.match GFILTERED
+    def initialize(content : String)
+      @raw = content
+      if match = content.match GFILTERED
         @first = Expression.new match["first"]
         @filters = Array(Tuple(Filters::Filter, Array(Expression)?)).new
       else
-        raise InvalidExpression.new "Invalid filter use :#{str}"
+        raise InvalidExpression.new "Invalid filter use :#{content}"
       end
     end
   end
@@ -28,11 +28,11 @@ module Liquid::Block
     getter inner
     @inner : Bool
 
-    def initialize(str)
-      if match(str)
-        @inner = str == "true"
+    def initialize(content : String)
+      if match(content)
+        @inner = content == "true"
       else
-        raise Exception.new "Invalid Boolean expression : #{str}"
+        raise Exception.new "Invalid Boolean expression : #{content}"
       end
     end
 
@@ -45,8 +45,8 @@ module Liquid::Block
     getter var
     @var : String
 
-    def initialize(var)
-      @var = var.strip
+    def initialize(content : String)
+      @var = content.strip
       pre_cache
     end
 

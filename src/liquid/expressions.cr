@@ -33,8 +33,8 @@ module Liquid
       left.not_nil!
     end
 
-    def initialize(str : String)
-      @inner = case str
+    def initialize(content : String)
+      @inner = case content
                when "and" then AND
                when "or"  then OR
                else

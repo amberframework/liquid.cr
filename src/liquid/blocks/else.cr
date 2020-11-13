@@ -5,7 +5,7 @@ module Liquid::Block
     def initialize
     end
 
-    def initialize(str : String)
+    def initialize(content : String)
     end
   end
 end

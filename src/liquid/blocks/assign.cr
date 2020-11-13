@@ -14,8 +14,8 @@ module Liquid::Block
     def initialize(@varname, @value)
     end
 
-    def initialize(str : String)
-      if match = str.strip.match ASSIGN
+    def initialize(content : String)
+      if match = content.strip.match ASSIGN
         @varname = match["varname"]
         @value = Expression.new match["value"]
       else
