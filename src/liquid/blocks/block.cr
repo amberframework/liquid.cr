@@ -16,7 +16,7 @@ module Liquid::Block
     @children : Array(Node)
     @children = Array(Node).new
 
-    abstract def initialize(content)
+    abstract def initialize(content : String)
 
     def accept(visitor : Visitor)
       visitor.visit self
