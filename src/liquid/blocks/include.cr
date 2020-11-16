@@ -14,8 +14,10 @@ module Liquid::Block
     def initialize(@template_name, @template_vars)
     end
 
-    def initialize(str : String)
-      if match = str.strip.match INCLUDE
+    def initialize(content : String)
+      content = content.strip
+
+      if match = content.match INCLUDE
         @template_vars = {} of String => Expression
         @template_name = match["template_name"].delete("\"")
         @template_name += ".liquid" if File.extname(@template_name).empty?
@@ -23,7 +25,7 @@ module Liquid::Block
         if match["value"]?
           varname = File.basename(@template_name, File.extname(@template_name))
           @template_vars[varname] = Expression.new match["value"]
-        elsif groups = str.strip.scan INCLUDE_VARS
+        elsif groups = content.scan INCLUDE_VARS
           groups.each do |group|
             next if groups.empty?
 
