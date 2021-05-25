@@ -7,7 +7,6 @@ authors:
 
 crystal: ">= 0.35.1, < 2.0.0"
 
-
 license: MIT
 
 dependencies:
