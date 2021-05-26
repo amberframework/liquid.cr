@@ -1,18 +1,18 @@
 name: liquid
-version: 0.3.4
+version: 0.4.1
 
 authors:
   - Arnaud Fernandés <arnaud.fernandes@laposte.net>
 
 
-crystal: 0.35.1
+crystal: ">= 0.35.1, < 2.0.0"
 
 license: MIT
 
 dependencies:
   inflector:
     github: phoffer/inflector.cr
-    version: ~> 0.1.8
+    version: ~> 1.0.0
   json_mapping:
     github: crystal-lang/json_mapping.cr
     version: ~> 0.1.0
