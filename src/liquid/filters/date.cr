@@ -28,10 +28,10 @@ module Liquid::Filters
   class Date
     extend Filter
 
-    def self.filter(data : Any, arguments : Array(Any)?) : Any
-      raise FilterArgumentException.new "date filter require an argument" unless arguments && arguments.size == 1
+    def self.filter(data : Any, args : Array(Any)?) : Any
+      raise FilterArgumentException.new "date filter require an argument" unless args && args.size == 1
 
-      format = if (arg = arguments.first.as_s?)
+      format = if (arg = args.first.as_s?)
                  arg
                else
                  raise FilterArgumentException.new "First argument of date filter should be a string"
