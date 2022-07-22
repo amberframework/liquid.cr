@@ -5,8 +5,6 @@
 
 Liquid templating language: [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
 
-This is a fork of [TechMagister/liquid.cr](https://github.com/TechMagister/liquid.cr), which was moving too slowly for my needs. I'm open to merging back at some point, and will do my best to maintain compatibility, but for the foreseeable future (through 2019), this fork may be unstable and/or add breaking changes here and there. Still, it includes many useful improvements, so please give it a try and report any issues you find.
-
 ## Installation
 
 Add this to your application's `shard.yml`:
@@ -14,7 +12,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   liquid:
-    github: anamba/liquid.cr
+    github: TechMagister/liquid.cr
 ```
 
 ## Usage
