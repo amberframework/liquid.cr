@@ -213,13 +213,25 @@ describe Liquid do
         expr = Expression.new "true == false"
         expr2 = Expression.new "true != false"
         expr3 = Expression.new "var != 15"
+        expr3a = Expression.new "-var == -16"
+        expr4 = Expression.new "str == 'asdf'"
+        expr5 = Expression.new "!false && !flag"
+        expr5a = Expression.new "!flag && !false"
+        expr6 = Expression.new "missing?"
 
-        ctx = Context.new
+        ctx = Context.new(strict: true)
         ctx.set "var", 16
+        ctx.set "str", "asdf"
+        ctx.set "flag", false
 
         expr.eval(ctx).should be_false
         expr2.eval(ctx).should be_true
         expr3.eval(ctx).should be_true
+        expr3a.eval(ctx).should be_true
+        expr4.eval(ctx).should be_true
+        expr5.eval(ctx).should be_true
+        expr5a.eval(ctx).should be_true
+        expr6.eval(ctx).raw.should be_nil # return value is JSON::Any which is not nil; need to check #raw instead
       end
       # it "should eval an operation with contains keyword" do
       #   expr = Expression.new "myarr contains another"
@@ -231,12 +243,13 @@ describe Liquid do
       it "should eval an multiple operation" do
         expr = Expression.new "test == false or some == true or another == 10"
         expr2 = Expression.new "test != false or some == false or another == 10"
-        expr3 = Expression.new "test != false and some != false and another == 15"
+        expr3 = Expression.new "test != false and some != false and another == 15 and str == 'asdf'"
 
         ctx = Context.new
         ctx.set "test", true
         ctx.set "some", true
         ctx.set "another", 15
+        ctx.set "str", "asdf"
 
         expr.eval(ctx).should be_true
         expr2.eval(ctx).should be_true

@@ -1,9 +1,11 @@
-# liquid
-[![Build Status](https://travis-ci.org/TechMagister/liquid.cr.svg?branch=master)](https://travis-ci.org/TechMagister/liquid.cr)
+# liquid - Liquid template engine for Crystal
 
-Liquid template engine for Crystal.
+[![Version](https://img.shields.io/github/tag/TechMagister/liquid.cr.svg?maxAge=360)](https://github.com/TechMagister/liquid.cr/releases/latest)
+[![License](https://img.shields.io/github/license/TechMagister/liquid.cr.svg)](https://github.com/TechMagister/liquid.cr/blob/master/LICENSE)
 
-Liquid templating language : [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
+Liquid templating language: [http://shopify.github.io/liquid/](http://shopify.github.io/liquid/)
+
+This is a fork of [TechMagister/liquid.cr](https://github.com/TechMagister/liquid.cr), which was moving too slowly for my needs. I'm open to merging back at some point, and will do my best to maintain compatibility, but for the foreseeable future (through 2019), this fork may be unstable and/or add breaking changes here and there. Still, it includes many useful improvements, so please give it a try and report any issues you find.
 
 ## Installation
 
@@ -12,7 +14,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   liquid:
-    github: TechMagister/liquid.cr
+    github: anamba/liquid.cr
 ```
 
 ## Usage
@@ -105,30 +107,81 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 - [ ] uniq
 - [x] upcase | uppercase
 
+# Helper Methods
+- [x] size (for Array and String)
+- [x] present / blank (added)
+- [ ] first / last
+
 ## Development
 
 TODO:
 - [x] Basic For loops
-- [x] Basic If Elsif Else
+- [x] if/elsif/else/endif
+- [ ] unless/endunless
 - [x] Raw and comment blocks ({% raw %} and {% comment %})
 - [x] Add variable assignment ({% assign var = "Hello World" %})
 - [x] Add support for multiple operator (no operator precedence support (for now))
 - [x] Add support for Array into for loop
-- [x] Add support for Hash into for loop ({% for key, val in myhash %})
+- [x] Add support for Hash into for loop (`{% for val in myhash %}`, access as `val[0]` and `val[1]`)
+- [ ] Add support for Hash into for loop ({% for key, val in myhash %}) (new)
 - [x] Add support for Float
 - [x] Add iteration over Arrays
 - [x] Improve data interface
 - [x] Add Filter support
-- [x] Add capture block
-- [x] Add increment block
-- [x] Add decrement block
-- [ ] Add "contains" keyword
-- [ ] Add support for Array into expressions
+- [x] Add `capture` block
+- [x] Add `increment` block
+- [x] Add `decrement` block
+- [x] Add support for Array in expressions
+- [x] Add support for Hash in expressions
+- [x] Add "secret" `empty` Array (`[]`) for use in comparisons (equivalent to `#blank` helper method)
+- [x] Add `contains` operator
+- [ ] Add `cycle` keyword
+- [ ] Add `starts_with` keyword (new)
+- [ ] Add `ends_with` keyword (new)
+- [ ] Add `continue` keyword
+- [ ] Add `break` keyword
 - [ ] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
+- [x] Add optional strict mode on Context (see below)
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
+## Context Strict Mode
+
+NOTE: Will eventually use this to implement a `strict_variables` rendering flag (planning to implement `strict_filters` as well).
+
+Enable at initialization:
+```crystal
+ctx = Liquid::Context.new(strict: true)
+```
+
+Or on an existing Context:
+```crystal
+ctx.strict = true
+```
+
+Raises `KeyError` on missing keys and `IndexError` on array out of bounds errors instead of silently emitting `nil`.
+
+Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
+
+```crystal
+ctx = Liquid::Context.new(strict: true)
+ctx["obj"] = { something: "something" }
+```
+
+```liquid
+{{ missing }}          -> KeyError
+{{ missing? }}         -> nil
+{{ obj.missing }}      -> KeyError
+{{ obj.missing? }}     -> nil
+{{ missing.missing? }} -> nil
+```
+
+## Note on order of operations in complex expressions ##
+
+Currently, comparison operators are evaluated before and/or. Other than that, evaluations are evaluated from left to right. Parentheses are not supported.
+
+Eventually, this will be fixed to evaluate expressions in a way that mirrors Crystal itself, but for now, it would be best to simply avoid writing complex expressions.
 
 ## Contributing
 
@@ -140,5 +193,6 @@ TODO:
 
 ## Contributors
 
-- [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer
+- [TechMagister](https://github.com/TechMagister) Arnaud Fernandés - creator, maintainer of [original version](https://github.com/TechMagister/liquid.cr)
 - [docelic](https://github.com/docelic) Davor Ocelic
+- [anamba](https://github.com/anamba) Aaron Namba

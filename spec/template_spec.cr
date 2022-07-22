@@ -52,6 +52,30 @@ describe Template do
     tpl.render(ctx).should eq "\n    Got : 1\n    \n    Got : 12.2\n    \n    Got : here\n    "
   end
 
+  it "should render for loop when iterating over a hash by value (key+value array)" do
+    tpl = Parser.parse <<-EOT
+    {%- for v in myhash -%}
+      Got : {{v[0]}} => {{v[1]}}
+    {%- endfor -%}
+    EOT
+
+    ctx = Context.new
+    ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
+    tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
+  end
+
+  # it "should render for loop when iterating over a hash by key, value" do
+  #   tpl = Parser.parse <<-EOT
+  #   {%- for k, v in myhash -%}
+  #     Got : {{k}} => {{v}}
+  #   {%- endfor -%}
+  #   EOT
+
+  #   ctx = Context.new
+  #   ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
+  #   tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
+  # end
+
   it "should render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new
@@ -71,8 +95,17 @@ describe Template do
     tpl.render(ctx).should eq ""
   end
 
+  it "should render if statement with zero comparison" do
+    tpl = Parser.parse("{% if var > 0 %}true{% endif %}")
+    ctx = Context.new
+    ctx.set("var", 1)
+    tpl.render(ctx).should eq "true"
+    ctx.set("var", 0)
+    tpl.render(ctx).should eq ""
+  end
+
   it "should render if else statement" do
-    tpl = Parser.parse("{% if var == true %}true{% else %}false{% endif %}")
+    tpl = Parser.parse("{% if true and var == true %}true{% else %}false{% endif %}")
     ctx = Context.new
     ctx.set("var", true)
     tpl.render(ctx).should eq "true"
@@ -93,10 +126,50 @@ describe Template do
     ctx = Context.new
     ctx.set "kenny.sick", false
     ctx.set "kenny.dead", true
+    ctx.set "kenny.state", "dead"
 
     tpl = Parser.parse txt
     result = tpl.render ctx
     result.should eq "\n    \n      You killed Kenny!  You bastard!!!\n    \n    "
+  end
+
+  it "should render if elsif else statement - variant 2" do
+    txt = <<-EOT
+    {%- if kenny.state == \"sick\" -%}
+      Kenny is sick.
+    {%- elsif kenny.state == 'dead' -%}
+      You killed Kenny!  You bastard!!!
+    {%- else -%}
+      Kenny looks okay --- so far
+    {%- endif -%}
+    EOT
+
+    ctx = Context.new
+    ctx.set "kenny.state", "dead"
+
+    tpl = Parser.parse txt
+    result = tpl.render ctx
+    result.should eq "You killed Kenny!  You bastard!!!"
+  end
+
+  it "should render if statement - variant 3" do
+    txt = <<-EOT
+    {%- if mykey? -%}
+      Key present
+    {%- else -%}
+      Key missing
+    {%- endif -%}
+    EOT
+
+    ctx = Context.new(strict: true)
+
+    tpl = Parser.parse txt
+    result = tpl.render ctx
+    result.should eq "Key missing"
+
+    ctx["mykey"] = "!"
+    result = tpl.render ctx
+    result.should eq "Key present"
   end
 
   it "should render captured variables" do
@@ -148,5 +221,115 @@ describe Template do
     tpl = Template.parse %({{var | replace: "a", "b"}})
     ctx = Context{"var" => "aaa"}
     tpl.render(ctx).should eq "bbb"
+  end
+
+  it "should support array access via literal" do
+    tpl = Template.parse %({{ objects[1] }}, {{ objects[0] }}, {{ objects[-1] }}, {{ objects[2] }})
+    ctx = Context{"objects" => ["first", "second", "third"]}
+    tpl.render(ctx).should eq "second, first, third, third"
+  end
+
+  it "should support array access via variable" do
+    tpl = Template.parse %({% assign idx = 2 %}{% assign idx2 = -2 %}{{ objects[idx] }}, {{ objects[idx2] }}, {{ objects[obj.id] }})
+    ctx = Context{"objects" => ["first", "second", "third"], "obj" => Hash{"id" => 1}}
+    tpl.render(ctx).should eq "third, second, second"
+  end
+
+  it "should support Array#size" do
+    tpl = Template.parse %({{ objects.size }})
+    ctx = Context{"objects" => ["first", "second", "third"]}
+    tpl.render(ctx).should eq "3"
+  end
+
+  it "should support String#size" do
+    tpl = Template.parse %({{ str.size }})
+    ctx = Context{"str" => "12345678"}
+    tpl.render(ctx).should eq "8"
+  end
+
+  it "should pre-initialize context with special `empty` array" do
+    tpl = Template.parse %({% if array == empty %}empty{% endif %})
+    ctx = Context.new
+    tpl.render(ctx).should eq "" # here array is nil, not empty
+    ctx["array"] = [] of String
+    tpl.render(ctx).should eq "empty"
+    ctx["array"] = ["val1"]
+    tpl.render(ctx).should eq ""
+  end
+
+  it "should support #blank?" do
+    tpl = Template.parse %({% if var.blank? %}blank{% endif %})
+    ctx = Context{"var" => "12345678"}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => ""}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"var" => [] of String}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"var" => ["val1"]}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq "blank"
+    ctx = Context{"var" => {"key1" => "val1"}}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"notvar" => ""}
+    tpl.render(ctx).should eq "blank"
+  end
+
+  it "should support #present?" do
+    tpl = Template.parse %({% if var.present? %}present{% endif %})
+    ctx = Context{"var" => "12345678"}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"var" => [] of String}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => ["val1"]}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"var" => {"key1" => "val1"}}
+    tpl.render(ctx).should eq "present"
+    ctx = Context{"var" => ""}
+    tpl.render(ctx).should eq ""
+    ctx = Context{"notvar" => ""}
+    tpl.render(ctx).should eq ""
+  end
+
+  it "should support contains for String, Array values" do
+    tpl = Template.parse %({% if var contains 'asdf' %}yep{% else %}nope{% endif %})
+    ctx = Context{"var" => "123"}
+    tpl.render(ctx).should eq "nope"
+    ctx = Context{"var" => "123asdffdsa321"}
+    tpl.render(ctx).should eq "yep"
+    ctx = Context{"var" => [] of String}
+    tpl.render(ctx).should eq "nope"
+    ctx = Context{"var" => ["asdf"]}
+    tpl.render(ctx).should eq "yep"
+    ctx = Context{"var" => {} of String => String}
+    tpl.render(ctx).should eq "nope"
+    # ctx = Context{"var" => {"asdf" => "val1"}}
+    # tpl.render(ctx).should eq "yep"
+  end
+
+  it "should support combinations of array/hash access and property access" do
+    tpl = Template.parse %({% assign myvar = objects[1][1] %}{{ objects.size }} {{ objects[1].size }} {{ objects[1][1] }} {{ hash['first'] }} {{ hash[first] }} {{ hash[objects[0]] }})
+    ctx = Context{"first" => "first", "objects" => ["first", ["second-a", "second-b"], "third"], "hash" => {"first" => "val"}}
+    tpl.render(ctx).should eq "3 2 second-b val val val"
+    ctx.get("myvar").should eq "second-b"
+  end
+
+  it "should respect strict mode on Context" do
+    ctx = Context.new
+    tpl = Template.parse %({{ missing }}{{ obj.missing }})
+    tpl.render(ctx).should eq ""
+
+    ctx.strict = true
+    expect_raises(KeyError) { tpl.render(ctx) }
+
+    ctx["missing"] = "present"
+    ctx["obj"] = {something: "something"} # still didn't define "missing"
+    expect_raises(KeyError) { tpl.render(ctx) }
+
+    ctx["missing"] = "present"
+    ctx["obj"] = {something: "something", missing: "present"}
+    tpl.render(ctx).should eq "presentpresent"
   end
 end

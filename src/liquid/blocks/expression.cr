@@ -65,16 +65,20 @@ module Liquid::Block
     end
 
     def eval(data) : Any
-      ret = if @var == "true" || @var == "false"
-              @var == "true"
-            elsif m = @var.match GSTRING
+      ret = if @var == "true" || @var == "!false"
+              true
+            elsif @var == "false" || @var == "!true"
+              false
+            elsif @var == "nil"
+              nil
+            elsif m = @var.match intern(GSTRING)
               m["str"]
             elsif m = @var.match intern(GINT)
               m["intval"].to_i
             elsif m = @var.match intern(GFLOAT)
               m["floatval"].to_f32
-            elsif @var.match intern(VAR)
-              data.get(@var)
+            elsif m = @var.match intern(VAR)
+              data.get(@var) # Context handles . and [] access
             elsif m = @var.match intern(GCMP)
               le = Expression.new(m["left"]).eval data
               re = Expression.new(m["right"]).eval data
@@ -82,7 +86,7 @@ module Liquid::Block
             elsif m = @var.scan MULTIPLE_EXPR
               stack = [] of Expression | BoolOperator
               m.each do |match|
-                stack << BoolOperator.new match["op"] if match["op"]?
+                stack << BoolOperator.new match["boolop"] if match["boolop"]?
                 stack << Expression.new match["expr"]
               end
               BoolOperator.process stack, data

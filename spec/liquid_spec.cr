@@ -35,5 +35,25 @@ describe Liquid do
       ctx["arr"][0]["some"].should be_true
       ctx["arr"][0]["foo"].should eq "bar"
     end
+
+    it "returns nil for missing key in normal mode" do
+      ctx = Context.new
+      ctx.get("missing").should be_nil
+      ctx.get("obj.missing").should be_nil
+    end
+
+    it "raises on missing key in strict mode" do
+      ctx = Context.new(strict: true)
+      expect_raises(KeyError) { ctx.get("missing") }
+      expect_raises(KeyError) { ctx.get("obj.missing") }
+      ctx["obj"] = {something: "something"}
+      expect_raises(KeyError) { ctx.get("obj.missing") }
+    end
+
+    it "returns nil for missing key in strict mode with ?" do
+      ctx = Context.new(strict: true)
+      ctx.get("missing?").should be_nil
+      ctx.get("obj.missing?").should be_nil
+    end
   end
 end
