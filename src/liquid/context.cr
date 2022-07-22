@@ -5,7 +5,7 @@ module Liquid
   struct Context
     include JSON::Serializable
 
-    @inner: Hash(String, JSON::Any)
+    @inner : Hash(String, JSON::Any)
     @strict : Bool = false
 
     property strict : Bool = false

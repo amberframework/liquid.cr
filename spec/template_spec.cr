@@ -61,7 +61,7 @@ describe Template do
 
     ctx = Context.new
     ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
-    tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
+    tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => ["val3a", "val3b"])
   end
 
   # it "should render for loop when iterating over a hash by key, value" do
@@ -135,7 +135,7 @@ describe Template do
 
   it "should render if elsif else statement - variant 2" do
     txt = <<-EOT
-    {%- if kenny.state == \"sick\" -%}
+    {%- if kenny.state == "sick" -%}
       Kenny is sick.
     {%- elsif kenny.state == 'dead' -%}
       You killed Kenny!  You bastard!!!

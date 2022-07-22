@@ -30,6 +30,6 @@ module Liquid
   BOOLEXPR = /\s*?!?(?<bool>#{BOOL})\s*?/
   EXPR     = /(?:#{CMPEXPR})|(?:#{BOOLEXPR})|(?:#{VAR})/
 
-  BOOLOP = /(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)/
+  BOOLOP        = /(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)/
   MULTIPLE_EXPR = /(?:(?<boolop>(?:#{BOOLOP})))?(?<expr>#{EXPR})/
 end
