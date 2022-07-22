@@ -204,7 +204,7 @@ describe Liquid::Filters do
 
   describe Minus do
     it "should should subtract numbers" do
-      Minus.filter(Any.new(10), Array{Any.new (2)}).should eq 8
+      Minus.filter(Any.new(10), Array{Any.new(2)}).should eq 8
       Minus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 8.0
       Minus.filter(Any.new("10"), Array{Any.new(2.0)}).should eq "10"
     end
@@ -239,7 +239,7 @@ describe Liquid::Filters do
 
   describe Plus do
     it "should should add numbers" do
-      Plus.filter(Any.new(10), Array{Any.new (2)}).should eq 12
+      Plus.filter(Any.new(10), Array{Any.new(2)}).should eq 12
       Plus.filter(Any.new(10), Array{Any.new(2.0)}).should eq 12.0
       Plus.filter(Any.new(10.0), Array{Any.new(2)}).should eq 12.0
       Plus.filter(Any.new(10.0), Array{Any.new(2.0)}).should eq 12.0

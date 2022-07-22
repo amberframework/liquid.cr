@@ -1,26 +1,35 @@
 module Liquid
-  OPERATOR = /==|!=|<=|>=|<|>/
-  GVAR     = /[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*/
-  VAR      = /[a-z_][a-z_0-9]*(?:\.[a-z_][a-z_0-9]*)*/
+  OPERATOR = /==|!=|<=|>=|<|>|contains/
 
-  STRING      = /"[^"]*"/
-  INT         = /-?[1-9][0-9]*/
-  FLOAT       = /#{INT}\.[0-9]+/
-  TYPE        = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})/
+  DQSTRING = /"([^"]|\\")*"/
+  SQSTRING = /'([^']|\\')*'/
+  STRING   = /(?:#{DQSTRING})|(?:#{SQSTRING})/
+  INT      = /(?:0|(?:-*[1-9][0-9]*))/
+  FLOAT    = /-*[0-9]+\.[0-9]+/
+  BOOL     = /(?:false)|(?:true)/
+  SCALAR   = /(?:#{STRING})|(?:#{FLOAT})|(?:#{INT})|(?:#{BOOL})/
+  ARRAY    = /\[(#{SCALAR}(?:\s*,\s*#{SCALAR})*)\]/
+  TYPE     = /(?:#{SCALAR})|(?:#{ARRAY})/
+
+  VAR = /([-!]*(?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<index>(?:#{STRING})|(?:#{INT})|(?1))\]))*\??)/
+
   TYPE_OR_VAR = /(?:#{TYPE})|(?:#{VAR})/
-  CMP         = /(?:#{TYPE_OR_VAR}) ?(?:#{OPERATOR}) ?(?:#{TYPE_OR_VAR})/
-  GCMP        = /(?<left>#{TYPE_OR_VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{TYPE_OR_VAR})/
+  CMP         = /(?:#{TYPE_OR_VAR})\s*(?:#{OPERATOR})\s*(?:#{TYPE_OR_VAR})/
+  GCMP        = /(?<left>#{TYPE_OR_VAR})\s*(?<op>#{OPERATOR})\s*(?<right>#{TYPE_OR_VAR})/
 
-  GSTRING = /^"(?<str>[^"]*)"$/
+  GSTRING = /^(?:"(?<str>[^"]*)")|(?:'(?<str>[^']*)')$/
   GINT    = /(?<intval>#{INT})/
   GFLOAT  = /(?<floatval>#{FLOAT})/
 
-  FILTER    = /#{VAR}(?:: ?#{TYPE_OR_VAR}(?:, ?#{TYPE_OR_VAR})*)?/
-  GFILTER   = /(?<filter>#{VAR})(?:: ?(?<args>#{TYPE_OR_VAR}(?:, ?#{TYPE_OR_VAR})*))?/
-  FILTERED  = /#{TYPE_OR_VAR}(?:\s?\|\s?#{FILTER})+/
-  GFILTERED = /(?<first>#{TYPE_OR_VAR})(\s?\|\s?(#{FILTER}))+/
+  FILTER_ARG  = TYPE_OR_VAR
+  FILTER_ARGS = /#{FILTER_ARG}(?:,\s*#{FILTER_ARG})*/
+  GFILTER     = /(?<filter>#{VAR})(?::\s*(?<args>#{FILTER_ARGS}))?/
+  GFILTERED   = /(?<first>#{TYPE_OR_VAR})(\s*\|\s*(#{GFILTER}))+/
 
-  EXPR = /\s*(?<left>#{VAR}) ?(?<op>#{OPERATOR}) ?(?<right>#{TYPE})\s*/
+  CMPEXPR  = /\s*?#{GCMP}\s*?/
+  BOOLEXPR = /\s*?!?(?<bool>#{BOOL})\s*?/
+  EXPR     = /(?:#{CMPEXPR})|(?:#{BOOLEXPR})|(?:#{VAR})/
 
-  MULTIPLE_EXPR = /(?: (?<op>or|and) )?(?<expr>#{CMP})/
+  BOOLOP        = /(?:\s+(?:or|and)\s+)|(?:\s*(?:&&|\|\|)\s*)/
+  MULTIPLE_EXPR = /(?:(?<boolop>(?:#{BOOLOP})))?(?<expr>#{EXPR})/
 end

@@ -1,4 +1,5 @@
 require "./filters/base"
+require "./filters/arg_test"
 require "./filters/case"
 require "./filters/compact"
 require "./filters/date"

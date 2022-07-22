@@ -99,15 +99,20 @@ module Liquid
         matches.shift
       end
       matches.each do |fm|
-        if filter = Filters::FilterRegister.get fm["filter"]
-          args : Array(Expression)?
-          args = nil
+        if (filter_name = Filters::FilterRegister.get fm["filter"])
+          filter_args : Array(Expression)? = nil
           if (margs = fm["args"]?)
-            args = Array(Expression).new
-            splitted = margs.split(',').map &.strip
-            splitted.each { |m| args << Expression.new(m) }
+            filter_args = Array(Expression).new
+            if margs.match(/^#{FILTER_ARGS}$/)
+              while margs =~ /^(#{FILTER_ARG})/
+                match = $1
+                filter_args << Expression.new(match)
+                margs = margs.sub(match, "")
+                margs = margs.sub(/^\s*,\s*/, "")
+              end
+            end
           end
-          node.filters << {filter, args}
+          node.filters << {filter_name, filter_args}
         else
           raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
         end
@@ -169,6 +174,15 @@ module Liquid
         data.set "loop.first", x == start
         data.set "loop.last", x == stop
         data.set "loop.length", stop - start
+
+        # for compatibility with Shopify liquid
+        data.set "forloop.length", stop - start
+        data.set "forloop.index", i + 1
+        data.set "forloop.index0", i
+        data.set "forloop.rindex", stop - start - i + 1
+        data.set "forloop.rindex0", stop - start - i
+        data.set "forloop.first", x == start
+        data.set "forloop.last", x == stop
         node.children.each &.accept(visitor)
         i += 1
       end
@@ -189,6 +203,41 @@ module Liquid
           data.set "loop.first", i == 0
           data.set "loop.last", i == stop
           data.set "loop.length", stop
+
+          # for compatibility with Shopify liquid
+          data.set "forloop.length", stop
+          data.set "forloop.index", i + 1
+          data.set "forloop.index0", i
+          data.set "forloop.rindex", stop - i + 1
+          data.set "forloop.rindex0", stop - i
+          data.set "forloop.first", i == 0
+          data.set "forloop.last", i == stop
+          node.children.each &.accept(visitor)
+          i += 1
+        end
+      elsif (hash = val.eval(data).as_h?)
+        visitor = RenderVisitor.new data, @io
+        i = 0
+        stop = hash.keys.size
+        hash.each do |k, v|
+          val = [k, v]
+          data.set node.loop_var, val
+          data.set "loop.index", i + 1
+          data.set "loop.index0", i
+          data.set "loop.revindex", stop - i + 1
+          data.set "loop.revindex0", stop - i
+          data.set "loop.first", i == 0
+          data.set "loop.last", i == stop
+          data.set "loop.length", stop
+
+          # for compatibility with Shopify liquid
+          data.set "forloop.length", stop
+          data.set "forloop.index", i + 1
+          data.set "forloop.index0", i
+          data.set "forloop.rindex", stop - i + 1
+          data.set "forloop.rindex0", stop - i
+          data.set "forloop.first", i == 0
+          data.set "forloop.last", i == stop
           node.children.each &.accept(visitor)
           i += 1
         end

@@ -12,7 +12,6 @@ require "./blocks/include"
 require "./blocks/increment"
 require "./blocks/raw"
 
-
 module Liquid
   include Liquid::Block
 

@@ -12,12 +12,8 @@ module Liquid
       right : Bool?
       proc : BoolOperator
 
-      exp = Exception.new "Invalid Boolean operation "
-      raise exp if arr.size < 3 || arr.first.is_a? BoolOperator
-      arr.each_index do |i|
-        raise exp if (i % 2 == 0 && arr[i].is_a? BoolOperator) ||
-                     (i % 2 == 1 && arr[i].is_a? Expression)
-      end
+      exp = Exception.new "Invalid Boolean operation: #{arr.inspect}"
+      raise exp if arr.size < 3
       left = nil
       i = 1
       while i < arr.size
@@ -34,11 +30,11 @@ module Liquid
     end
 
     def initialize(content : String)
-      @inner = case content
-               when "and" then AND
-               when "or"  then OR
+      @inner = case content.strip.downcase
+               when "and", "&&" then AND
+               when "or", "||"  then OR
                else
-                 raise Exception.new "Invalid Boolean operation"
+                 raise Exception.new "Invalid Boolean operation: #{content}"
                end
     end
 
@@ -57,6 +53,7 @@ module Liquid
       ">=",
       "<",
       ">",
+      "contains",
     ]
 
     def self.process(operator : String, left : Any, right : Any) : Any
@@ -77,7 +74,7 @@ module Liquid
               when ">"
                 left_raw > right_raw
               else
-                # TODO? invalid operator
+                raise Exception.new "Invalid operator: #{operator}"
               end
         Any.new res
       elsif (left_t = left.as_t?) && (right_t = right.as_t?)
@@ -91,7 +88,33 @@ module Liquid
               when ">"
                 left_t > right_t
               else
-                # TODO? invalid operator
+                raise Exception.new "Invalid operator: #{operator}"
+              end
+        Any.new res
+      elsif (left_a = left.as_a?) && (right_a = right.as_a?)
+        res = case operator
+              when "contains"
+                left_a.includes?(right_a)
+              end
+        Any.new res
+      elsif (left_s = left.as_s?) && (right_s = right.as_s?)
+        res = case operator
+              when "<="
+                left_s <= right_s
+              when ">="
+                left_s >= right_s
+              when "<"
+                left_s < right_s
+              when ">"
+                left_s > right_s
+              when "contains"
+                left_s.includes?(right_s)
+              end
+        Any.new res
+      elsif (left_a = left.as_a?) && (right_raw = right.raw)
+        res = case operator
+              when "contains"
+                left_a.includes?(right_raw)
               end
         Any.new res
       else
@@ -102,7 +125,7 @@ module Liquid
 
     def self.check_operator(str : String)
       if !OPS.includes? str
-        raise Exception.new "Invalid comparison operator : #{str}"
+        raise Exception.new "Invalid comparison operator: #{str}"
       end
     end
   end
