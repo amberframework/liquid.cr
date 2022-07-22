@@ -1,12 +1,11 @@
 require "json"
-require "json_mapping"
 require "./any"
 
 module Liquid
   struct Context
-    JSON.mapping(
-      inner: Hash(String, JSON::Any)
-    )
+    include JSON::Serializable
+
+    @inner: Hash(String, JSON::Any)
 
     def initialize
       @inner = Hash(String, JSON::Any).new
