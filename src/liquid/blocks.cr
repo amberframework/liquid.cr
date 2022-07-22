@@ -12,9 +12,10 @@ require "./blocks/include"
 require "./blocks/increment"
 require "./blocks/raw"
 
-include Liquid::Block
 
 module Liquid
+  include Liquid::Block
+
   BlockRegister.register "if", Liquid::Block::If
   BlockRegister.register "elsif", Liquid::Block::ElsIf, false
   BlockRegister.register "else", Liquid::Block::Else, false
