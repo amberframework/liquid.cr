@@ -1,5 +1,5 @@
 # liquid - Liquid template engine for Crystal
-
+[![Build Status](https://github.com/TechMagister/liquid.cr/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/TechMagister/liquid.cr/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/github/tag/TechMagister/liquid.cr.svg?maxAge=360)](https://github.com/TechMagister/liquid.cr/releases/latest)
 [![License](https://img.shields.io/github/license/TechMagister/liquid.cr.svg)](https://github.com/TechMagister/liquid.cr/blob/master/LICENSE)
 
