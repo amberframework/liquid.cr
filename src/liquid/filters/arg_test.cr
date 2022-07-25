@@ -1,15 +1,14 @@
-require "json"
 require "./base"
 
 module Liquid::Filters
   class ArgTest
     extend Filter
 
-    def self.filter(data : JSON::Any, args : Array(JSON::Any)? = nil) : JSON::Any
+    def self.filter(data : Any, args : Array(Any)? = nil) : Any
       if (a = args)
-        JSON::Any.new(a.map(&.to_s).join(", "))
+        Any.new(a.map(&.to_s).join(", "))
       else
-        JSON::Any.new(nil)
+        Any.new(nil)
       end
     end
   end

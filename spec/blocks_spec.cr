@@ -35,7 +35,7 @@ describe Liquid do
         stmt = For.new "for x in myarray"
         stmt << Expression.new "x"
         ctx = Context.new
-        ctx.set("myarray", ["apple", 12])
+        ctx.set("myarray", Any{"apple", 12})
         node_output(stmt, ctx).should eq "apple12"
       end
     end
@@ -231,7 +231,7 @@ describe Liquid do
         expr4.eval(ctx).should be_true
         expr5.eval(ctx).should be_true
         expr5a.eval(ctx).should be_true
-        expr6.eval(ctx).raw.should be_nil # return value is JSON::Any which is not nil; need to check #raw instead
+        expr6.eval(ctx).raw.should be_nil # return value is Any which is not nil; need to check #raw instead
       end
       # it "should eval an operation with contains keyword" do
       #   expr = Expression.new "myarr contains another"

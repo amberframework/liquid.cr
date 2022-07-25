@@ -220,7 +220,7 @@ module Liquid
         i = 0
         stop = hash.keys.size
         hash.each do |k, v|
-          val = [k, v]
+          val = [Any.new(k), v]
           data.set node.loop_var, val
           data.set "loop.index", i + 1
           data.set "loop.index0", i

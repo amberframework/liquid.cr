@@ -1,4 +1,3 @@
-require "json"
 require "./base"
 
 module Liquid::Filters
@@ -6,9 +5,8 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (d = data.as_a?)
-        result = d.reject &.raw.nil?
-        JSON.parse(result.to_json)
+      if d = data.as_a?
+        Any.new(d.reject(&.raw.nil?))
       else
         data
       end

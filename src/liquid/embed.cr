@@ -1,5 +1,4 @@
 require "./context"
-require "json"
 
 module Liquid
   macro embed(filename, io_name, *args)
