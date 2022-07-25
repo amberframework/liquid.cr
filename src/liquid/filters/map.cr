@@ -1,4 +1,3 @@
-require "json"
 require "./base"
 
 module Liquid::Filters
@@ -19,7 +18,7 @@ module Liquid::Filters
         if result.empty?
           data
         else
-          JSON.parse(result.to_json)
+          Any.new(result)
         end
       elsif (raw = data.raw) && raw.is_a?(Hash) && (first = args.first?)
         raw[first.as_s]

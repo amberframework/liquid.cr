@@ -1,18 +1,15 @@
-require "json"
 require "./any"
 
 module Liquid
   struct Context
-    include JSON::Serializable
-
-    @inner : Hash(String, JSON::Any)
+    @inner : Hash(String, Any)
     @strict : Bool = false
 
     property strict : Bool = false
 
     def initialize(@strict = false)
-      @inner = Hash(String, JSON::Any).new
-      self["empty"] = [] of String
+      @inner = Hash(String, Any).new
+      self["empty"] = [] of Any
     end
 
     def parse_error(key, strict : Bool, message : String? = nil)
@@ -77,7 +74,7 @@ module Liquid
       # remove any segments that are now blank
       segments.reject!(&.blank?)
 
-      ret : JSON::Any? = nil
+      ret : Any? = nil
 
       segments.each do |k|
         next unless k
@@ -87,31 +84,31 @@ module Liquid
           name = $1
           if ret
             # handle a selection of convenience methods
-            # wrap values in JSON::Any to make sure the return type is always the same
+            # wrap values in Any to make sure the return type is always the same
             case name
             when "present"
               if (array = ret.as_a?)
-                ret = JSON::Any.new(array.size > 0)
+                ret = Any.new(array.size > 0)
               elsif (hash = ret.as_h?)
-                ret = JSON::Any.new(hash.keys.size > 0)
+                ret = Any.new(hash.keys.size > 0)
               else
-                ret = JSON::Any.new(ret.raw.to_s.size > 0)
+                ret = Any.new(ret.raw.to_s.size > 0)
               end
             when "blank"
               if (array = ret.as_a?)
-                ret = JSON::Any.new(array.size == 0)
+                ret = Any.new(array.size == 0)
               elsif (hash = ret.as_h?)
-                ret = JSON::Any.new(hash.keys.size == 0)
+                ret = Any.new(hash.keys.size == 0)
               else
-                ret = JSON::Any.new(ret.raw.to_s.size == 0)
+                ret = Any.new(ret.raw.to_s.size == 0)
               end
             when "size"
               if (array = ret.as_a?)
-                ret = JSON::Any.new(array.size)
+                ret = Any.new(array.size)
               elsif (hash = ret.as_h?)
-                ret = JSON::Any.new(hash.keys.size)
+                ret = Any.new(hash.keys.size)
               elsif (str = ret.as_s?)
-                ret = JSON::Any.new(str.size)
+                ret = Any.new(str.size)
               else
                 return parse_error(key, strict, "Parse error: Tried to call #size on something other than a String, Array or Hash (#{key} -> #{ret.inspect})")
               end
@@ -134,7 +131,7 @@ module Liquid
                 return key_missing(key, strict)
               else
                 # keep going, in case we're ultimately just doing a #blank check
-                ret = JSON::Any.new(nil)
+                ret = Any.new(nil)
               end
             end
           end
@@ -193,7 +190,7 @@ module Liquid
         case prefix
         when "-"
           if ret && ((num = ret.as_i?) || (num = ret.as_f?))
-            ret = JSON::Any.new(-1 * num)
+            ret = Any.new(-1 * num)
           else
             return parse_error(key, true, "Parse error: Couldn't interpret #{ret.inspect} as numeric value (#{key})")
           end
@@ -202,9 +199,9 @@ module Liquid
           # next, check to see whether it can be interpret as bool (check for nil
           # specifically, to avoid returning parse error on false value)
           if ret.nil? || ret.raw.nil?
-            ret = JSON::Any.new(true)
+            ret = Any.new(true)
           elsif !(bool = ret.as_bool?).nil?
-            ret = JSON::Any.new(!bool)
+            ret = Any.new(!bool)
           else
             return parse_error(key, true, "Parse error: Couldn't interpret #{ret.inspect} as boolean value (#{key})")
           end
@@ -213,28 +210,45 @@ module Liquid
         end
       end
 
-      # unwrap if it's just a nil inside a JSON::Any (note: Expression sometimes re-wraps it)
+      # unwrap if it's just a nil inside a Any (note: Expression sometimes re-wraps it)
       ret = nil if ret && ret.raw.nil?
 
       ret
     end
 
-    def [](key : String) : JSON::Any
+    def [](key : String) : Any
       get(key, strict: true).not_nil!
     end
 
-    def []?(key : String) : JSON::Any?
+    def []?(key : String) : Any?
       get(key, strict: false)
     end
 
     @[AlwaysInline]
-    def []=(key, value)
-      @inner[key] = Any.from_json value.to_json
+    def []=(key, value : Any)
+      @inner[key] = value
+    end
+
+    @[AlwaysInline]
+    def []=(key, value : Any::Type)
+      @inner[key] = Any.new(value)
+    end
+
+    @[Deprecated]
+    def []=(key : String, val : Array(String))
+      self[key] = val.map { |e| Any.new(e) }
+    end
+
+    @[Deprecated]
+    def []=(key : String, val : Hash(String, String))
+      hash = Hash(String, Any).new
+      val.each { |k, v| hash[k] = Any.new(v) }
+      self[key] = hash
     end
 
     # alias for []=(key, val)
     @[AlwaysInline]
-    def set(key, val)
+    def set(key : String, val)
       self[key] = val
     end
   end

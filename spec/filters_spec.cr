@@ -91,9 +91,9 @@ describe Filters do
 
   describe Compact do
     it "should remove all nil values from array" do
-      a = [nil, true, "other", 1, nil, nil, nil, "wuddup!"].to_json
-      expected = [true, "other", 1, "wuddup!"]
-      Compact.filter(JSON.parse(a)).should eq expected
+      a = Any{nil, true, "other", 1, nil, nil, nil, "wuddup!"}
+      expected = Any{true, "other", 1, "wuddup!"}
+      Compact.filter(a).should eq expected
     end
   end
 
@@ -154,10 +154,10 @@ describe Filters do
 
   describe First do
     it "should return first result of an array" do
-      a = [false, 1, "two"].to_json
-      empty = [] of String
-      First.filter(JSON.parse(a)).should eq false
-      First.filter(JSON.parse(empty.to_json)).should eq empty
+      a = Any{false, 1, "two"}
+      empty = Any.new([] of Any)
+      First.filter(a).should eq false
+      First.filter(empty).should eq empty
     end
   end
 
@@ -171,17 +171,17 @@ describe Filters do
 
   describe Join do
     it "join (yes)" do
-      n = ["John", "Paul", "George", "Ringo"].to_json
-      Join.filter(JSON.parse(n), [Any.new " and "]).should eq "John and Paul and George and Ringo"
+      n = Any{"John", "Paul", "George", "Ringo"}
+      Join.filter(n, [Any.new " and "]).should eq "John and Paul and George and Ringo"
     end
   end
 
   describe Last do
     it "should return the last item in an array that isn't empty" do
-      a = ["one", "two", "three"].to_json
-      empty = [] of String
-      Last.filter(JSON.parse(a)).should eq "three"
-      Last.filter(JSON.parse(empty.to_json)).should eq empty
+      a = Any{"one", "two", "three"}
+      empty = Any.new([] of Any)
+      Last.filter(a).should eq "three"
+      Last.filter(empty).should eq empty
     end
   end
 
@@ -193,11 +193,11 @@ describe Filters do
 
   describe Map do
     it "should return the property of the array of hashes & hash values" do
-      d1 = JSON.parse({"category" => "yoo"}.to_json)
-      d2 = JSON.parse([{"category" => "yoo"}, {"category" => "another"}].to_json)
+      d1 = Any{"category" => "yoo"}
+      d2 = Any{Any{"category" => "yoo"}, Any{"category" => "another"}}
       Map.filter(d1, [Any.new "category"]).should eq "yoo"
-      Map.filter(d2, [Any.new "category"]).should eq ["yoo", "another"]
-      Map.filter(d2, [Any.new "test"]).should eq [{"category" => "yoo"}, {"category" => "another"}]
+      Map.filter(d2, [Any.new "category"]).should eq Any{"yoo", "another"}
+      Map.filter(d2, [Any.new "test"]).should eq Any{Any{"category" => "yoo"}, Any{"category" => "another"}}
     end
   end
 
@@ -279,8 +279,8 @@ describe Filters do
 
   describe Reverse do
     it "should reverse an array" do
-      d = [1, 2, 3].to_json
-      Reverse.filter(JSON.parse(d)).should eq [3, 2, 1]
+      d = Any{1, 2, 3}
+      Reverse.filter(d).should eq [3, 2, 1]
     end
   end
 
@@ -300,13 +300,13 @@ describe Filters do
 
   describe Size do
     it "returns the size of a string, array or hash or return 0" do
-      arr = [1, 2, 3, "4"]
-      hash = {"example" => "hash", :blah => "wut"}
+      arr = Any{1, 2, 3, "4"}
+      hash = Any{"example" => "hash", :blah => "wut"}
 
       Size.filter(Any.new(10)).should eq 0
       Size.filter(Any.new("example")).should eq 7
-      Size.filter(JSON.parse(arr.to_json)).should eq 4
-      Size.filter(JSON.parse(hash.to_json)).should eq 2
+      Size.filter(arr).should eq 4
+      Size.filter(hash).should eq 2
     end
   end
 

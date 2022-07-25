@@ -1,4 +1,3 @@
-require "json"
 require "./liquid"
 
 filename, io, context = ARGV[0], ARGV[1], ARGV[2]?
