@@ -1,7 +1,5 @@
 require "./spec_helper"
 
-include Liquid
-
 describe Template do
   it "should render raw text" do
     tpl = Parser.parse("raw text")
