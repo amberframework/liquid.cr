@@ -1,9 +1,8 @@
 require "./spec_helper"
 
-include Liquid
 include Liquid::Filters
 
-describe Liquid::Filters do
+describe Filters do
   describe FilterRegister do
     it "should have registered default filters" do
       FilterRegister.get("abs").should eq Abs

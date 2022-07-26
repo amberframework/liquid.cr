@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe Liquid::BinOperator do
+describe BinOperator do
   it "should compare Boolean" do
     BinOperator.process("==", Any.new(true), Any.new(true)).should eq Any.new true
     BinOperator.process("==", Any.new(false), Any.new(false)).should eq Any.new true

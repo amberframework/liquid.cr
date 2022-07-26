@@ -1,8 +1,6 @@
 require "./spec_helper"
 
-include Liquid
-
-describe Liquid::Parser do
+describe Parser do
   it "parses raw text" do
     txt = "raw text"
     template = Parser.parse txt
