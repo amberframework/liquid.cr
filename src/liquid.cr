@@ -13,3 +13,8 @@ require "./liquid/version"
 require "./liquid/visitor"
 require "./liquid/codegen_visitor"
 require "./liquid/render_visitor"
+
+module Liquid
+  class Exception < RuntimeError
+  end
+end

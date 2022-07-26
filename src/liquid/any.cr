@@ -1,6 +1,8 @@
+require "./drop"
+
 module Liquid
   struct Any
-    alias Type = Nil | Bool | Int32 | Int64 | Float32 | Float64 | String | Time | Array(Any) | Hash(String, Any)
+    alias Type = Nil | Bool | Int32 | Int64 | Float32 | Float64 | String | Time | Array(Any) | Hash(String, Any) | Drop
 
     # Returns the raw underlying value.
     getter raw : Type
@@ -248,6 +250,13 @@ module Liquid
 
     def inspect(io : IO) : Nil
       @raw.inspect(io)
+    end
+
+    def -
+      raw = @raw
+      raise Exception.new("Can't apply '-' operator to #{raw.class.name}") unless raw.is_a?(Number)
+
+      Any.new(-raw)
     end
 
     def to_s(io : IO) : Nil

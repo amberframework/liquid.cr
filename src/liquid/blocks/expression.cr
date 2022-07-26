@@ -69,7 +69,7 @@ module Liquid::Block
     INTERNED_GFILTERED   = /^#{GFILTERED}$/
     PARENTHESIZED_SCALAR = /^(#{SCALAR})/
 
-    def eval(data) : Any
+    def eval(data : Context) : Any
       ret = if @var == "true" || @var == "!false"
               true
             elsif @var == "false" || @var == "!true"
