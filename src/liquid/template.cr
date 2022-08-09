@@ -5,11 +5,8 @@ require "./codegen_visitor"
 
 module Liquid
   class Template
-    getter root
-    property template_path
-
-    @root : Block::Root
-    @template_path : String?
+    getter root : Block::Root
+    property template_path : String?
 
     def self.parse(str : String) : Template
       Parser.parse(str)
