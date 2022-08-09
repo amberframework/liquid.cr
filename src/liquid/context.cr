@@ -3,8 +3,6 @@ require "./any"
 module Liquid
   struct Context
     @inner : Hash(String, Any)
-    @strict : Bool = false
-
     property strict : Bool = false
 
     def initialize(@strict = false)
