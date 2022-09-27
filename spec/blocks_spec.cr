@@ -26,6 +26,60 @@ describe Liquid do
       end
     end
 
+    describe Case do
+      it "should be inherit BeginBlock" do
+        Case.new("case variable").should be_a BeginBlock
+      end
+
+      it "should add when node" do
+        case_node = Case.new("case animal")
+        case_node << When.new("when \"cat\"")
+        case_node.when.should_not be_nil
+      end
+
+      it "should add else node" do
+        case_node = Case.new("case animal")
+        case_node << When.new("when \"cat\"")
+        case_node << Else.new("else")
+        case_node.else.should_not be_nil
+      end
+
+      it "should NOT add else node without a when" do
+        case_node = Case.new("case var")
+        expect_raises(Liquid::InvalidNode, "Else without When in Case statement!") do
+          case_node << Else.new("else")
+        end
+      end
+
+      it "should NOT add any when after an else" do
+        case_node = Case.new("case animal")
+        case_node << When.new("when \"cat\"")
+        case_node << Else.new("else")
+        expect_raises(Liquid::InvalidNode, "When statement must preceed Else!") do
+          case_node << When.new("when \"dog\"")
+        end
+      end
+
+      it "should render case" do
+        case_node = Block::Case.new("case desert")
+        case_node << Block::Raw.new("")
+        when_node = Block::When.new("when \"cake\"")
+        when_node << Block::Raw.new("This is a cake")
+        case_node << when_node
+        when_node = Block::When.new("when \"cookie\", \"biscuit\"")
+        when_node << Block::Raw.new("This is a cookie")
+        case_node << when_node
+        else_node = Block::Else.new("")
+        else_node << Block::Raw.new("This is not a cake nor a cookie")
+        case_node << else_node
+
+        node_output(case_node, Context{"desert" => "cake"}).should eq "This is a cake"
+        node_output(case_node, Context{"desert" => "cookie"}).should eq "This is a cookie"
+        node_output(case_node, Context{"desert" => "biscuit"}).should eq "This is a cookie"
+        node_output(case_node, Context{"desert" => "jellybean"}).should eq "This is not a cake nor a cookie"
+      end
+    end
+
     describe For do
       it "should be inherit BeginBlock" do
         For.new("for x in array").should be_a BeginBlock

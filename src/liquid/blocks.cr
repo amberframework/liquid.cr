@@ -1,6 +1,7 @@
 require "./blocks/assign"
 require "./blocks/block"
 require "./blocks/capture"
+require "./blocks/case"
 require "./blocks/comment"
 require "./blocks/decrement"
 require "./blocks/else"
@@ -11,10 +12,13 @@ require "./blocks/if"
 require "./blocks/include"
 require "./blocks/increment"
 require "./blocks/raw"
+require "./blocks/when"
 
 module Liquid
   include Liquid::Block
 
+  BlockRegister.register "case", Liquid::Block::Case
+  BlockRegister.register "when", Liquid::Block::When
   BlockRegister.register "if", Liquid::Block::If
   BlockRegister.register "elsif", Liquid::Block::ElsIf, false
   BlockRegister.register "else", Liquid::Block::Else, false
