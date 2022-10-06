@@ -69,6 +69,21 @@ module Liquid
       pop
     end
 
+    def visit(node : Case)
+      def_to_io %(Liquid::Block::Expression.new(
+                   "#{escape node.case_expression.not_nil!.var}"))
+      def_to_io "Liquid::Block::Case.new(#{@last_var})"
+      push
+      node.children.each &.accept self
+      if arr = node.when
+        arr.each &.accept self
+      end
+      if e = node.else
+        e.accept self
+      end
+      pop
+    end
+
     def visit(node : For)
       if node.begin && node.end
         def_to_io %(Liquid::Block::For.new("#{node.loop_var}",

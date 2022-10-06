@@ -138,7 +138,7 @@ TODO:
 - [ ] Add `ends_with` keyword (new)
 - [ ] Add `continue` keyword
 - [ ] Add `break` keyword
-- [ ] Add case/when
+- [X] Add case/when
 - [ ] Add syntax checking
 - [ ] Improve expression parsing
 - [x] Add optional strict mode on Context (see below)

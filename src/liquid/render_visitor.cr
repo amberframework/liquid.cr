@@ -26,6 +26,21 @@ module Liquid
       @io.to_s
     end
 
+    def visit(node : Case)
+      value = node.case_expression.not_nil!.eval(@data).raw
+      if when_arr = node.when
+        when_arr.each do |when_node|
+          if when_node.eval(value)
+            when_node.children.each &.accept(self)
+            return
+          end
+        end
+      end
+      if else_node = node.else
+        else_node.children.each &.accept(self)
+      end
+    end
+
     def visit(node : If)
       if node.if_expression.not_nil!.eval(@data).raw
         node.children.each &.accept(self)

@@ -77,6 +77,34 @@ describe Parser do
     template.root.children.should eq expected
   end
 
+  it "parses case statement" do
+    txt = <<-STRING
+            {% case desert %}
+              {% when "cake" %} This is a cake
+              {% when "cookie", "biscuit" %} This is a cookie
+              {% else %} This is not a cake nor a cookie
+            {% endcase %}
+            STRING
+
+    template = Liquid::Parser.parse txt
+
+    expected = [] of Block::Node
+    case_node = Block::Case.new("case desert")
+    case_node << Block::Raw.new("\n  ")
+    when_node = Block::When.new("when \"cake\"")
+    when_node << Block::Raw.new(" This is a cake\n  ")
+    case_node << when_node
+    when_node = Block::When.new("when \"cookie\", \"biscuit\"")
+    when_node << Block::Raw.new(" This is a cookie\n  ")
+    case_node << when_node
+    else_node = Block::Else.new("")
+    else_node << Block::Raw.new(" This is not a cake nor a cookie\n")
+    case_node << else_node
+    expected << case_node
+
+    template.root.children.should eq expected
+  end
+
   it "trims lspace in statements" do
     txt = " PRE \t\n{%- if a == true %} \t\nPOST "
     template = Liquid::Parser.parse txt

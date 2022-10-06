@@ -74,6 +74,28 @@ describe Template do
   #   tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
   # end
 
+  it "should render case statement without an else option" do
+    tpl = Parser.parse("{% case var %}{% when \"here\" %}We are here{% when \"there\" %}We are there{% endcase %}")
+    ctx = Context.new
+    ctx.set("var", "here")
+    tpl.render(ctx).should eq "We are here"
+    ctx.set("var", "there")
+    tpl.render(ctx).should eq "We are there"
+    ctx.set("var", "")
+    tpl.render(ctx).should eq ""
+  end
+
+  it "should render case statement with an else option" do
+    tpl = Parser.parse("{% case var %}{% when \"here\" %}We are here{% else %}We are somewhere{% endcase %}")
+    ctx = Context.new
+    ctx.set("var", "here")
+    tpl.render(ctx).should eq "We are here"
+    ctx.set("var", "there")
+    tpl.render(ctx).should eq "We are somewhere"
+    ctx.set("var", "")
+    tpl.render(ctx).should eq "We are somewhere"
+  end
+
   it "should render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new
