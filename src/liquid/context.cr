@@ -35,6 +35,10 @@ module Liquid
       end
     end
 
+    STRING_OR_INT_OR_VAR = /\[((#{STRING})|(#{INT})|(#{VAR}))\]/
+    NEGATIVE_INT         = /^(\-?#{INT})$/
+    NEGATIVE_VAR         = /^\-?(#{VAR})$/
+
     # key can include . (property/method access) and/or [] (array index)
     @[AlwaysInline]
     def get(key, strict : Bool = @strict)
@@ -135,10 +139,10 @@ module Liquid
           end
         end
 
-        while k =~ /\[((#{STRING})|(#{INT})|(#{VAR}))\]/
+        while k =~ STRING_OR_INT_OR_VAR
           index = $1
           # puts index
-          if (index =~ /^(\-?#{INT})$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
+          if (index =~ NEGATIVE_INT) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
             # array access via integer literal
             return index_error(key, strict) unless (-array.size..array.size).includes?(idx)
 
@@ -154,7 +158,7 @@ module Liquid
             end
 
             k = k.sub("[#{index}]", "")
-          elsif (index =~ /^\-?(#{VAR})$/) && (varname = $1) && ret && (array = ret.as_a?)
+          elsif (index =~ NEGATIVE_VAR) && (varname = $1) && ret && (array = ret.as_a?)
             # array access via integer variable
             invert = (index[0] == '-')
             if (realidx = self[varname]?.try(&.as_i?))
