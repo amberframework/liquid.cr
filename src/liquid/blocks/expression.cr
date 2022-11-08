@@ -55,14 +55,19 @@ module Liquid::Block
       if m = @var.match GSTRING
         @children << Block::Raw.new m["str"]
       end
-      if @var.match intern(GFILTERED)
+      if @var.match INTERNED_GFILTERED
         @children << Filtered.new @var
       end
     end
 
-    private def intern(re)
-      /^#{re}$/
-    end
+    INTERNED_GSTRING     = /^#{GSTRING}$/
+    INTERNED_GINT        = /^#{GINT}$/
+    INTERNED_GFLOAT      = /^#{GFLOAT}$/
+    INTERNED_ARRAY       = /^#{ARRAY}$/
+    INTERNED_VAR         = /^#{VAR}$/
+    INTERNED_GCMP        = /^#{GCMP}$/
+    INTERNED_GFILTERED   = /^#{GFILTERED}$/
+    PARENTHESIZED_SCALAR = /^(#{SCALAR})/
 
     def eval(data) : Any
       ret = if @var == "true" || @var == "!false"
@@ -71,25 +76,25 @@ module Liquid::Block
               false
             elsif @var == "nil"
               nil
-            elsif m = @var.match intern(GSTRING)
+            elsif m = @var.match INTERNED_GSTRING
               m["str"]
-            elsif m = @var.match intern(GINT)
+            elsif m = @var.match INTERNED_GINT
               m["intval"].to_i
-            elsif m = @var.match intern(GFLOAT)
+            elsif m = @var.match INTERNED_GFLOAT
               m["floatval"].to_f32
-            elsif m = @var.match intern(ARRAY) # scalars only for now; no variables allowed
+            elsif m = @var.match INTERNED_ARRAY # scalars only for now; no variables allowed
               str = $1
               scalars = Array(Expression).new
-              while str =~ /^(#{SCALAR})/
+              while str =~ PARENTHESIZED_SCALAR
                 match = $1
                 scalars << Expression.new(match)
                 str = str.sub(match, "")
                 str = str.sub(/^\s*,\s*/, "")
               end
               scalars.map { |s| s.eval(data) }
-            elsif m = @var.match intern(VAR)
+            elsif m = @var.match INTERNED_VAR
               data.get(@var) # Context handles . and [] access
-            elsif m = @var.match intern(GCMP)
+            elsif m = @var.match INTERNED_GCMP
               le = Expression.new(m["left"]).eval data
               re = Expression.new(m["right"]).eval data
               BinOperator.process m["op"], le, re
