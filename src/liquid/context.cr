@@ -67,7 +67,7 @@ module Liquid
           (i + 1...segments.size).each do |j|
             str = segments[j]
             segments[j] = ""
-            segments[i] = [segments[i], str].join(".")
+            segments[i] = "#{segments[i]}.#{str}"
             break if str.includes?("]") # found the closing bracket
           end
         end
