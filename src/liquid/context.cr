@@ -35,6 +35,10 @@ module Liquid
       end
     end
 
+    STRING_OR_INT_OR_VAR = /\[((#{STRING})|(#{INT})|(#{VAR}))\]/
+    NEGATIVE_INT         = /^(\-?#{INT})$/
+    NEGATIVE_VAR         = /^\-?(#{VAR})$/
+
     # key can include . (property/method access) and/or [] (array index)
     @[AlwaysInline]
     def get(key, strict : Bool = @strict)
@@ -63,7 +67,7 @@ module Liquid
           (i + 1...segments.size).each do |j|
             str = segments[j]
             segments[j] = ""
-            segments[i] = [segments[i], str].join(".")
+            segments[i] = "#{segments[i]}.#{str}"
             break if str.includes?("]") # found the closing bracket
           end
         end
@@ -78,67 +82,72 @@ module Liquid
         next unless k
 
         # ignore array index/hash key if present, first handle methods/properties
-        if k =~ /^(.*?)(?:\[.*?\])*$/
-          name = $1
-          if ret
-            # handle a selection of convenience methods
-            # wrap values in Any to make sure the return type is always the same
-            case name
-            when "present"
-              if (array = ret.as_a?)
-                ret = Any.new(array.size > 0)
-              elsif (hash = ret.as_h?)
-                ret = Any.new(hash.keys.size > 0)
-              else
-                ret = Any.new(ret.raw.to_s.size > 0)
-              end
-            when "blank"
-              if (array = ret.as_a?)
-                ret = Any.new(array.size == 0)
-              elsif (hash = ret.as_h?)
-                ret = Any.new(hash.keys.size == 0)
-              else
-                ret = Any.new(ret.raw.to_s.size == 0)
-              end
-            when "size"
-              if (array = ret.as_a?)
-                ret = Any.new(array.size)
-              elsif (hash = ret.as_h?)
-                ret = Any.new(hash.keys.size)
-              elsif (str = ret.as_s?)
-                ret = Any.new(str.size)
-              else
-                return parse_error(key, strict, "Parse error: Tried to call #size on something other than a String, Array or Hash (#{key} -> #{ret.inspect})")
-              end
-            else
-              # if not a method, then it's a property (implemented as JSON hash member)
-              if (hash = ret.as_h?)
-                return key_missing(key, strict) unless hash.has_key?(k)
+        bracket_index = k.index('[')
+        name =
+          if bracket_index && k.ends_with?(']')
+            k[0...bracket_index]
+          else
+            k
+          end
 
-                ret = hash[k]
-              else
-                return parse_error(key, strict, "Parse error: Tried to access property of a non-hash object (#{key} -> #{ret.inspect})")
-              end
+        if ret
+          # handle a selection of convenience methods
+          # wrap values in Any to make sure the return type is always the same
+          case name
+          when "present"
+            if (array = ret.as_a?)
+              ret = Any.new(array.size > 0)
+            elsif (hash = ret.as_h?)
+              ret = Any.new(hash.keys.size > 0)
+            else
+              ret = Any.new(ret.raw.to_s.size > 0)
+            end
+          when "blank"
+            if (array = ret.as_a?)
+              ret = Any.new(array.size == 0)
+            elsif (hash = ret.as_h?)
+              ret = Any.new(hash.keys.size == 0)
+            else
+              ret = Any.new(ret.raw.to_s.size == 0)
+            end
+          when "size"
+            if (array = ret.as_a?)
+              ret = Any.new(array.size)
+            elsif (hash = ret.as_h?)
+              ret = Any.new(hash.keys.size)
+            elsif (str = ret.as_s?)
+              ret = Any.new(str.size)
+            else
+              return parse_error(key, strict, "Parse error: Tried to call #size on something other than a String, Array or Hash (#{key} -> #{ret.inspect})")
             end
           else
-            # first time through ret = nil, name should correspond to a top level key in @inner
-            if @inner.has_key?(name)
-              ret = @inner[name]
+            # if not a method, then it's a property (implemented as JSON hash member)
+            if (hash = ret.as_h?)
+              return key_missing(key, strict) unless hash.has_key?(k)
+
+              ret = hash[k]
             else
-              if strict
-                return key_missing(key, strict)
-              else
-                # keep going, in case we're ultimately just doing a #blank check
-                ret = Any.new(nil)
-              end
+              return parse_error(key, strict, "Parse error: Tried to access property of a non-hash object (#{key} -> #{ret.inspect})")
+            end
+          end
+        else
+          # first time through ret = nil, name should correspond to a top level key in @inner
+          if @inner.has_key?(name)
+            ret = @inner[name]
+          else
+            if strict
+              return key_missing(key, strict)
+            else
+              # keep going, in case we're ultimately just doing a #blank check
+              ret = Any.new(nil)
             end
           end
         end
 
-        while k =~ /\[((#{STRING})|(#{INT})|(#{VAR}))\]/
+        while k =~ STRING_OR_INT_OR_VAR
           index = $1
           # puts index
-          if (index =~ /^(\-?#{INT})$/) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
+          if (index =~ NEGATIVE_INT) && (idx = $1.to_i?) && ret && (array = ret.as_a?)
             # array access via integer literal
             return index_error(key, strict) unless (-array.size..array.size).includes?(idx)
 
@@ -154,7 +163,7 @@ module Liquid
             end
 
             k = k.sub("[#{index}]", "")
-          elsif (index =~ /^\-?(#{VAR})$/) && (varname = $1) && ret && (array = ret.as_a?)
+          elsif (index =~ NEGATIVE_VAR) && (varname = $1) && ret && (array = ret.as_a?)
             # array access via integer variable
             invert = (index[0] == '-')
             if (realidx = self[varname]?.try(&.as_i?))
