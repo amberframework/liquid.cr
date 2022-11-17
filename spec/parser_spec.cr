@@ -82,6 +82,8 @@ describe Parser do
             {% case desert %}
               {% when "cake" %} This is a cake
               {% when "cookie", "biscuit" %} This is a cookie
+              {% when 'potato' %} This is a potato
+              {% when 'potato', 'tomato' %} This is a tomato
               {% else %} This is not a cake nor a cookie
             {% endcase %}
             STRING
@@ -96,6 +98,12 @@ describe Parser do
     case_node << when_node
     when_node = Block::When.new("when \"cookie\", \"biscuit\"")
     when_node << Block::Raw.new(" This is a cookie\n  ")
+    case_node << when_node
+    when_node = Block::When.new("when 'potato'")
+    when_node << Block::Raw.new(" This is a potato\n  ")
+    case_node << when_node
+    when_node = Block::When.new("when 'potato', 'tomato'")
+    when_node << Block::Raw.new(" This is a tomato\n  ")
     case_node << when_node
     else_node = Block::Else.new("")
     else_node << Block::Raw.new(" This is not a cake nor a cookie\n")
@@ -151,5 +159,15 @@ describe Parser do
     expected << Block::Raw.new("POST ")
 
     template.root.children.should eq expected
+  end
+
+  it "should raise error if try to parse case statement using single and double quotes together" do
+    expect_raises(InvalidNode) do
+      when_node = Block::When.new("when 'cake\"")
+    end
+
+    expect_raises(InvalidNode) do
+      when_node = Block::When.new("when \"cake'")
+    end
   end
 end

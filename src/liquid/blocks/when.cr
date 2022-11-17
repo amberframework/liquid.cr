@@ -2,7 +2,7 @@ require "./block"
 
 module Liquid::Block
   class When < InlineBlock
-    SIMPLE_EXP = /^\s*when ((?:\s*"([^"]+)",?)+)\s*$/
+    SIMPLE_EXP = /^\s*when \s*(["'])(\\\1|[^\1]+)*\1/
 
     getter when_values
     @when_values : Array(String)
@@ -12,7 +12,7 @@ module Liquid::Block
 
     def initialize(content : String)
       if match = content.match(SIMPLE_EXP)
-        @when_values = match[1].split(",").map { |value| /.*"(.*)".*/.match(value).not_nil![1] }
+        @when_values = match[2].gsub("\"", "").gsub("'", "").split(/\s*,\s*/).map { |value| value.strip }
       else
         raise InvalidNode.new("Invalid When Node")
       end
