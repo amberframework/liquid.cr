@@ -13,11 +13,9 @@ module Liquid::Block
       Else
     end
 
-    getter :case, :case_expression, :else, :when
-
-    @case_expression : Expression?
-    @when : Array(When)?
-    @else : Else?
+    getter case_expression : Expression
+    getter when : Array(When)?
+    getter else : Else?
 
     @last = PutInto::Case
 
