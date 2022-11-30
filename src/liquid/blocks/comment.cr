@@ -1,14 +1,15 @@
 require "./block"
 
 module Liquid::Block
-  class Comment < RawHiddenBlock
-    @content : String
-
-    def initialize(@content)
+  class Comment < BeginBlock
+    def initialize(content : String)
     end
 
     def content
       ""
+    end
+
+    def <<(node : Node)
     end
 
     def_equals @children, content

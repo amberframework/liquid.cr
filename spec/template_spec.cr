@@ -96,6 +96,25 @@ describe Template do
     tpl.render(ctx).should eq "We are somewhere"
   end
 
+  it "should render case statement with strip" do
+    tpl = Parser.parse <<-EOT
+    Hey...
+    {%- case var %}
+    {% when "here" -%}
+    We are here
+    {%- else -%}
+    We are somewhere
+    {%- endcase %}
+    EOT
+    ctx = Context.new
+    ctx.set("var", "here")
+    tpl.render(ctx).should eq "Hey...We are here"
+    ctx.set("var", "there")
+    tpl.render(ctx).should eq "Hey...We are somewhere"
+    ctx.set("var", "")
+    tpl.render(ctx).should eq "Hey...We are somewhere"
+  end
+
   it "should render if statement" do
     tpl = Parser.parse("{% if var == true %}true{% endif %}")
     ctx = Context.new
