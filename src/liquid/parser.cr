@@ -1,26 +1,19 @@
 require "./blocks"
+require "./tokenizer"
+require "./strip_visitor"
 
 module Liquid
   class Parser
-    STATEMENT        = /^\s*(?<keyword>[a-z]+).*$/
-    ENDRAW_STATEMENT = {
-      "raw"     => /(?<!\\){%\s*endraw\s*\-?%}|$/,
-      "comment" => /(?<!\\){%\s*endcomment\s*\-?%}|$/,
-    }
+    private STATEMENT        = /^\s*(?<keyword>[a-z]+).*$/
+    private ENDRAW_STATEMENT = /\A\s*endraw\s*\z/
 
     getter root : Root
 
     @str : String
-    @i = 0
-    @current_line = 0
-    @escape = false
-    @lstrip = false
-    @rstrip = false
-    @buffer_start = -1
-    @buffer_size = 0
-
-    # buffers
     @nodes = Array(Node).new
+    # if this flag is true we are parsing a {% raw %} block, so we keep creating Raw blocks for every token until we find
+    # a {% endraw %}
+    @under_raw_block = false
 
     def self.parse(str : String)
       internal = self.new str
@@ -39,141 +32,74 @@ module Liquid
 
     def initialize(@str)
       @root = Root.new
+      @last_node = @root
       @nodes << @root
     end
 
-    def has_char?
-      @i < str.size
-    end
-
     # parse string
-    def parse
-      @i = 0
-      while @i < @str.size - 1
-        if @str[@i] == '{' && @str[@i + 1] == '%' && !@escape
-          @i += 2
-          if @str[@i] == '-'
-            @rstrip = true
-            @i += 1
+    def parse : Root
+      Tokenizer.parse(@str) do |token|
+        if token.kind.raw?
+          @nodes.last << Block::Raw.new(token.value)
+          next
+        elsif @under_raw_block # processing contents of {% raw %}
+          if token.kind.statement? && token.value =~ ENDRAW_STATEMENT
+            @under_raw_block = false
+          else
+            @nodes.last << Block::Raw.new(token.raw_value)
           end
-          add_raw
-          consume_statement
-        elsif @str[@i] == '{' && @str[@i + 1] == '{' && !@escape
-          @i += 2
-          if @str[@i] == '-'
-            @rstrip = true
-            @i += 1
-          end
-          add_raw
-          consume_expression
-        else
-          consume_char
-        end
-        @escape = false if @escape
-        @escape = true if @str[@i] == '\\'
-        @i += 1
-      end
-      consume_char # last char ?
-      add_raw
-    end
-
-    # Create and add a Raw node with current buffer
-    def add_raw
-      if @buffer_size > 0
-        buffer_str = buffer
-        buffer_str = buffer_str.lstrip if @lstrip
-        buffer_str = buffer_str.rstrip if @rstrip
-        @nodes.last << Block::Raw.new(buffer_str)
-        reset_buffer
-      end
-      @lstrip = false
-      @rstrip = false
-    end
-
-    def consume_expression
-      while @i < @str.size - 1
-        if @str[@i] == '-' && @str[@i + 1] == '}' && @str[@i + 2] == '}'
-          @lstrip = true
-          @i += 2
-          break
-        elsif @str[@i] == '}' && @str[@i + 1] == '}'
-          @i += 1
-          break
-        else
-          consume_char
-        end
-        @i += 1
-      end
-
-      raise "Invalid Expression at line #{@current_line}" if @buffer_size <= 0
-
-      @nodes.last << Expression.new(buffer)
-      reset_buffer
-    end
-
-    # Consume a statement
-    def consume_statement
-      while @i < @str.size - 1
-        if @str[@i] == '-' && @str[@i + 1] == '%' && @str[@i + 2] == '}'
-          @lstrip = true
-          @i += 2
-          break
-        elsif @str[@i] == '%' && @str[@i + 1] == '}'
-          @i += 1
-          break
-        else
-          consume_char
-        end
-        @i += 1
-      end
-
-      buffer_str = buffer
-      if match = buffer_str.match STATEMENT
-        block_class = BlockRegister.for_name match["keyword"]
-        case block_class.type
-        when BlockType::End
-          while (pop = @nodes.pop?) && pop.is_a? Block && !pop.class.type == BlockType::Begin
-          end
-        when BlockType::Begin
-          block = block_class.new(buffer_str)
+        elsif token.kind.expression?
+          block = Expression.new(token.value)
+          block.rstrip = token.rstrip?
+          block.lstrip = token.lstrip?
           @nodes.last << block
-          @nodes << block
-        when BlockType::Inline
-          @nodes.last << block_class.new(buffer_str)
-        else # when BlockType::Raw, BlockType::RawHidden
-          if match = @str.match(ENDRAW_STATEMENT[match["keyword"]], @i)
-            j = match.begin.not_nil! - 1
-            buffer_str = @str[@i + 1..j]
-            @i = match.end.not_nil! - 1
-            @nodes.last << block_class.new(buffer_str)
+        elsif token.kind.statement?
+          parse_statement(token)
+        end
+      end
+
+      StripVisitor.new.visit(@root)
+      @root
+    end
+
+    private def parse_statement(token : Token)
+      token_value = token.value
+      match = token_value.match(STATEMENT)
+      invalid_statement!(token) if match.nil?
+
+      block_class = BlockRegister.for_name(match["keyword"])
+      block = block_class.new(token.value)
+      block.rstrip = token.rstrip?
+      block.lstrip = token.lstrip?
+
+      case block
+      when Block::EndBlock
+        loop do
+          last = @nodes.last
+          if last != root && last.is_a?(Block::BeginBlock)
+            @nodes.pop
+          else
+            break
           end
         end
+        @nodes.last << block
+      when Block::BeginBlock
+        @nodes.last << block
+        @nodes << block
+      when Block::InlineBlock
+        @nodes.last << block
+      when Block::RawBlock
+        # If a Raw block appear here, is because Raw statement is a RawBlock instead of a BeginBlock.
+        # To process {% raw %} we turn this flag on and start generating RawBlock for every token until we
+        # find a statement token that matches with ENDRAW_STATEMENT regex.
+        @under_raw_block = true
       else
-        raise "Invalid Statement at line #{@current_line}"
+        invalid_statement!(token)
       end
-
-      reset_buffer
     end
 
-    private def buffer : String
-      return "" if @buffer_start < 0
-
-      @str[@buffer_start, @buffer_size]
-    end
-
-    private def reset_buffer
-      @buffer_start = -1
-      @buffer_size = 0
-    end
-
-    # Add current char to buffer
-    private def consume_char
-      @buffer_start = @i if @buffer_start < 0
-
-      if @i < @str.size
-        @buffer_size += 1
-        @current_line += 1 if @str[@i] == '\n'
-      end
+    private def invalid_statement!(token)
+      raise InvalidStatement.new("Invalid Statement #{token.value.inspect} at line #{token.line_number}.")
     end
   end
 end

@@ -13,19 +13,21 @@ describe Parser do
     template = Parser.parse txt
     expected = [
       Block::Raw.new("PRE "),
-      Block::Raw.new("test\nIn Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not."),
+      Block::Raw.new("test\nIn Handlebars, "),
+      Block::Raw.new("{{ this }}"),
+      Block::Raw.new(" will be HTML-escaped, but "),
+      Block::Raw.new("{{{ that }}"),
+      Block::Raw.new("} will not."),
       Block::Raw.new(" POST"),
     ]
     template.root.children.should eq expected
+  end
 
-    txt = " PRE {%- raw -%} RAW  {% endraw %} POST "
-    template = Parser.parse txt
-    expected = [
-      Block::Raw.new(" PRE"),
-      Block::Raw.new(" RAW  "),
-      Block::Raw.new("POST "),
-    ]
-    template.root.children.should eq expected
+  # This is for compatibility with Ruby version of liquid template
+  it "raise error when using whitespace controls in raw tags" do
+    expect_raises(InvalidStatement, "Raw tags can not have whitespace controls.") do
+      Parser.parse(" PRE {%- raw -%} RAW  {% endraw %} POST ")
+    end
   end
 
   it "should allow to escape statement" do
@@ -47,6 +49,7 @@ describe Parser do
     expected = [] of Block::Node
     expected << Block::For.new("for x in 0..2")
     expected.last << Block::Raw.new(" shown 2 times ")
+    expected << Block::EndBlock.new
 
     template.root.children.should eq expected
   end
@@ -58,6 +61,7 @@ describe Parser do
     expected = [] of Block::Node
     expected << Block::If.new("if a == true")
     expected.last << Block::Raw.new(" shown ")
+    expected << Block::EndBlock.new
 
     template.root.children.should eq expected
   end
@@ -73,6 +77,7 @@ describe Parser do
     else_node << Block::Raw.new(" not shown ")
     if_node << else_node
     expected << if_node
+    expected << Block::EndBlock.new
 
     template.root.children.should eq expected
   end
@@ -109,6 +114,7 @@ describe Parser do
     else_node << Block::Raw.new(" This is not a cake nor a cookie\n")
     case_node << else_node
     expected << case_node
+    expected << Block::EndBlock.new
 
     template.root.children.should eq expected
   end

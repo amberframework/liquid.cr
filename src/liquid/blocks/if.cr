@@ -13,11 +13,9 @@ module Liquid::Block
       Else
     end
 
-    getter :else, :elsif, :if_expression
-
-    @if_expression : Expression?
-    @elsif : Array(ElsIf)?
-    @else : Else?
+    getter if_expression : Expression
+    getter elsif : Array(ElsIf)?
+    getter else : Else?
 
     @last = PutInto::If
 
