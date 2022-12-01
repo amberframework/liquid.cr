@@ -16,10 +16,11 @@ module Liquid
     @escape = false
     @lstrip = false
     @rstrip = false
+    @buffer_start = -1
+    @buffer_size = 0
 
     # buffers
     @nodes = Array(Node).new
-    @buffer = ""
 
     def self.parse(str : String)
       internal = self.new str
@@ -78,11 +79,12 @@ module Liquid
 
     # Create and add a Raw node with current buffer
     def add_raw
-      if !@buffer.empty?
-        @buffer = @buffer.lstrip if @lstrip
-        @buffer = @buffer.rstrip if @rstrip
-        @nodes.last << Block::Raw.new @buffer
-        @buffer = ""
+      if @buffer_size > 0
+        buffer_str = buffer
+        buffer_str = buffer_str.lstrip if @lstrip
+        buffer_str = buffer_str.rstrip if @rstrip
+        @nodes.last << Block::Raw.new(buffer_str)
+        reset_buffer
       end
       @lstrip = false
       @rstrip = false
@@ -103,12 +105,10 @@ module Liquid
         @i += 1
       end
 
-      if !@buffer.empty?
-        @nodes.last << Expression.new @buffer
-        @buffer = ""
-      else
-        raise "Invalid Expression at line #{@current_line}"
-      end
+      raise "Invalid Expression at line #{@current_line}" if @buffer_size <= 0
+
+      @nodes.last << Expression.new(buffer)
+      reset_buffer
     end
 
     # Consume a statement
@@ -127,37 +127,51 @@ module Liquid
         @i += 1
       end
 
-      if match = @buffer.match STATEMENT
+      buffer_str = buffer
+      if match = buffer_str.match STATEMENT
         block_class = BlockRegister.for_name match["keyword"]
         case block_class.type
         when BlockType::End
           while (pop = @nodes.pop?) && pop.is_a? Block && !pop.class.type == BlockType::Begin
           end
         when BlockType::Begin
-          block = block_class.new @buffer
+          block = block_class.new(buffer_str)
           @nodes.last << block
           @nodes << block
         when BlockType::Inline
-          @nodes.last << block_class.new @buffer
+          @nodes.last << block_class.new(buffer_str)
         else # when BlockType::Raw, BlockType::RawHidden
           if match = @str.match(ENDRAW_STATEMENT[match["keyword"]], @i)
             j = match.begin.not_nil! - 1
-            @buffer = @str[@i + 1..j]
+            buffer_str = @str[@i + 1..j]
             @i = match.end.not_nil! - 1
-            @nodes.last << block_class.new @buffer
+            @nodes.last << block_class.new(buffer_str)
           end
         end
       else
         raise "Invalid Statement at line #{@current_line}"
       end
 
-      @buffer = ""
+      reset_buffer
+    end
+
+    private def buffer : String
+      return "" if @buffer_start < 0
+
+      @str[@buffer_start, @buffer_size]
+    end
+
+    private def reset_buffer
+      @buffer_start = -1
+      @buffer_size = 0
     end
 
     # Add current char to buffer
-    def consume_char
+    private def consume_char
+      @buffer_start = @i if @buffer_start < 0
+
       if @i < @str.size
-        @buffer += @str[@i]
+        @buffer_size += 1
         @current_line += 1 if @str[@i] == '\n'
       end
     end
