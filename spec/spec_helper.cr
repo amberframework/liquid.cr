@@ -3,8 +3,9 @@ require "../src/liquid"
 
 include Liquid
 
-def node_output(node : Node, ctx : Context)
-  v = RenderVisitor.new ctx, IO::Memory.new
-  node.accept v
-  v.output
+def node_output(node : Node, ctx : Context = Context.new) : String
+  io = IO::Memory.new
+  v = RenderVisitor.new(ctx, io)
+  node.accept(v)
+  io.to_s
 end

@@ -6,23 +6,11 @@ module Liquid
     @io : IO
     @template_path : String?
 
-    def initialize
-      @data = Context.new
-      @io = IO::Memory.new
+    def initialize(@data = Context.new, @io = IO::Memory.new, @template_path = nil)
     end
 
-    def initialize(@data : Context)
-      @io = IO::Memory.new
-    end
-
-    def initialize(@data : Context, @io : IO)
-    end
-
-    def initialize(@data : Context, @io : IO, @template_path : String?)
-    end
-
+    @[Deprecated]
     def output
-      @io.close
       @io.to_s
     end
 
