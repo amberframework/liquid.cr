@@ -32,7 +32,7 @@ module Liquid::Block
       if match(content)
         @inner = content == "true"
       else
-        raise Exception.new "Invalid Boolean expression : #{content}"
+        raise InvalidExpression.new "Invalid Boolean expression : #{content}"
       end
     end
 

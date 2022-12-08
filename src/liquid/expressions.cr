@@ -12,15 +12,14 @@ module Liquid
       right : Bool?
       proc : BoolOperator
 
-      exp = Exception.new "Invalid Boolean operation: #{arr.inspect}"
-      raise exp if arr.size < 3
+      raise InvalidExpression.new("Invalid Boolean operation: #{arr.inspect}.") if arr.size < 3
       left = nil
       i = 1
       while i < arr.size
         left ||= arr[i - 1].as(Expression).eval(data).as_bool?
         right = arr[i + 1].as(Expression).eval(data).as_bool?
 
-        raise exp if left.nil? || right.nil?
+        raise InvalidExpression.new("Invalid Boolean operation: #{arr.inspect}.") if left.nil? || right.nil?
 
         op = arr[i].as BoolOperator
         left = op.call left, right
@@ -34,7 +33,7 @@ module Liquid
                when "and", "&&" then AND
                when "or", "||"  then OR
                else
-                 raise Exception.new "Invalid Boolean operation: #{content}"
+                 raise InvalidExpression.new("Invalid Boolean operation: #{content}.")
                end
     end
 
@@ -74,7 +73,7 @@ module Liquid
               when ">"
                 left_raw > right_raw
               else
-                raise Exception.new "Invalid operator: #{operator}"
+                raise InvalidExpression.new "Invalid operator: #{operator}"
               end
         Any.new res
       elsif (left_t = left.as_t?) && (right_t = right.as_t?)
@@ -88,7 +87,7 @@ module Liquid
               when ">"
                 left_t > right_t
               else
-                raise Exception.new "Invalid operator: #{operator}"
+                raise InvalidExpression.new "Invalid operator: #{operator}"
               end
         Any.new res
       elsif (left_a = left.as_a?) && (right_a = right.as_a?)
@@ -125,7 +124,7 @@ module Liquid
 
     def self.check_operator(str : String)
       if !OPS.includes? str
-        raise Exception.new "Invalid comparison operator: #{str}"
+        raise InvalidExpression.new "Invalid comparison operator: #{str}"
       end
     end
   end

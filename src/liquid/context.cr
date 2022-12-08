@@ -13,7 +13,7 @@ module Liquid
     def parse_error(key, strict : Bool, message : String? = nil)
       message ||= "Parse error: \"#{key}\""
       if strict
-        raise Exception.new(message)
+        raise LiquidException.new(message)
       else
         nil
       end
