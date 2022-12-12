@@ -187,40 +187,40 @@ describe Liquid do
       end
     end
 
-    describe Filtered do
-      it "should filter a string" do
-        node = Filtered.new " \"whatever\" | abs"
-        node_output(node).should eq "whatever"
-      end
-
-      it "should filter a int" do
-        node = Filtered.new "-12 | abs"
-        node_output(node).should eq "12"
-      end
-
-      it "should filter a float" do
-        node = Filtered.new "-12.25 | abs"
-        node_output(node).should eq "12.25"
-      end
-
-      it "should filter a var" do
-        node = Filtered.new "var | abs"
-        ctx = Context{"var" => -12}
-        node_output(node, ctx).should eq "12"
-      end
-
-      it "should use multiple filters" do
-        node = Filtered.new "var | append: \"Hello \" | append: \"World !\""
-        ctx = Context{"var" => ""}
-        node_output(node, ctx).should eq "Hello World !"
-      end
-
-      it "should filter with an argument" do
-        node = Filtered.new "var | append: var2"
-        ctx = Context{"var" => "Hello", "var2" => " World !"}
-        node_output(node, ctx).should eq "Hello World !"
-      end
-    end
+    #     describe Filtered do
+    #       it "should filter a string" do
+    #         node = Filtered.new " \"whatever\" | abs"
+    #         node_output(node).should eq "whatever"
+    #       end
+    #
+    #       it "should filter a int" do
+    #         node = Filtered.new "-12 | abs"
+    #         node_output(node).should eq "12"
+    #       end
+    #
+    #       it "should filter a float" do
+    #         node = Filtered.new "-12.25 | abs"
+    #         node_output(node).should eq "12.25"
+    #       end
+    #
+    #       it "should filter a var" do
+    #         node = Filtered.new "var | abs"
+    #         ctx = Context{"var" => -12}
+    #         node_output(node, ctx).should eq "12"
+    #       end
+    #
+    #       it "should use multiple filters" do
+    #         node = Filtered.new "var | append: \"Hello \" | append: \"World !\""
+    #         ctx = Context{"var" => ""}
+    #         node_output(node, ctx).should eq "Hello World !"
+    #       end
+    #
+    #       it "should filter with an argument" do
+    #         node = Filtered.new "var | append: var2"
+    #         ctx = Context{"var" => "Hello", "var2" => " World !"}
+    #         node_output(node, ctx).should eq "Hello World !"
+    #       end
+    #     end
 
     describe Expression do
       it "should eval true" do
@@ -259,13 +259,9 @@ describe Liquid do
         expr = Expression.new "true == false"
         expr2 = Expression.new "true != false"
         expr3 = Expression.new "var != 15"
-        expr3a = Expression.new "-var == -16"
         expr4 = Expression.new "str == 'asdf'"
-        expr5 = Expression.new "!false && !flag"
-        expr5a = Expression.new "!flag && !false"
-        expr6 = Expression.new "missing?"
 
-        ctx = Context.new(strict: true)
+        ctx = Context.new(:strict)
         ctx.set "var", 16
         ctx.set "str", "asdf"
         ctx.set "flag", false
@@ -273,19 +269,9 @@ describe Liquid do
         expr.eval(ctx).should be_false
         expr2.eval(ctx).should be_true
         expr3.eval(ctx).should be_true
-        expr3a.eval(ctx).should be_true
         expr4.eval(ctx).should be_true
-        expr5.eval(ctx).should be_true
-        expr5a.eval(ctx).should be_true
-        expr6.eval(ctx).raw.should be_nil # return value is Any which is not nil; need to check #raw instead
       end
-      # it "should eval an operation with contains keyword" do
-      #   expr = Expression.new "myarr contains another"
-      #   ctx = Context.new
-      #   ctx.set "myarr", [12,15,13]
-      #   ctx.set "another", 12
-      #   expr.eval(ctx).should be_true
-      # end
+
       it "should eval an multiple operation" do
         expr = Expression.new "test == false or some == true or another == 10"
         expr2 = Expression.new "test != false or some == false or another == 10"

@@ -30,7 +30,7 @@ module Liquid
     end
 
     def visit(node : If)
-      if node.if_expression.not_nil!.eval(@data).raw
+      if node.if_expression.eval(@data).raw
         node.children.each &.accept(self)
       else
         found = false

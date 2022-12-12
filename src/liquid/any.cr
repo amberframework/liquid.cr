@@ -1,6 +1,8 @@
+require "./drop"
+
 module Liquid
   struct Any
-    alias Type = Nil | Bool | Int32 | Int64 | Float32 | Float64 | String | Time | Array(Any) | Hash(String, Any)
+    alias Type = Nil | Bool | Int32 | Int64 | Float32 | Float64 | String | Time | Array(Any) | Hash(String, Any) | Drop
 
     # Returns the raw underlying value.
     getter raw : Type
@@ -29,7 +31,7 @@ module Liquid
       when Hash
         object.size
       else
-        raise "Expected Array or Hash for #size, not #{object.class}"
+        raise InvalidExpression.new("Expected Array or Hash for #size, not #{object.class}.")
       end
     end
 
@@ -41,7 +43,7 @@ module Liquid
       when Array
         object[index]
       else
-        raise "Expected Array for #[](index : Int), not #{object.class}"
+        raise InvalidExpression.new("Expected Array for #[](index : Int), not #{object.class}.")
       end
     end
 
@@ -53,7 +55,7 @@ module Liquid
       when Array
         object[index]?
       else
-        raise "Expected Array for #[]?(index : Int), not #{object.class}"
+        raise InvalidExpression.new("Expected Array for #[]?(index : Int), not #{object.class}.")
       end
     end
 
@@ -65,7 +67,7 @@ module Liquid
       when Hash
         object[key]
       else
-        raise "Expected Hash for #[](key : String), not #{object.class}"
+        raise InvalidExpression.new("Expected Hash for #[](key : String), not #{object.class}.")
       end
     end
 
@@ -77,7 +79,7 @@ module Liquid
       when Hash
         object[key]?
       else
-        raise "Expected Hash for #[]?(key : String), not #{object.class}"
+        raise InvalidExpression.new("Expected Hash for #[]?(key : String), not #{object.class}.")
       end
     end
 
@@ -250,6 +252,13 @@ module Liquid
       @raw.inspect(io)
     end
 
+    def -
+      raw = @raw
+      raise InvalidExpression.new("Can't apply '-' operator to #{raw.class.name}") unless raw.is_a?(Number)
+
+      Any.new(-raw)
+    end
+
     def to_s(io : IO) : Nil
       @raw.to_s(io)
     end
@@ -268,6 +277,36 @@ module Liquid
     def ==(other)
       raw == other
     end
+
+    def logical_and(other : Any) : Bool
+      !!(@raw && other.raw)
+    end
+
+    def logical_or(other : Any) : Bool
+      !!(@raw || other.raw)
+    end
+
+    def contains?(other : Any) : Bool
+      raw = @raw
+      return raw.includes?(other) if raw.is_a?(Array(Any))
+
+      other_raw = other.raw
+      return raw.includes?(other_raw) if raw.is_a?(String) && other_raw.is_a?(String)
+
+      false
+    end
+
+    {% for operator in %w(< <= > >=) %}
+    def {{ operator.id }}(other : Any) : Bool
+      raw = @raw
+      other_raw = other.raw
+      if raw.is_a?(Number) && other_raw.is_a?(Number)
+        raw {{ operator.id }} other_raw
+      else
+        raise InvalidExpression.new("Can't  use #{{{ operator }}} with #{raw.class.name} and #{other_raw.class.name}")
+      end
+    end
+    {% end %}
 
     # See `Object#hash(hasher)`
     def_hash raw

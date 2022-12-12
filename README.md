@@ -12,7 +12,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   liquid:
-    github: TechMagister/liquid.cr
+    github: amberframework/liquid.cr
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ txt = "
     {% endif %}
     "
 ctx = Liquid::Context.new
-ctx.set "kenny", { "sick" => false, "dead" => true}
+ctx.set "kenny", Any{ "sick" => false, "dead" => true}
 
 tpl = Liquid::Template.parse txt  # tpl can be cached and reused
 
@@ -140,7 +140,7 @@ TODO:
 - [ ] Add `break` keyword
 - [X] Add case/when
 - [ ] Add syntax checking
-- [ ] Improve expression parsing
+- [x] Improve expression parsing
 - [x] Add optional strict mode on Context (see below)
 - [ ] Add Everything that's missing [https://shopify.github.io/liquid/]
 
@@ -150,15 +150,15 @@ NOTE: Will eventually use this to implement a `strict_variables` rendering flag 
 
 Enable at initialization:
 ```crystal
-ctx = Liquid::Context.new(strict: true)
+ctx = Liquid::Context.new(:strict)
 ```
 
 Or on an existing Context:
 ```crystal
-ctx.strict = true
+ctx.error_mode = :strict
 ```
 
-Raises `KeyError` on missing keys and `IndexError` on array out of bounds errors instead of silently emitting `nil`.
+Raises `Liquid::InvalidExpression` on missing keys or `IndexError` on array out of bounds errors instead of silently emitting `nil`.
 
 Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
 
@@ -175,15 +175,9 @@ ctx["obj"] = { something: "something" }
 {{ missing.missing? }} -> nil
 ```
 
-## Note on order of operations in complex expressions ##
-
-Currently, comparison operators are evaluated before and/or. Other than that, evaluations are evaluated from left to right. Parentheses are not supported.
-
-Eventually, this will be fixed to evaluate expressions in a way that mirrors Crystal itself, but for now, it would be best to simply avoid writing complex expressions.
-
 ## Contributing
 
-1. Fork it ( https://github.com/TechMagister/liquid.cr/fork )
+1. Fork it ( https://github.com/amberframework/liquid.cr/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)

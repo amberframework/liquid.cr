@@ -34,11 +34,11 @@ describe Template do
     tpl.render(Context.new).should eq "012"
   end
 
-  it "should render for loop with loop variable" do
+  pending "should render for loop with loop variable" do
     tpl = Parser.parse("{% for x in 0..2 %}
     Iteration n°{{ loop.index }}
     {% endfor %}")
-    tpl.render(Context.new).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
+    tpl.render(Context.new(:strict)).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
   end
 
   it "should render for loop when iterating over an array" do
@@ -163,9 +163,7 @@ describe Template do
     {% endif %}
     "
     ctx = Context.new
-    ctx.set "kenny.sick", false
-    ctx.set "kenny.dead", true
-    ctx.set "kenny.state", "dead"
+    ctx.set("kenny", Any{"sick" => false, "dead" => true})
 
     tpl = Parser.parse txt
     result = tpl.render ctx
@@ -184,7 +182,7 @@ describe Template do
     EOT
 
     ctx = Context.new
-    ctx.set "kenny.state", "dead"
+    ctx.set("kenny", Any{"state" => "dead"})
 
     tpl = Parser.parse txt
     result = tpl.render ctx
@@ -205,7 +203,7 @@ describe Template do
     {%- endif -%}
     EOT
 
-    ctx = Context.new(strict: true)
+    ctx = Context.new
 
     tpl = Parser.parse txt
     result = tpl.render ctx
@@ -245,6 +243,11 @@ describe Template do
 
     tpl = Parser.parse "{% assign var = 12.5%}{{var}}"
     tpl.render(Context.new).should eq "12.5"
+  end
+
+  it "should render assigned variable with filters" do
+    tpl = Parser.parse "{% assign var = \"abc\" | upcase%}{{var}}"
+    tpl.render(Context.new).should eq "ABC"
   end
 
   it "should render abs filters" do
@@ -379,12 +382,12 @@ describe Template do
     tpl = Template.parse %({{ missing }}{{ obj.missing }})
     tpl.render(ctx).should eq ""
 
-    ctx.strict = true
-    expect_raises(KeyError) { tpl.render(ctx) }
+    ctx.error_mode = :strict
+    expect_raises(InvalidExpression) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = Any{"something" => "something"} # still didn't define "missing"
-    expect_raises(KeyError) { tpl.render(ctx) }
+    expect_raises(InvalidExpression) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = Any{"something" => "something", "missing" => "present"}
@@ -393,7 +396,7 @@ describe Template do
 
   it "filter should receive all args, in order" do
     ctx = Context.new
-    tpl = Template.parse %({{ "" | arg_test: '1', "2", 3, 4.0, [5] }})
-    tpl.render(ctx).should eq "1, 2, 3, 4.0, [5]"
+    tpl = Template.parse %({{ "" | arg_test: '1', "2", 3, 4.0, 5 }})
+    tpl.render(ctx).should eq "1, 2, 3, 4.0, 5"
   end
 end

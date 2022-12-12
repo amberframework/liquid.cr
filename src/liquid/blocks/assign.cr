@@ -4,7 +4,7 @@ require "../block_register"
 
 module Liquid::Block
   class Assign < InlineBlock
-    ASSIGN = /^assign (?<varname>#{VAR}) ?= ?(?<value>#{TYPE_OR_VAR})$/
+    ASSIGN = /\Aassign (?<varname>#{VAR}) ?= ?(?<value>.*)/
 
     @varname : String
     @value : Expression
@@ -22,5 +22,7 @@ module Liquid::Block
         raise InvalidNode.new "Invalid assignment Node"
       end
     end
+
+    def_equals @varname, @value
   end
 end
