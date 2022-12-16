@@ -4,7 +4,7 @@ require "../block_register"
 
 module Liquid::Block
   class Assign < InlineBlock
-    ASSIGN = /\Aassign (?<varname>#{VAR}) ?= ?(?<value>.*)/
+    ASSIGN = /\Aassign (?<varname>#{VAR})\s*=\s*(?<value>.*)/
 
     @varname : String
     @value : Expression

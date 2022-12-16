@@ -246,7 +246,7 @@ describe Template do
   end
 
   it "should render assigned variable with filters" do
-    tpl = Parser.parse "{% assign var = \"abc\" | upcase%}{{var}}"
+    tpl = Parser.parse "{%   assign var  =  \"abc\" | upcase%}{{var}}"
     tpl.render(Context.new).should eq "ABC"
   end
 
