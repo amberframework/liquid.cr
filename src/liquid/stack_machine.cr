@@ -34,7 +34,7 @@ module Liquid
         when "and"      then And
         when "or"       then Or
         else
-          raise InvalidExpression.new("Invalid operator: #{str}.")
+          raise LiquidException.new("Invalid operator: #{str}.")
         end
       end
 
@@ -111,7 +111,7 @@ module Liquid
                      raise?(ctx) { error_message }
                    else
                      var = apply_unary_operator(var, stack)
-                     call_index(var, index.as(Any))
+                     call_index(ctx, var, index.as(Any))
                    end
           stack.push(retval)
         end
@@ -140,16 +140,18 @@ module Liquid
 
       return result if filters.nil?
 
-      apply_filters(result, filters)
+      apply_filters(ctx, result, filters)
+    rescue e : InvalidExpression
+      raise?(ctx, e)
     end
 
     private def apply_binary_operator(stack : Stack) : Any
       right_operand = stack.pop
       operator = stack.pop
       left_operand = stack.pop
-      raise InvalidExpression.new("Unexpected operator: #{operator}.") unless operator.is_a?(Operator)
-      raise InvalidExpression.new("Unexpected left operand: #{left_operand}.") unless left_operand.is_a?(Any)
-      raise InvalidExpression.new("Unexpected right operand: #{right_operand}.") unless right_operand.is_a?(Any)
+      raise LiquidException.new("Unexpected operator: #{operator}.") unless operator.is_a?(Operator)
+      raise LiquidException.new("Unexpected left operand: #{left_operand}.") unless left_operand.is_a?(Any)
+      raise LiquidException.new("Unexpected right operand: #{right_operand}.") unless right_operand.is_a?(Any)
 
       result = operator.eval(left_operand, right_operand)
       Any.new(result)
@@ -164,7 +166,7 @@ module Liquid
               when .negate? then Any.new(!any.raw)
               when .invert? then -any
               else
-                raise InvalidExpression.new("Unexpected operator: #{operator}.")
+                raise LiquidException.new("Unexpected operator: #{operator}.")
               end
         stack.pop
       end
@@ -172,25 +174,25 @@ module Liquid
     end
 
     private def apply_unary_operator(_prefix : Operator, _stack : Stack)
-      raise InvalidExpression.new("Unexpected operator.")
+      raise LiquidException.new("Unexpected operator.")
     end
 
-    private def apply_filters(operand : Any, filter_stack : Stack) : Any
+    private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack) : Any
       while filter_stack.any?
         filter_operator = filter_stack.shift
         if !filter_operator.is_a?(Operator) || !filter_operator.filter?
-          raise InvalidExpression.new("Expected a filter, got #{filter_operator}.")
+          raise LiquidException.new("Expected a filter, got #{filter_operator}.")
         end
 
         filter_name = filter_stack.shift
         if !filter_name.is_a?(Any) || !filter_name.raw.is_a?(String)
-          raise InvalidExpression.new("Expected a filter name, got #{filter_name}.")
+          raise LiquidException.new("Expected a filter name, got #{filter_name}.")
         end
 
         filter_args = shift_filter_args(filter_stack)
 
         filter = Filters::FilterRegister.get(filter_name.as_s)
-        raise InvalidExpression.new("Unknown filter: #{filter_name}.") if filter.nil?
+        return raise?(ctx) { "Unknown filter: #{filter_name}." } if filter.nil?
 
         filter_args ||= [] of Any # FIXME: Some filters doesn't compile if args is nil, probably because old
         # expression implementation was always sending an array.
@@ -210,23 +212,23 @@ module Liquid
       filter_args
     end
 
-    private def call_index(any : Any, index : Any) : Any
+    private def call_index(ctx : Context, any : Any, index : Any) : Any
       raw = any.raw
-      return call_hash_method(raw, index.as_s) if raw.is_a?(Hash)
-      return call_drop_method(raw, index.as_s) if raw.is_a?(Drop)
+      return call_hash_method(ctx, raw, index.as_s) if raw.is_a?(Hash)
+      return call_drop_method(ctx, raw, index.as_s) if raw.is_a?(Drop)
 
-      raise InvalidExpression.new("Tried to index a non-array object with \"#{index}\".") unless raw.is_a?(Array)
+      return raise?(ctx) { "Tried to index a non-array object with \"#{index}\"." } unless raw.is_a?(Array)
 
       i = index.as_i?
-      raise InvalidExpression.new("Tried to index an array object with a #{raw.class.name}.") if i.nil?
+      return raise?(ctx) { "Tried to index an array object with a #{raw.class.name}." } if i.nil?
 
-      raw[i]? || raise InvalidExpression.new("\"Index out of bounds: #{i}.")
+      raw[i]? || raise?(ctx) { "\"Index out of bounds: #{i}." }
     end
 
     private def call_method(ctx : Context, obj : Any, method : String) : Any
       raw = obj.raw
-      return call_drop_method(raw, method) if raw.is_a?(Drop)
-      return call_hash_method(raw, method) if raw.is_a?(Hash)
+      return call_drop_method(ctx, raw, method) if raw.is_a?(Drop)
+      return call_hash_method(ctx, raw, method) if raw.is_a?(Hash)
       return call_nil_method(ctx, method) if raw.is_a?(Nil)
 
       return raise?(ctx) { "Tried to call ##{method} on a #{raw.class.name}." } if !raw.responds_to?(:size)
@@ -243,11 +245,13 @@ module Liquid
       end
     end
 
-    private def call_drop_method(drop : Drop, method : String) : Any
+    private def call_drop_method(ctx : Context, drop : Drop, method : String) : Any
       drop.call(method)
+    rescue e : Liquid::InvalidExpression
+      raise?(ctx, e)
     end
 
-    private def call_hash_method(hash : Hash, method : String) : Any
+    private def call_hash_method(ctx : Context, hash : Hash, method : String) : Any
       case method
       when "present", "present?"
         Any.new(hash.size > 0)
@@ -257,7 +261,7 @@ module Liquid
         Any.new(hash.size)
       else
         value = hash[method]?
-        raise InvalidExpression.new("Method \"#{method}\" not found.") if value.nil?
+        return raise?(ctx) { "Method \"#{method}\" not found." } if value.nil?
 
         value
       end
@@ -278,6 +282,14 @@ module Liquid
       case ctx.error_mode
       when .strict? then raise InvalidExpression.new(yield)
       when .warn?   then ctx.errors << yield
+      end
+      Any.new(nil)
+    end
+
+    private def raise?(ctx : Context, exception : LiquidException) : Any
+      case ctx.error_mode
+      when .strict? then raise exception
+      when .warn?   then ctx.errors << exception.message.to_s
       end
       Any.new(nil)
     end
