@@ -25,6 +25,10 @@ module Liquid::Block
       @content = @content.rstrip
     end
 
+    def inspect(io : IO)
+      inspect(io) { io << @content.inspect }
+    end
+
     def_equals @children, @content
   end
 end

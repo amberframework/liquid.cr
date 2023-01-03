@@ -43,5 +43,13 @@ module Liquid::Block
         raise InvalidNode.new "Invalid for node : #{content}"
       end
     end
+
+    def inspect(io : IO)
+      inspect(io) do
+        io << @loop_var.inspect
+        loop_over = @loop_over
+        io << " in " << loop_over.inspect if loop_over
+      end
+    end
   end
 end

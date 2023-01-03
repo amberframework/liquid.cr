@@ -15,7 +15,7 @@ module Liquid
     end
 
     def visit(node : Case)
-      value = node.case_expression.not_nil!.eval(@data).raw
+      value = node.case_expression.eval(@data).raw
       if when_arr = node.when
         when_arr.each do |when_node|
           if when_node.eval(value)

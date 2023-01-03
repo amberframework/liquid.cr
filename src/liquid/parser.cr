@@ -74,14 +74,8 @@ module Liquid
 
       case block
       when Block::EndBlock
-        loop do
-          last = @nodes.last
-          if last != root && last.is_a?(Block::BeginBlock)
-            @nodes.pop
-          else
-            break
-          end
-        end
+        # FIXME: Check if the end tag matches the begin tag
+        @nodes.pop
         @nodes.last << block
       when Block::BeginBlock
         @nodes.last << block

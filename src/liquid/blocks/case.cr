@@ -33,7 +33,7 @@ module Liquid::Block
     def <<(node : Node)
       case @last
       when PutInto::Case
-        @children << node
+        # Probbly white space between {% case %} and {% when %}
       when PutInto::When
         @when.not_nil!.last << node
       when PutInto::Else
@@ -53,6 +53,10 @@ module Liquid::Block
       raise InvalidNode.new "Else without When in Case statement!" unless @last == PutInto::When
       @else = node
       @last = PutInto::Else
+    end
+
+    def inspect(io : IO)
+      inspect(io) { io << @case_expression.expression.inspect }
     end
 
     def_equals @when, @else, @children

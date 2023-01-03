@@ -21,5 +21,9 @@ module Liquid::Block
     def eval(data)
       @when_values.includes?(data)
     end
+
+    def inspect(io : IO)
+      inspect(io) { io << @when_values.map(&.inspect).join(", ") }
+    end
   end
 end

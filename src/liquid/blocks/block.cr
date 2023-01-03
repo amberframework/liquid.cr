@@ -17,6 +17,21 @@ module Liquid::Block
     end
 
     def_equals @children
+
+    def inspect(io : IO)
+      inspect(io) do
+      end
+    end
+
+    protected def inspect(io : IO)
+      io << '<'
+      io << '-' if lstrip?
+      io << ' '
+      io << self.class.name.gsub(/(\w*::)*/, "") << ' '
+      yield
+      io << '-' if rstrip?
+      io << '>'
+    end
   end
 
   class Root < Node

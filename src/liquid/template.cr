@@ -27,9 +27,9 @@ module Liquid
       visitor.visit @root
     end
 
-    def render(data) : String
+    def render(ctx : Context) : String
       io = IO::Memory.new
-      render(data, io)
+      render(ctx, io)
       io.to_s
     end
 
