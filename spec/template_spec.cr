@@ -1,6 +1,15 @@
 require "./spec_helper"
 
+private def it_renders(template : String, expected : String, file = __FILE__, line = __LINE__)
+  it "renders", file: file, line: line do
+    Parser.parse(template).render(Context.new).should eq(expected)
+  end
+end
+
 describe Template do
+
+  it_renders("{% assign i = 1 %}{% assign i = i | prepend: 0 %}{{ i }}", "01")
+
   it "should render raw text" do
     tpl = Parser.parse("raw text")
     template_path = __DIR__

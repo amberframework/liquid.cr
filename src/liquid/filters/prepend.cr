@@ -24,11 +24,9 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (d = data.as_s?) && args && args.size == 1 && (arg = args.first.as_s?)
-        Any.new arg + d
-      else
-        data
-      end
+      return data if args.nil? || args.empty?
+
+      Any.new(args.first.to_s + data.to_s)
     end
   end
 
