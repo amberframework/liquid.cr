@@ -7,8 +7,8 @@ private def it_renders(template : String, expected : String, file = __FILE__, li
 end
 
 describe Template do
-
   it_renders("{% assign i = 1 %}{% assign i = i | prepend: 0 %}{{ i }}", "01")
+  it_renders("{% assign i = 1 %}{% assign i = i | append: 0 %}{{ i }}", "10")
 
   it "should render raw text" do
     tpl = Parser.parse("raw text")

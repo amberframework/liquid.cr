@@ -1,4 +1,5 @@
 require "./filters/base"
+require "./filters/append"
 require "./filters/arg_test"
 require "./filters/case"
 require "./filters/compact"
@@ -144,36 +145,6 @@ module Liquid::Filters
         Any.new data.raw.as(Number).abs
       elsif (str = data.as_s?) && (flt = str.to_f32?)
         Any.new flt.abs
-      else
-        data
-      end
-    end
-  end
-
-  # append
-  #
-  # Concatenates two strings and returns the concatenated value.
-  #
-  # Input
-  # {{ "/my/fancy/url" | append: ".html" }}
-  #
-  # Output
-  # /my/fancy/url.html
-  #
-  # append can also be used with variables:
-  #
-  # Input
-  # {% assign filename = "/index.html" %}
-  # {{ "website.com" | append: filename }}
-  #
-  # Output
-  # website.com/index.html
-  class Append
-    extend Filter
-
-    def self.filter(data : Any, args : Array(Any)?) : Any
-      if (d = data.as_s?) && args && args.size == 1 && (arg = args.first.as_s?)
-        Any.new d + arg
       else
         data
       end
