@@ -29,3 +29,21 @@ module Liquid
     end
   end
 end
+
+class String
+  def ==(any : Liquid::Drop)
+    any == self
+  end
+end
+
+struct Nil
+  def ==(any : Liquid::Drop)
+    any == self
+  end
+end
+
+class Array
+  def ==(any : Liquid::Drop)
+    any == self
+  end
+end

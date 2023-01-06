@@ -1,4 +1,5 @@
 require "./any"
+require "./blank"
 
 module Liquid
   class Context
@@ -28,6 +29,7 @@ module Liquid
 
     private def add_builtins
       self["empty"] = [] of Any
+      self["blank"] = Blank.new
     end
 
     @[Deprecated("Use `#error_mode` instead.")]

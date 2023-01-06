@@ -1,7 +1,9 @@
 require "./spec_helper"
 
 private def it_renders(template : String, expected : String, file = __FILE__, line = __LINE__)
-  it "renders", file: file, line: line do
+  template_as_title = template.size < 64 ? template : "#{template[0..60]}…"
+
+  it "renders #{template_as_title} as #{expected}", file: file, line: line do
     Parser.parse(template).render(Context.new).should eq(expected)
   end
 end
@@ -9,6 +11,15 @@ end
 describe Template do
   it_renders("{% assign i = 1 %}{% assign i = i | prepend: 0 %}{{ i }}", "01")
   it_renders("{% assign i = 1 %}{% assign i = i | append: 0 %}{{ i }}", "10")
+
+  # blank literal
+  it_renders("{% if '' == blank %}blank{% endif %}", "blank")
+  it_renders("{% if '' != blank %}blank{% endif %}", "")
+  it_renders("{% if a == blank %}blank{% endif %}", "blank")
+  it_renders("{% if 'a' == blank %}blank{% endif %}", "")
+  it_renders("{% if 'a' != blank %}noblank{% endif %}", "noblank")
+  it_renders("{% if '' > blank %}blank{% endif %}", "")
+  it_renders("{% assign a = '' | split %}{% if a == blank %}blank{% endif %}", "blank")
 
   it "should render raw text" do
     tpl = Parser.parse("raw text")
