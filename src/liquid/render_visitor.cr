@@ -96,45 +96,6 @@ module Liquid
       end
     end
 
-    def visit(node : Filtered)
-      matches = node.raw.scan GFILTER
-      if matches.first["filter"] == node.first.var ||
-         "\"#{matches.first["filter"]}\"" == node.first.var
-        matches.shift
-      end
-      matches.each do |fm|
-        if (filter_name = Filters::FilterRegister.get fm["filter"])
-          filter_args : Array(Expression)? = nil
-          if (margs = fm["args"]?)
-            filter_args = Array(Expression).new
-            if margs.match(/^#{FILTER_ARGS}$/)
-              while margs =~ /^(#{FILTER_ARG})/
-                match = $1
-                filter_args << Expression.new(match)
-                margs = margs.sub(match, "")
-                margs = margs.sub(/^\s*,\s*/, "")
-              end
-            end
-          end
-          node.filters << {filter_name, filter_args}
-        else
-          raise InvalidExpression.new "Filter #{fm["filter"]} is not registered."
-        end
-      end
-
-      result : Any
-      result = node.first.eval @data
-      node.filters.each do |tuple|
-        args = tuple[1].not_nil!.map &.eval(@data) if tuple[1]
-        result = tuple[0].filter(result, args)
-      end
-      @io << result
-    end
-
-    def visit(node : Boolean)
-      @io << (node.inner ? "true" : "false")
-    end
-
     def visit(node : For)
       ctx = @data.dup
       loop_over_var = node.loop_over
