@@ -136,14 +136,25 @@ module Liquid
     end
 
     def visit(node : For)
-      data = @data.dup
-      if node.begin && node.end
-        render_with_range node, data
-      elsif node.loop_over
-        render_with_var node, data
-      else
-        raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
+      ctx = @data.dup
+      loop_over_var = node.loop_over
+      loop_over = if loop_over_var.is_a?(String)
+                    value = Expression.new(loop_over_var).eval(ctx)
+                    value.as_a? || value.as_h? || raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
+                  else
+                    loop_over_var
+                  end
+
+      visitor = RenderVisitor.new(ctx, @io)
+      parentloop = ctx["forloop"]?.try(&.raw).as?(ForLoop)
+      forloop = ForLoop.new(loop_over, parentloop)
+
+      ctx.set("forloop", forloop)
+      forloop.each do |val|
+        ctx.set(node.loop_var, val)
+        node.children.each(&.accept(visitor))
       end
+      ctx.set("forloop", parentloop)
     end
 
     def visit(node : Include)
@@ -162,50 +173,6 @@ module Liquid
       template_content = File.read filename
       template = Template.parse template_content
       @io << template.render(@data)
-    end
-
-    private def render_with_range(node : For, data : Context)
-      i = 0
-      visitor = RenderVisitor.new data, @io
-      start = node.begin.as(Int32)
-      stop = node.end.as(Int32)
-      start.upto stop do |x|
-        data.set node.loop_var, x
-        data.set "loop.index", i + 1
-        data.set "loop.index0", i
-        data.set "loop.revindex", stop - start - i + 1
-        data.set "loop.revindex0", stop - start - i
-        data.set "loop.first", x == start
-        data.set "loop.last", x == stop
-        data.set "loop.length", stop - start
-
-        # for compatibility with Shopify liquid
-        data.set "forloop.length", stop - start
-        data.set "forloop.index", i + 1
-        data.set "forloop.index0", i
-        data.set "forloop.rindex", stop - start - i + 1
-        data.set "forloop.rindex0", stop - start - i
-        data.set "forloop.first", x == start
-        data.set "forloop.last", x == stop
-        node.children.each &.accept(visitor)
-        i += 1
-      end
-    end
-
-    private def render_with_var(node : For, ctx : Context)
-      loop_over = Expression.new(node.loop_over.not_nil!).eval(ctx)
-
-      collection = loop_over.as_a? || loop_over.as_h? || raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
-      visitor = RenderVisitor.new(ctx, @io)
-      parentloop = ctx["forloop"]?.try(&.raw).as?(ForLoop)
-      forloop = ForLoop.new(collection, parentloop)
-
-      ctx.set("forloop", forloop)
-      forloop.each do |val|
-        ctx.set(node.loop_var, val)
-        node.children.each(&.accept(visitor))
-      end
-      ctx.set("forloop", parentloop)
     end
   end
 end

@@ -2,7 +2,7 @@ require "./drop"
 
 module Liquid
   class ForLoop < Drop
-    @collection : Array(Any) | Hash(String, Any)
+    @collection : Array(Any) | Hash(String, Any) | Range(Int32, Int32)
     getter parentloop : ForLoop?
 
     def initialize(@collection, @parentloop)
@@ -12,7 +12,7 @@ module Liquid
     @[Ignore]
     def each
       collection = @collection
-      if collection.is_a?(Array)
+      if collection.is_a?(Array) || collection.is_a?(Range)
         collection.each do |val|
           yield(val)
           @i += 1
