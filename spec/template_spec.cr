@@ -46,9 +46,9 @@ describe Template do
     tpl.render(Context.new).should eq "012"
   end
 
-  pending "should render for loop with loop variable" do
+  it "should render for loop with loop variable" do
     tpl = Parser.parse("{% for x in 0..2 %}
-    Iteration n°{{ loop.index }}
+    Iteration n°{{ forloop.index }}
     {% endfor %}")
     tpl.render(Context.new(:strict)).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
   end
