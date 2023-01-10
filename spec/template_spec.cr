@@ -1,13 +1,5 @@
 require "./spec_helper"
 
-private def it_renders(template : String, expected : String, file = __FILE__, line = __LINE__)
-  template_as_title = template.size < 64 ? template : "#{template[0..60]}…"
-
-  it "renders #{template_as_title} as #{expected}", file: file, line: line do
-    Parser.parse(template).render(Context.new).should eq(expected)
-  end
-end
-
 describe Template do
   it_renders("{% assign i = 1 %}{% assign i = i | prepend: 0 %}{{ i }}", "01")
   it_renders("{% assign i = 1 %}{% assign i = i | append: 0 %}{{ i }}", "10")
@@ -81,18 +73,6 @@ describe Template do
     ctx.set("myhash", Any{"key1" => 1, "key2" => "val2", "key3" => Any{"val3a", "val3b"}})
     tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => ["val3a", "val3b"])
   end
-
-  # it "should render for loop when iterating over a hash by key, value" do
-  #   tpl = Parser.parse <<-EOT
-  #   {%- for k, v in myhash -%}
-  #     Got : {{k}} => {{v}}
-  #   {%- endfor -%}
-  #   EOT
-
-  #   ctx = Context.new
-  #   ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
-  #   tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
-  # end
 
   it "should render case statement without an else option" do
     tpl = Parser.parse("{% case var %}{% when \"here\" %}We are here{% when \"there\" %}We are there{% endcase %}")

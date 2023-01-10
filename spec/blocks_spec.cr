@@ -187,41 +187,6 @@ describe Liquid do
       end
     end
 
-    #     describe Filtered do
-    #       it "should filter a string" do
-    #         node = Filtered.new " \"whatever\" | abs"
-    #         node_output(node).should eq "whatever"
-    #       end
-    #
-    #       it "should filter a int" do
-    #         node = Filtered.new "-12 | abs"
-    #         node_output(node).should eq "12"
-    #       end
-    #
-    #       it "should filter a float" do
-    #         node = Filtered.new "-12.25 | abs"
-    #         node_output(node).should eq "12.25"
-    #       end
-    #
-    #       it "should filter a var" do
-    #         node = Filtered.new "var | abs"
-    #         ctx = Context{"var" => -12}
-    #         node_output(node, ctx).should eq "12"
-    #       end
-    #
-    #       it "should use multiple filters" do
-    #         node = Filtered.new "var | append: \"Hello \" | append: \"World !\""
-    #         ctx = Context{"var" => ""}
-    #         node_output(node, ctx).should eq "Hello World !"
-    #       end
-    #
-    #       it "should filter with an argument" do
-    #         node = Filtered.new "var | append: var2"
-    #         ctx = Context{"var" => "Hello", "var2" => " World !"}
-    #         node_output(node, ctx).should eq "Hello World !"
-    #       end
-    #     end
-
     describe Expression do
       it "should eval true" do
         expr = Expression.new "true"

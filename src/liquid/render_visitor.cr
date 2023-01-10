@@ -1,4 +1,5 @@
 require "./blocks"
+require "./for_loop"
 
 module Liquid
   class RenderVisitor < Visitor
@@ -191,62 +192,20 @@ module Liquid
       end
     end
 
-    private def render_with_var(node : For, data : Context)
-      val = Expression.new node.loop_over.not_nil!
-      if (arr = val.eval(data).as_a?)
-        visitor = RenderVisitor.new data, @io
-        i = 0
-        stop = arr.size
-        arr.each do |val|
-          data.set node.loop_var, val
-          data.set "loop.index", i + 1
-          data.set "loop.index0", i
-          data.set "loop.revindex", stop - i + 1
-          data.set "loop.revindex0", stop - i
-          data.set "loop.first", i == 0
-          data.set "loop.last", i == stop
-          data.set "loop.length", stop
+    private def render_with_var(node : For, ctx : Context)
+      loop_over = Expression.new(node.loop_over.not_nil!).eval(ctx)
 
-          # for compatibility with Shopify liquid
-          data.set "forloop.length", stop
-          data.set "forloop.index", i + 1
-          data.set "forloop.index0", i
-          data.set "forloop.rindex", stop - i + 1
-          data.set "forloop.rindex0", stop - i
-          data.set "forloop.first", i == 0
-          data.set "forloop.last", i == stop
-          node.children.each &.accept(visitor)
-          i += 1
-        end
-      elsif (hash = val.eval(data).as_h?)
-        visitor = RenderVisitor.new data, @io
-        i = 0
-        stop = hash.keys.size
-        hash.each do |k, v|
-          val = [Any.new(k), v]
-          data.set node.loop_var, val
-          data.set "loop.index", i + 1
-          data.set "loop.index0", i
-          data.set "loop.revindex", stop - i + 1
-          data.set "loop.revindex0", stop - i
-          data.set "loop.first", i == 0
-          data.set "loop.last", i == stop
-          data.set "loop.length", stop
+      collection = loop_over.as_a? || loop_over.as_h? || raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
+      visitor = RenderVisitor.new(ctx, @io)
+      parentloop = ctx["forloop"]?.try(&.raw).as?(ForLoop)
+      forloop = ForLoop.new(collection, parentloop)
 
-          # for compatibility with Shopify liquid
-          data.set "forloop.length", stop
-          data.set "forloop.index", i + 1
-          data.set "forloop.index0", i
-          data.set "forloop.rindex", stop - i + 1
-          data.set "forloop.rindex0", stop - i
-          data.set "forloop.first", i == 0
-          data.set "forloop.last", i == stop
-          node.children.each &.accept(visitor)
-          i += 1
-        end
-      else
-        raise InvalidStatement.new "Can't iterate over #{node.loop_over}"
+      ctx.set("forloop", forloop)
+      forloop.each do |val|
+        ctx.set(node.loop_var, val)
+        node.children.each(&.accept(visitor))
       end
+      ctx.set("forloop", parentloop)
     end
   end
 end
