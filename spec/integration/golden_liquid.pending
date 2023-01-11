@@ -49,14 +49,6 @@ liquid.golden.case_tag mix or and comma separated when expression
 liquid.golden.case_tag mix or and comma separated when expression
 liquid.golden.case_tag or separated when expression
 liquid.golden.case_tag unexpected when token
-liquid.golden.ceil_filter negative float
-liquid.golden.ceil_filter negative string float
-liquid.golden.ceil_filter not a string, int or float
-liquid.golden.ceil_filter positive float
-liquid.golden.ceil_filter positive string float
-liquid.golden.ceil_filter string not a number
-liquid.golden.ceil_filter undefined left value
-liquid.golden.ceil_filter unexpected argument
 liquid.golden.compact_filter array of objects with key property
 liquid.golden.compact_filter too many arguments
 liquid.golden.concat_filter left value contains non string

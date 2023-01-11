@@ -3,6 +3,7 @@ require "./filters/abs"
 require "./filters/append"
 require "./filters/arg_test"
 require "./filters/case"
+require "./filters/ceil"
 require "./filters/compact"
 require "./filters/date"
 require "./filters/default"
@@ -52,49 +53,6 @@ module Liquid::Filters
   end
 
   FilterRegister.register "capitalize", Capitalize
-  FilterRegister.register "ceil", Ceil
-
-  # ceil
-  # Rounds the input up to the nearest whole number.
-  # Liquid tries to convert the input to a number before the filter is applied.
-  # Input
-  # {{ 1.2 | ceil }}
-  #
-  # Output
-  # 2
-  #
-  # Input
-  # {{ 2.0 | ceil }}
-  #
-  # Output
-  # 2
-  #
-  # Input
-  # {{ 183.357 | ceil }}
-  #
-  # Output
-  # 184
-  #
-  # Here the input value is a string:
-  #
-  # Input
-  # {{ "3.5" | ceil }}
-  #
-  # Output
-  # 4
-  class Ceil
-    extend Filter
-
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (raw = data.raw) && raw.is_a? Number
-        Any.new raw.ceil
-      elsif (str = data.as_s?) && (flt = str.to_f32?)
-        Any.new flt.ceil
-      else
-        data
-      end
-    end
-  end
 
   # capitalize
   #
