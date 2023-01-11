@@ -2,6 +2,7 @@ require "./filters/base"
 require "./filters/abs"
 require "./filters/append"
 require "./filters/arg_test"
+require "./filters/capitalize"
 require "./filters/case"
 require "./filters/ceil"
 require "./filters/compact"
@@ -49,37 +50,6 @@ module Liquid::Filters
 
     def self.register(name, filter)
       @@register[name] = filter
-    end
-  end
-
-  FilterRegister.register "capitalize", Capitalize
-
-  # capitalize
-  #
-  # Makes the first character of a string capitalized.
-  #
-  # Input
-  # {{ "title" | capitalize }}
-  #
-  # Output
-  # Title
-  #
-  # capitalize only capitalizes the first character of the string, so later words are not affected:
-  #
-  # Input
-  # {{ "my great title" | capitalize }}
-  #
-  # Output
-  # My great title
-  class Capitalize
-    extend Filter
-
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (raw = data.raw) && raw.responds_to? :capitalize
-        Any.new raw.capitalize
-      else
-        data
-      end
     end
   end
 end

@@ -42,7 +42,6 @@ liquid.golden.base64_url_safe_encode_filter from string
 liquid.golden.base64_url_safe_encode_filter from string with URL unsafe
 liquid.golden.base64_url_safe_encode_filter not a string
 liquid.golden.base64_url_safe_encode_filter unexpected argument
-liquid.golden.capitalize_filter unexpected argument
 liquid.golden.capture_tag capture into a variable with a hyphen
 liquid.golden.case_tag comma string literal
 liquid.golden.case_tag mix or and comma separated when expression
