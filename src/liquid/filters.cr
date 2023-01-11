@@ -51,7 +51,6 @@ module Liquid::Filters
   end
 
   FilterRegister.register "abs", Abs
-  FilterRegister.register "append", Append
   FilterRegister.register "capitalize", Capitalize
   FilterRegister.register "ceil", Ceil
 

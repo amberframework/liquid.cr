@@ -28,4 +28,6 @@ module Liquid::Filters
       Any.new(data.to_s + args.first.to_s)
     end
   end
+
+  FilterRegister.register "append", Append
 end
