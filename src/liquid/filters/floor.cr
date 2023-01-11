@@ -14,12 +14,14 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if (str_data = data.as_s?) && !str_data.to_f?.nil?
-        Any.new str_data.to_f.floor
-      elsif (fl_data = data.as_f?)
-        Any.new fl_data.floor
+      raise LiquidException.new("Unexpected argument for floor filter") if args && args.any?
+
+      if (raw = data.raw) && raw.is_a? Number
+        Any.new(raw.floor.to_i)
+      elsif str = data.as_s?
+        Any.new((str.to_i? || str.to_f? || 0).floor.to_i)
       else
-        data
+        Any.new(0)
       end
     end
   end
