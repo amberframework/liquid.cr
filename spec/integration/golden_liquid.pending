@@ -1,5 +1,3 @@
-liquid.golden.append_filter missing argument
-liquid.golden.append_filter too many arguments
 liquid.golden.at_least_filter argument string not a number
 liquid.golden.at_least_filter left value not a number
 liquid.golden.at_least_filter left value not a number negative argument
