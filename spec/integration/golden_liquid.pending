@@ -1,9 +1,3 @@
-liquid.golden.abs_filter negative string integer
-liquid.golden.abs_filter not a string, int or float
-liquid.golden.abs_filter positive string integer
-liquid.golden.abs_filter string not a number
-liquid.golden.abs_filter undefined left value
-liquid.golden.abs_filter unexpected argument
 liquid.golden.append_filter missing argument
 liquid.golden.append_filter too many arguments
 liquid.golden.at_least_filter argument string not a number

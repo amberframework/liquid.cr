@@ -1,4 +1,5 @@
 require "./filters/base"
+require "./filters/abs"
 require "./filters/append"
 require "./filters/arg_test"
 require "./filters/case"
@@ -50,7 +51,6 @@ module Liquid::Filters
     end
   end
 
-  FilterRegister.register "abs", Abs
   FilterRegister.register "capitalize", Capitalize
   FilterRegister.register "ceil", Ceil
 
@@ -119,31 +119,6 @@ module Liquid::Filters
     def self.filter(data : Any, args : Array(Any)? = nil) : Any
       if (raw = data.raw) && raw.responds_to? :capitalize
         Any.new raw.capitalize
-      else
-        data
-      end
-    end
-  end
-
-  # Filter abs
-  #
-  # Returns the absolute value of a number.
-  #
-  # `{{ -17 | abs }}` => `17`
-  #
-  # `{{ 4 | abs }}` => `4`
-  #
-  # abs will also work on a string if the string only contains a number.
-  #
-  # `{{ "-19.86" | abs }}` => `19.86`
-  class Abs
-    extend Filter
-
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
-      if data.raw.is_a? Number
-        Any.new data.raw.as(Number).abs
-      elsif (str = data.as_s?) && (flt = str.to_f32?)
-        Any.new flt.abs
       else
         data
       end

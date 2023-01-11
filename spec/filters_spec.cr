@@ -57,7 +57,7 @@ describe Filters do
     it "filter var and return absolute value" do
       Abs.filter(Any.new -12).should eq 12
       Abs.filter(Any.new 12).should eq 12
-      Abs.filter(Any.new "wrong").should eq "wrong"
+      Abs.filter(Any.new "wrong").should eq 0
       Abs.filter(Any.new "-21.25").should eq 21.25
     end
   end
