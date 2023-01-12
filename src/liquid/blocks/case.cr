@@ -50,7 +50,7 @@ module Liquid::Block
 
     def <<(node : Else)
       raise InvalidNode.new "Multiple Else in Case statement!" if @else
-      raise InvalidNode.new "Else without When in Case statement!" unless @last == PutInto::When
+
       @else = node
       @last = PutInto::Else
     end

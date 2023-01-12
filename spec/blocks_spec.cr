@@ -44,13 +44,6 @@ describe Liquid do
         case_node.else.should_not be_nil
       end
 
-      it "should NOT add else node without a when" do
-        case_node = Case.new("case var")
-        expect_raises(Liquid::InvalidNode, "Else without When in Case statement!") do
-          case_node << Else.new("else")
-        end
-      end
-
       it "should NOT add any when after an else" do
         case_node = Case.new("case animal")
         case_node << When.new("when \"cat\"")
@@ -58,33 +51,6 @@ describe Liquid do
         expect_raises(Liquid::InvalidNode, "When statement must preceed Else!") do
           case_node << When.new("when \"dog\"")
         end
-      end
-
-      it "should render case" do
-        case_node = Block::Case.new("case desert")
-        case_node << Block::Raw.new("")
-        when_node = Block::When.new("when \"cake\"")
-        when_node << Block::Raw.new("This is a cake")
-        case_node << when_node
-        when_node = Block::When.new("when \"cookie\", \"biscuit\"")
-        when_node << Block::Raw.new("This is a cookie")
-        case_node << when_node
-        when_node = Block::When.new("when 'potato'")
-        when_node << Block::Raw.new("This is a potato")
-        case_node << when_node
-        when_node = Block::When.new("when 'potato', 'tomato'")
-        when_node << Block::Raw.new("This is a tomato")
-        case_node << when_node
-        else_node = Block::Else.new("")
-        else_node << Block::Raw.new("This is not a cake nor a cookie")
-        case_node << else_node
-
-        node_output(case_node, Context{"desert" => "cake"}).should eq "This is a cake"
-        node_output(case_node, Context{"desert" => "cookie"}).should eq "This is a cookie"
-        node_output(case_node, Context{"desert" => "biscuit"}).should eq "This is a cookie"
-        node_output(case_node, Context{"desert" => "potato"}).should eq "This is a potato"
-        node_output(case_node, Context{"desert" => "tomato"}).should eq "This is a tomato"
-        node_output(case_node, Context{"desert" => "jellybean"}).should eq "This is not a cake nor a cookie"
       end
     end
 

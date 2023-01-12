@@ -2,28 +2,31 @@ require "./block"
 
 module Liquid::Block
   class When < InlineBlock
-    SIMPLE_EXP = /^\s*when \s*(["'])(\\\1|[^\1]+)*\1/
-
-    getter when_values
-    @when_values : Array(String)
-
-    def initialize(@when_values)
-    end
+    @when_expressions : Array(StackMachine)
 
     def initialize(content : String)
-      if match = content.match(SIMPLE_EXP)
-        @when_values = match[2].gsub("\"", "").gsub("'", "").split(/\s*,\s*/).map { |value| value.strip }
-      else
-        raise InvalidNode.new("Invalid When Node")
+      @when_expressions = Array(StackMachine).new
+
+      scanner = StringScanner.new(content)
+      raise InvalidNode.new("Invalid When Node") unless scanner.scan(/\A\s*when\s+/)
+
+      while expr = scanner.scan(/("[^"]*"|'[^']*'|(?:\w|\.)+)/)
+        @when_expressions << StackMachine.new(expr)
+        break unless scanner.scan(/\s*(?:,|or)\s*/)
+      end
+
+      raise InvalidNode.new("No expression for When tag") if @when_expressions.empty?
+    end
+
+    # Return the number of matches in when clause
+    def match?(ctx : Context, value : Any) : Int32
+      @when_expressions.count do |expr|
+        expr.evaluate(ctx) == value
       end
     end
 
-    def eval(data)
-      @when_values.includes?(data)
-    end
-
     def inspect(io : IO)
-      inspect(io) { io << @when_values.map(&.inspect).join(", ") }
+      inspect(io) { io << @when_expressions.map(&.inspect).join(", ") }
     end
   end
 end

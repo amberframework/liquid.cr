@@ -16,18 +16,20 @@ module Liquid
     end
 
     def visit(node : Case)
-      value = node.case_expression.eval(@data).raw
+      value = node.case_expression.eval(@data)
+      found = false
       if when_arr = node.when
         when_arr.each do |when_node|
-          if when_node.eval(value)
+          when_node.match?(@data, value).times do
             when_node.children.each &.accept(self)
-            return
+            found = true
           end
         end
       end
-      if else_node = node.else
-        else_node.children.each &.accept(self)
-      end
+      return if found
+
+      else_node = node.else
+      else_node.children.each(&.accept(self)) if else_node
     end
 
     def visit(node : If)

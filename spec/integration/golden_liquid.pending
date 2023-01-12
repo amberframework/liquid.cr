@@ -42,16 +42,6 @@ liquid.golden.base64_url_safe_encode_filter from string with URL unsafe
 liquid.golden.base64_url_safe_encode_filter not a string
 liquid.golden.base64_url_safe_encode_filter unexpected argument
 liquid.golden.capture_tag capture into a variable with a hyphen
-liquid.golden.case_tag comma string literal
-liquid.golden.case_tag evaluate multiple matching blocks
-liquid.golden.case_tag mix or and comma separated when expression
-liquid.golden.case_tag mix or and comma separated when expression
-liquid.golden.case_tag no whens
-liquid.golden.case_tag or separated when expression
-liquid.golden.case_tag tags inside when block
-liquid.golden.case_tag unexpected when token
-liquid.golden.case_tag 'when' expression using an identifier
-liquid.golden.case_tag 'when' expression using an out of scope identifier
 liquid.golden.compact_filter array of objects with key property
 liquid.golden.compact_filter too many arguments
 liquid.golden.concat_filter left value contains non string
