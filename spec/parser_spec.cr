@@ -59,7 +59,7 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    expected << Block::If.new("if a == true")
+    expected << Block::If.new("if a == true ")
     expected.last << Block::Raw.new(" shown ")
     expected << Block::EndBlock.new
 
@@ -71,7 +71,7 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    if_node = Block::If.new("if a == true")
+    if_node = Block::If.new("if a == true ")
     if_node << Block::Raw.new(" shown ")
     else_node = Block::Else.new("")
     else_node << Block::Raw.new(" not shown ")
@@ -125,7 +125,7 @@ describe Parser do
 
     expected = [] of Block::Node
     expected << Block::Raw.new(" PRE")
-    expected << Block::If.new("if a == true")
+    expected << Block::If.new("if a == true ")
     expected.last << Block::Raw.new(" \t\nPOST ")
 
     template.root.children.should eq expected
@@ -137,7 +137,7 @@ describe Parser do
 
     expected = [] of Block::Node
     expected << Block::Raw.new(" PRE \t\n")
-    expected << Block::If.new("if a == true")
+    expected << Block::If.new("if a == true ")
     expected.last << Block::Raw.new("POST ")
 
     template.root.children.should eq expected

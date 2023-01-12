@@ -31,23 +31,41 @@ module Liquid
     end
 
     def visit(node : If)
-      if node.if_expression.eval(@data).raw
+      if node.expression.eval(@data).raw
         node.children.each &.accept(self)
-      else
-        found = false
-        if elsif_arr = node.elsif
-          elsif_arr.each do |alt|
-            if alt.eval(@data).raw
-              found = true
-              alt.accept self
-              break
-            end
+        return
+      end
+
+      elsif_arr = node.elsif
+      if elsif_arr
+        elsif_arr.each do |alt|
+          if alt.eval(@data).raw
+            alt.accept self
+            return
           end
         end
-        if !found && (else_alt = node.else)
-          else_alt.accept self
+      end
+
+      node.else.try(&.accept(self))
+    end
+
+    def visit(node : Unless)
+      unless node.expression.eval(@data).raw
+        node.children.each &.accept(self)
+        return
+      end
+
+      elsif_arr = node.elsif
+      if elsif_arr
+        elsif_arr.each do |alt|
+          if alt.eval(@data).raw
+            alt.accept self
+            return
+          end
         end
       end
+
+      node.else.try(&.accept(self))
     end
 
     def visit(node : Node)

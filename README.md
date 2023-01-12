@@ -115,7 +115,7 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 TODO:
 - [x] Basic For loops
 - [x] if/elsif/else/endif
-- [ ] unless/endunless
+- [x] unless/endunless
 - [x] Raw and comment blocks ({% raw %} and {% comment %})
 - [x] Add variable assignment ({% assign var = "Hello World" %})
 - [x] Add support for multiple operator (no operator precedence support (for now))

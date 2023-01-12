@@ -435,15 +435,7 @@ liquid.golden.uniq_filter array of things
 liquid.golden.uniq_filter left value is not an array
 liquid.golden.uniq_filter too many arguments
 liquid.golden.uniq_filter unhashable items
-liquid.golden.unless_tag alternative block
 liquid.golden.unless_tag blocks that contain only whitespace are not rendered
-liquid.golden.unless_tag conditional alternative block
-liquid.golden.unless_tag conditional alternative block with default
-liquid.golden.unless_tag literal false condition
-liquid.golden.unless_tag literal true condition
-liquid.golden.unless_tag one is not equal to true
-liquid.golden.unless_tag zero is not equal to false
-liquid.golden.unless_tag zero is truthy
 liquid.golden.upcase_filter unexpected argument
 liquid.golden.url_decode_filter not a string
 liquid.golden.url_decode_filter some special URL characters
@@ -462,7 +454,6 @@ liquid.golden.where_filter value is explicit nil
 liquid.golden.where_filter value is false
 liquid.golden.whitespace_control don't suppress whitespace only blocks containing echo
 liquid.golden.whitespace_control don't suppress whitespace only case blocks containing output
-liquid.golden.whitespace_control don't suppress whitespace only unless blocks containing output in nested blocks
 liquid.golden.whitespace_control suppress whitespace only case blocks
 liquid.golden.whitespace_control suppress whitespace only if blocks
 liquid.golden.whitespace_control suppress whitespace only unless blocks
