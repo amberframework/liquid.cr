@@ -16,7 +16,7 @@ module Liquid
     end
 
     def visit(node : Case)
-      value = node.case_expression.eval(@data)
+      value = node.expression.eval(@data)
       found = false
       if when_arr = node.when
         when_arr.each do |when_node|

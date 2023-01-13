@@ -13,18 +13,18 @@ module Liquid::Block
       Else
     end
 
-    getter case_expression : Expression
+    getter expression : Expression
     getter when : Array(When)?
     getter else : Else?
 
     @last = PutInto::Case
 
-    def initialize(@case_expression)
+    def initialize(@expression)
     end
 
     def initialize(content : String)
       if match = content.strip.match SIMPLE_EXP
-        @case_expression = Expression.new match["expr"]
+        @expression = Expression.new match["expr"]
       else
         raise InvalidNode.new "Invalid case node"
       end
@@ -56,7 +56,7 @@ module Liquid::Block
     end
 
     def inspect(io : IO)
-      inspect(io) { io << @case_expression.expression.inspect }
+      inspect(io) { io << @expression.expression.inspect }
     end
 
     def_equals @when, @else, @children
