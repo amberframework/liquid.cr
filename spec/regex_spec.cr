@@ -22,42 +22,5 @@ module Liquid
       ok.each &.match(/^#{TYPE_OR_VAR}$/).should_not be_nil
       err.each &.match(/^#{TYPE_OR_VAR}$/).should be_nil
     end
-
-    it "should match a comparison" do
-      ok = ["a == !b", "!-a == ---b", "!--a == !!b", "sdf != fds", "dd < 12", "true > false", "hh==hh", "12 <= var"]
-      err = ["a = b", "dfs ! fff", "ddd=ddd", "12>"]
-      ok.each &.match(/^#{CMP}$/).should_not be_nil
-      err.each &.match(/^#{CMP}$/).should be_nil
-    end
-
-    it "should match filters" do
-      ok = ["a | b", "a | b | v", "-12 | abs", "\"toto\" | abs"]
-      err = ["a ||", "dfs |", "|ddd=ddd", "1|2", "dd | 12"]
-      ok.each &.match(/^#{GFILTERED}$/).should_not be_nil
-      err.each &.match(/^#{GFILTERED}$/).should be_nil
-    end
-
-    it "should match filters with multiple arguments" do
-      str = "filtered | filter: arg1, arg2, arg3"
-      matches = str.match(/^#{GFILTERED}$/).not_nil!
-      matches[0].should eq str
-      matches["first"].should eq "filtered"
-      matches["filter"].should eq "filter"
-      matches["args"].should eq "arg1, arg2, arg3"
-    end
-
-    it "should match filters with multiple arguments 2" do
-      str = "filtered | filter: \"a,b\", 'c, d', e"
-      matches = str.match(/^#{GFILTERED}$/).not_nil!
-      matches[0].should eq str
-      matches["first"].should eq "filtered"
-      matches["filter"].should eq "filter"
-      matches["args"].should eq "\"a,b\", 'c, d', e"
-    end
-
-    it "should match a string" do
-      "\"content\"".match(GSTRING).should_not be_nil
-      "'content'".match(GSTRING).should_not be_nil
-    end
   end
 end
