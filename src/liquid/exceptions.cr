@@ -4,10 +4,11 @@ module Liquid
   class LiquidException < Exception
   end
 
-  class InvalidExpression < LiquidException
+  class SyntaxError < LiquidException
+    property line_number : Int32 = -1
   end
 
-  class InvalidNode < LiquidException
+  class InvalidExpression < LiquidException
   end
 
   class InvalidStatement < LiquidException

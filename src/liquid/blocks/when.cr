@@ -13,7 +13,7 @@ module Liquid::Block
         break unless scanner.scan(/\s*(?:,|or)\s*/)
       end
 
-      raise InvalidNode.new("No expression for When tag") if @when_expressions.empty?
+      raise SyntaxError.new("No expression for When tag") if @when_expressions.empty?
     end
 
     # Return the number of matches in when clause

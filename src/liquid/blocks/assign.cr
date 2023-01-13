@@ -19,7 +19,7 @@ module Liquid::Block
         @varname = match["varname"]
         @value = Expression.new match["value"]
       else
-        raise InvalidNode.new "Invalid assignment Node"
+        raise SyntaxError.new("Invalid assignment Node")
       end
     end
 

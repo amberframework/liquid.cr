@@ -43,7 +43,7 @@ module Liquid::Block
     end
 
     def <<(node : Else)
-      raise InvalidNode.new "Multiple Else in If statement !" if @else
+      raise SyntaxError.new("Multiple Else in If statement.") if @else
 
       @else = node
       @put_into = PutInto::Else

@@ -4,12 +4,8 @@ module Liquid::Block
   class Decrement < Liquid::Block::InlineBlock
     getter var_name : String
 
-    def initialize(content : String)
-      if content =~ VAR
-        @var_name = content
-      else
-        raise InvalidNode.new "decrement block needs an argument"
-      end
+    def initialize(content @var_name)
+      raise SyntaxError.new if @var_name !~ VARIABLE_SIGNATURE
     end
   end
 end

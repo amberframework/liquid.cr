@@ -34,10 +34,10 @@ module Liquid::Block
                      elsif (rmatch = gmatch["range"].match VARNAME)
                        rmatch["varname"]
                      else
-                       raise InvalidNode.new "Invalid for node : #{content}"
+                       raise SyntaxError.new("Invalid for node: #{content}.")
                      end
       else
-        raise InvalidNode.new "Invalid for node : #{content}"
+        raise SyntaxError.new("Invalid for node: #{content}.")
       end
     end
 

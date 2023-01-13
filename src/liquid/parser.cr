@@ -67,7 +67,10 @@ module Liquid
       match = token_value.match(STATEMENT)
       invalid_statement!(token) if match.nil?
 
-      block_class = BlockRegister.for_name(match["tag"])
+      tag_name = match["tag"]
+      block_class = BlockRegister.for_name(tag_name)
+      raise SyntaxError.new("Unknown tag '#{tag_name}'.") if block_class.nil?
+
       block = block_class.new(match["markup"].strip)
       block.rstrip = token.rstrip?
       block.lstrip = token.lstrip?
@@ -90,6 +93,9 @@ module Liquid
       else
         invalid_statement!(token)
       end
+    rescue e : SyntaxError
+      e.line_number = token.line_number
+      raise e
     end
 
     private def invalid_statement!(token)

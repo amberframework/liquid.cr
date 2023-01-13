@@ -12,4 +12,6 @@ module Liquid
   VAR = /([-!]*(?<varbasename>[A-Za-z_]\w*)(?:(?<property>\.[A-Za-z_]\w*)|(?:\[(?<index>(?:#{STRING})|(?:#{INT})|(?1))\]))*\??)/
 
   TYPE_OR_VAR = /(?:#{TYPE})|(?:#{VAR})/
+
+  VARIABLE_SIGNATURE = /\(?[\w\-\.\[\]]\)?/
 end

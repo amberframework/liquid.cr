@@ -36,14 +36,14 @@ module Liquid::Block
     end
 
     def <<(node : When)
-      raise InvalidNode.new "When statement must preceed Else!" if @else
+      raise SyntaxError.new("When statement must preceed Else!") if @else
       @when ||= Array(When).new
       @when.not_nil! << node
       @last = PutInto::When
     end
 
     def <<(node : Else)
-      raise InvalidNode.new "Multiple Else in Case statement!" if @else
+      raise SyntaxError.new("Multiple Else in Case statement!") if @else
 
       @else = node
       @last = PutInto::Else
