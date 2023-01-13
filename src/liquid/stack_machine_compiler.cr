@@ -6,13 +6,11 @@ require "./exceptions"
 module Liquid
   struct StackMachineOpCode
     enum Action
-      PushInvertion # Like in -var
-      PushNegation  # Like in !var
-      PushVar       # Like in var
-      PushLiteral   # Like in "var" or 'var'
-      Call          # Like in var.call
-      IndexCall     # Like in var[index]
-      Operator      # ==, >=, <=, <, >, !=, contains, or, and
+      PushVar     # Like in var
+      PushLiteral # Like in "var" or 'var'
+      Call        # Like in var.call
+      IndexCall   # Like in var[index]
+      Operator    # ==, >=, <=, <, >, !=, contains, or, and
       Filter
     end
 
@@ -72,12 +70,6 @@ module Liquid
           when '.'
             calling_method = true
             scanner.offset += 1
-          when '-'
-            opcodes << StackMachineOpCode.new(:push_invertion)
-            scanner.offset += 1
-          when '!'
-            scanner.offset += 1
-            opcodes << StackMachineOpCode.new(:push_negation)
           when '['
             scanner.offset += 1
           when ']'

@@ -9,8 +9,6 @@ module Liquid
     @opcodes : Array(StackMachineOpCode)
 
     private enum Operator
-      Invert
-      Negate
       Equals
       NotEqual
       Greater
@@ -36,10 +34,6 @@ module Liquid
         else
           raise LiquidException.new("Invalid operator: #{str}.")
         end
-      end
-
-      def unary? : Bool
-        invert? || negate?
       end
 
       def eval(left : Any, right : Any) : Bool
@@ -84,10 +78,6 @@ module Liquid
                       ctx.get(opcode_value)
                     end
           stack.push(value)
-        in .push_invertion?
-          stack.push(Operator::Invert)
-        in .push_negation?
-          stack.push(Operator::Negate)
         in .push_literal?
           stack.push(opcode.value)
         in .operator?
@@ -102,24 +92,20 @@ module Liquid
         in .index_call?
           index = stack.pop
           var = stack.pop
-          error_message = if index.is_a?(Operator)
-                            "Unexpected operator: #{index}"
-                          elsif var.is_a?(Operator)
-                            "Unexpected operator: #{var}"
-                          end
-          retval = if error_message
-                     raise?(ctx) { error_message }
-                   else
-                     var = apply_unary_operator(var, stack)
-                     call_index(ctx, var, index.as(Any))
-                   end
+          if index.is_a?(Operator)
+            return raise?(ctx) { "Unexpected operator: #{index}." }
+          elsif var.is_a?(Operator)
+            return raise?(ctx) { "Unexpected operator: #{var}." }
+          end
+
+          retval = call_index(ctx, var, index.as(Any))
           stack.push(retval)
         end
       end
       case stack.size
-      when 0 then raise?(ctx) { "Empty expression" }
+      when 0 then raise?(ctx) { "Empty expression." }
       when 1 then stack.first.as(Any)
-      when 2 then apply_unary_operator(stack.pop, stack)
+      when 2 then raise?(ctx) { "Bad values left on stack." }
       else
         apply_operators(ctx, stack)
       end
@@ -136,7 +122,7 @@ module Liquid
       return raise?(ctx) { "Too many items left on stack." } if stack.size != 1
 
       result = stack.first.as?(Any)
-      return raise?(ctx) { "Bad value left on stack" } if result.nil?
+      return raise?(ctx) { "Bad values left on stack." } if result.nil?
 
       return result if filters.nil?
 
@@ -155,26 +141,6 @@ module Liquid
 
       result = operator.eval(left_operand, right_operand)
       Any.new(result)
-    end
-
-    private def apply_unary_operator(any : Any, stack : Stack) : Any
-      loop do
-        operator = stack.last?
-        break unless operator.is_a?(Operator)
-
-        any = case operator
-              when .negate? then Any.new(!any.raw)
-              when .invert? then -any
-              else
-                raise LiquidException.new("Unexpected operator: #{operator}.")
-              end
-        stack.pop
-      end
-      any
-    end
-
-    private def apply_unary_operator(_prefix : Operator, _stack : Stack)
-      raise LiquidException.new("Unexpected operator.")
     end
 
     private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack) : Any

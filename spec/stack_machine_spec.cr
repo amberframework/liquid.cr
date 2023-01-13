@@ -61,7 +61,6 @@ describe StackMachine do
   it_evaluates("foo[\"bar\"]", Context{"foo" => Any{"bar" => "ok"}}, "ok")
   it_evaluates("foo[hey.ho]", Context{"foo" => Any{true}, "hey" => Any{"ho" => 0}}, true)
   it_evaluates("foo[0][1]", Context{"foo" => Any{Any{1, 42}}}, 42)
-  it_evaluates("!foo", Context{"foo" => true}, false)
 
   it_evaluates("a == true", Context{"a" => true}, true)
   it_evaluates("a == true", Context{"a" => false}, false)

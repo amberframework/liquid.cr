@@ -41,10 +41,8 @@ describe StackMachineCompiler do
   it_compiles("42", "PushLiteral 42;")
 
   it_compiles("foo", "PushVar foo;")
-  it_compiles("-foo", "PushInvertion;PushVar foo;")
   it_compiles("foo[-42]", "PushVar foo;PushLiteral -42;IndexCall;")
   it_compiles("foo[42]", "PushVar foo;PushLiteral 42;IndexCall;")
-  it_compiles("!foo", "PushNegation;PushVar foo;")
 
   it_compiles("foo.bar", "PushVar foo;Call bar;")
   it_compiles("foo.bar.hey", "PushVar foo;Call bar;Call hey;")
