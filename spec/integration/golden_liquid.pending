@@ -152,8 +152,6 @@ liquid.golden.for_tag offset is not a string or number
 liquid.golden.for_tag parent's parentloop
 liquid.golden.for_tag range loop using identifier
 liquid.golden.for_tag some comma separated arguments
-liquid.golden.identifiers capture hyphens
-liquid.golden.identifiers capture only digits
 liquid.golden.identifiers decrement with a hyphen
 liquid.golden.identifiers hyphen in for loop target
 liquid.golden.identifiers hyphen in for loop variable
