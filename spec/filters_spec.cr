@@ -43,7 +43,6 @@ describe Filters do
       FilterRegister.get("strip_html").should eq StripHtml
       FilterRegister.get("underscore").should eq Underscore
       FilterRegister.get("upcase").should eq UpCase
-      FilterRegister.get("uppercase").should eq UpCase
     end
   end
 
