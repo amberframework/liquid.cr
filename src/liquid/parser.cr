@@ -49,7 +49,7 @@ module Liquid
             @nodes.last << Block::Raw.new(token.raw_value)
           end
         elsif token.kind.expression?
-          block = Expression.new(token.value)
+          block = ExpressionNode.new(token.value)
           block.rstrip = token.rstrip?
           block.lstrip = token.lstrip?
           @nodes.last << block

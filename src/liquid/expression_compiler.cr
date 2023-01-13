@@ -1,6 +1,6 @@
 require "string_scanner"
 
-require "./stack_machine"
+require "./expression"
 require "./expression_opcode"
 require "./exceptions"
 

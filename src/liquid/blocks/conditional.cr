@@ -1,7 +1,7 @@
 require "./block"
 require "./else"
 require "./elsif"
-require "./expression"
+require "../expression"
 
 module Liquid::Block
   # Base class for if/unless tags

@@ -1,6 +1,6 @@
 require "./block"
 require "./else"
-require "./expression"
+require "../expression"
 require "./when"
 
 module Liquid::Block

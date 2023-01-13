@@ -2,9 +2,13 @@ require "string_scanner"
 require "./expression_compiler"
 
 module Liquid
-  # :nodoc:
-  # This is used by `Context` to evaluate expressions like `variable.attribute[0]`
-  struct StackMachine
+  # This represent a liquid expression used in under `{{ }}` or passed to statements like if, case, etc... including
+  # filter and their arguments.
+  #
+  # The Expression is reentrant and doesn't store any state besides the compiled expression.
+  #
+  # To evaluate a expression call the `evaluate` method with the desired `Context`.
+  struct Expression
     getter expression : String
     @opcodes : Array(ExpressionOpCode)
 
@@ -61,7 +65,7 @@ module Liquid
 
     def_equals @expression
 
-    def evaluate(ctx : Context) : Any
+    def eval(ctx : Context) : Any
       # Fast path for single variables
       value = ctx[@expression]?
       return value if value

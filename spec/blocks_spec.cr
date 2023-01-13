@@ -61,7 +61,7 @@ describe Liquid do
 
       it "should loop over array" do
         stmt = For.new "for x in myarray"
-        stmt << Expression.new "x"
+        stmt << ExpressionNode.new "x"
         ctx = Context.new
         ctx.set("myarray", Any{"apple", 12})
         node_output(stmt, ctx).should eq "apple12"
@@ -153,28 +153,28 @@ describe Liquid do
       end
     end
 
-    describe Expression do
+    describe ExpressionNode do
       it "should eval true" do
-        expr = Expression.new "true"
+        expr = ExpressionNode.new "true"
         expr.eval(Context.new).should be_true
       end
 
       it "should eval false" do
-        expr = Expression.new "false"
+        expr = ExpressionNode.new "false"
         expr.eval(Context.new).should be_false
       end
 
       it "should eval float" do
-        expr = Expression.new "12.5"
-        expr2 = Expression.new "-120.5"
+        expr = ExpressionNode.new "12.5"
+        expr2 = ExpressionNode.new "-120.5"
         expr.eval(Context.new).should eq 12.5
         expr2.eval(Context.new).should eq -120.5
       end
 
       it "should eval a var" do
-        expr = Expression.new "myvar"
-        expr2 = Expression.new "myvar.inner"
-        expr3 = Expression.new "myvar.inner.inner"
+        expr = ExpressionNode.new "myvar"
+        expr2 = ExpressionNode.new "myvar.inner"
+        expr3 = ExpressionNode.new "myvar.inner.inner"
 
         ctx = Context.new
         ctx.set("myvar", true)
@@ -187,10 +187,10 @@ describe Liquid do
       end
 
       it "should eval an comparison" do
-        expr = Expression.new "true == false"
-        expr2 = Expression.new "true != false"
-        expr3 = Expression.new "var != 15"
-        expr4 = Expression.new "str == 'asdf'"
+        expr = ExpressionNode.new "true == false"
+        expr2 = ExpressionNode.new "true != false"
+        expr3 = ExpressionNode.new "var != 15"
+        expr4 = ExpressionNode.new "str == 'asdf'"
 
         ctx = Context.new(:strict)
         ctx.set "var", 16
@@ -204,9 +204,9 @@ describe Liquid do
       end
 
       it "should eval an multiple operation" do
-        expr = Expression.new "test == false or some == true or another == 10"
-        expr2 = Expression.new "test != false or some == false or another == 10"
-        expr3 = Expression.new "test != false and some != false and another == 15 and str == 'asdf'"
+        expr = ExpressionNode.new "test == false or some == true or another == 10"
+        expr2 = ExpressionNode.new "test != false or some == false or another == 10"
+        expr3 = ExpressionNode.new "test != false and some != false and another == 15 and str == 'asdf'"
 
         ctx = Context.new
         ctx.set "test", true

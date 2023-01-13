@@ -2,16 +2,16 @@ require "./block"
 
 module Liquid::Block
   class When < InlineBlock
-    @when_expressions : Array(StackMachine)
+    @when_expressions : Array(Expression)
 
     def initialize(content : String)
-      @when_expressions = Array(StackMachine).new
+      @when_expressions = Array(Expression).new
 
       scanner = StringScanner.new(content)
       raise InvalidNode.new("Invalid When Node") unless scanner.scan(/\A\s*when\s+/)
 
       while expr = scanner.scan(/("[^"]*"|'[^']*'|(?:\w|\.)+)/)
-        @when_expressions << StackMachine.new(expr)
+        @when_expressions << Expression.new(expr)
         break unless scanner.scan(/\s*(?:,|or)\s*/)
       end
 
@@ -21,7 +21,7 @@ module Liquid::Block
     # Return the number of matches in when clause
     def match?(ctx : Context, value : Any) : Int32
       @when_expressions.count do |expr|
-        expr.evaluate(ctx) == value
+        expr.eval(ctx) == value
       end
     end
 

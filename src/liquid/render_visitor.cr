@@ -108,7 +108,7 @@ module Liquid
       end
     end
 
-    def visit(node : Expression)
+    def visit(node : ExpressionNode)
       if node.children.empty?
         @io << node.eval(@data)
       else

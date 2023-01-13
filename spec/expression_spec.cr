@@ -37,7 +37,7 @@ end
 private def it_evaluates(expr : String, ctx : Context, expected : Liquid::Any::Type,
                          file = __FILE__, line = __LINE__)
   it "evaluates #{expr} with #{ctx} to #{expected}", file: file, line: line do
-    StackMachine.new(expr).evaluate(ctx).should eq(Any.new(expected))
+    Expression.new(expr).eval(ctx).should eq(Any.new(expected))
   end
 end
 
@@ -45,12 +45,12 @@ private def it_raises(exception, message : String, expr : String, ctx : Context,
   it "raises #{exception}(#{message}) evaluating #{expr} with #{ctx}", file: file, line: line do
     ctx.error_mode = :strict
     expect_raises(exception, message) do
-      StackMachine.new(expr).evaluate(ctx)
+      Expression.new(expr).eval(ctx)
     end
   end
 end
 
-describe StackMachine do
+describe Expression do
   it_raises(InvalidExpression, "Variable \"bar\" not found", "bar", Context.new(:strict))
 
   it_evaluates("foo", Context{"foo" => 42}, 42)
