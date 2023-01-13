@@ -7,8 +7,6 @@ describe Filters do
     it "should have registered default filters" do
       FilterRegister.get("abs").should eq Abs
       FilterRegister.get("append").should eq Append
-      FilterRegister.get("camelcase").should eq CamelCase
-      FilterRegister.get("camelize").should eq CamelCase
       FilterRegister.get("capitalize").should eq Capitalize
       FilterRegister.get("ceil").should eq Ceil
       FilterRegister.get("compact").should eq Compact
@@ -27,7 +25,6 @@ describe Filters do
       FilterRegister.get("modulo").should eq Modulo
       FilterRegister.get("newline_to_br").should eq NewLineToBr
       FilterRegister.get("strip_newlines").should eq StripNewLines
-      FilterRegister.get("pluralize").should eq Pluralize
       FilterRegister.get("plus").should eq Plus
       FilterRegister.get("remove").should eq Remove
       FilterRegister.get("remove_first").should eq RemoveFirst
@@ -41,7 +38,6 @@ describe Filters do
       FilterRegister.get("split").should eq Split
       FilterRegister.get("strip").should eq Strip
       FilterRegister.get("strip_html").should eq StripHtml
-      FilterRegister.get("underscore").should eq Underscore
       FilterRegister.get("upcase").should eq UpCase
     end
   end
@@ -64,12 +60,6 @@ describe Filters do
   describe Append do
     it "should append a string at the end of another" do
       Append.filter(Any.new("hello"), [Any.new " world"]).should eq "hello world"
-    end
-  end
-
-  describe CamelCase do
-    it "should camelcase a string" do
-      CamelCase.filter(Any.new "active_model").should eq "ActiveModel"
     end
   end
 
@@ -229,12 +219,6 @@ describe Filters do
     end
   end
 
-  describe Pluralize do
-    it "should pluralize a string" do
-      Pluralize.filter(Any.new "post").should eq "posts"
-    end
-  end
-
   describe Plus do
     it "should should add numbers" do
       Plus.filter(Any.new(10), Array{Any.new(2)}).should eq 12
@@ -338,12 +322,6 @@ describe Filters do
       StripHtml.filter(Any.new "<a href='#'>mystring</a>my<br/>String").should eq "mystringmyString"
       StripHtml.filter(Any.new "<b>bla blub</a>").should eq "bla blub"
       StripHtml.filter(Any.new "<!-- split and some <ul> tag --><b>bla blub</a>").should eq "bla blub"
-    end
-  end
-
-  describe Underscore do
-    it "should underscore a string" do
-      Underscore.filter(Any.new "ActiveModel").should eq "active_model"
     end
   end
 

@@ -61,10 +61,12 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 # Filters
 - [x] abs
 - [x] append
-- [x] camelcase | camelize
+- [ ] at_least
+- [ ] at_most
 - [x] capitalize
 - [x] ceil
 - [x] compact
+- [ ] concat
 - [x] date
 - [x] default
 - [x] divided_by
@@ -80,7 +82,6 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 - [x] minus
 - [x] modulo
 - [x] newline_to_br
-- [x] pluralize
 - [x] plus
 - [x] prepend
 - [x] remove
@@ -101,9 +102,11 @@ Cache block (only supports caching using Redis): https://github.com/TechMagister
 - [ ] times
 - [ ] truncate
 - [ ] truncatewords
-- [x] underscore
 - [ ] uniq
-- [x] upcase | uppercase
+- [x] upcase
+- [ ] url_decode
+- [ ] url_encode
+- [ ] where
 
 # Helper Methods
 - [x] size (for Array and String)
