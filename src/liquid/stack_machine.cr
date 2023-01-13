@@ -1,5 +1,5 @@
 require "string_scanner"
-require "./stack_machine_compiler"
+require "./expression_compiler"
 
 module Liquid
   # :nodoc:
@@ -56,7 +56,7 @@ module Liquid
     private alias Stack = Array(Any | Operator)
 
     def initialize(@expression : String)
-      @opcodes = StackMachineCompiler.compile(@expression)
+      @opcodes = ExpressionCompiler.compile(@expression)
     end
 
     def_equals @expression

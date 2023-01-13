@@ -5,7 +5,7 @@ require "./expression_opcode"
 require "./exceptions"
 
 module Liquid
-  class StackMachineCompiler
+  class ExpressionCompiler
     private OPERATOR        = /(?:==|!=|<>|<=?|>=?|contains|or|and)(?=\s)/
     private IDENTIFIER      = /[a-zA-Z_][\w-]*\??/
     private INTEGER_LITERAL = /-?\d+/

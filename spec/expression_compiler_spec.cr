@@ -1,25 +1,25 @@
 require "./spec_helper"
-require "../src/liquid/stack_machine_compiler"
+require "../src/liquid/expression_compiler"
 
 private def compile(expr : String) : String
-  StackMachineCompiler.compile(expr).join
+  ExpressionCompiler.compile(expr).join
 end
 
 private def it_compiles(expr : String, expected : String, file = __FILE__, line = __LINE__)
   it "compiles #{expr} to #{expected}", file: file, line: line do
-    StackMachineCompiler.compile(expr).join.should eq(expected)
+    ExpressionCompiler.compile(expr).join.should eq(expected)
   end
 end
 
 private def it_raises(exception, message : String, expr : String, file = __FILE__, line = __LINE__)
   it "raises #{exception}(#{message}) compiling #{expr}", file: file, line: line do
     expect_raises(exception, message) do
-      StackMachineCompiler.compile(expr)
+      ExpressionCompiler.compile(expr)
     end
   end
 end
 
-describe StackMachineCompiler do
+describe ExpressionCompiler do
   it_compiles("", "")
   it_compiles(" \t ", "")
   it_compiles("'foo'", %(PushLiteral "foo";))
