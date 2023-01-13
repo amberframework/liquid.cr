@@ -12,7 +12,7 @@ module Liquid::Block
   # loop.last     	True if last iteration.
   # loop.length    	The number of items in the sequence.
   class For < BeginBlock
-    GLOBAL  = /for (?<var>\w+) in (?<range>.+)/
+    GLOBAL  = /(?<var>\w+) in (?<range>.+)/
     RANGE   = /(?<start>[0-9]+)\.\.(?<end>[0-9]+)/
     VARNAME = /^\s*(?<varname>#{VAR})\s*$/
 

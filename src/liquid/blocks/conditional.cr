@@ -22,10 +22,8 @@ module Liquid::Block
     end
 
     def initialize(content : String)
-      @expression = expression_from_content(content)
+      @expression = Expression.new(content)
     end
-
-    protected abstract def expression_from_content(content : String) : Expression
 
     def <<(node : Node)
       case @put_into

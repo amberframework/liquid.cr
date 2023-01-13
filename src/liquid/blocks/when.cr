@@ -8,8 +8,6 @@ module Liquid::Block
       @when_expressions = Array(Expression).new
 
       scanner = StringScanner.new(content)
-      raise InvalidNode.new("Invalid When Node") unless scanner.scan(/\A\s*when\s+/)
-
       while expr = scanner.scan(/("[^"]*"|'[^']*'|(?:\w|\.)+)/)
         @when_expressions << Expression.new(expr)
         break unless scanner.scan(/\s*(?:,|or)\s*/)

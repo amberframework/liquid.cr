@@ -5,8 +5,6 @@ require "./when"
 
 module Liquid::Block
   class Case < BeginBlock
-    SIMPLE_EXP = /^\s*case (?<expr>.+)\s*$/
-
     enum PutInto
       Case
       When
@@ -23,11 +21,7 @@ module Liquid::Block
     end
 
     def initialize(content : String)
-      if match = content.strip.match SIMPLE_EXP
-        @expression = Expression.new match["expr"]
-      else
-        raise InvalidNode.new "Invalid case node"
-      end
+      @expression = Expression.new(content)
     end
 
     def <<(node : Node)

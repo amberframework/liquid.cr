@@ -4,7 +4,7 @@ require "./strip_visitor"
 
 module Liquid
   class Parser
-    private STATEMENT        = /^\s*(?<keyword>[a-z]+).*$/
+    private STATEMENT        = /\A\s*(?<tag>[a-z]+)\s*(?<markup>.*)\s*\z/
     private ENDRAW_STATEMENT = /\A\s*endraw\s*\z/
 
     getter root : Root
@@ -67,8 +67,8 @@ module Liquid
       match = token_value.match(STATEMENT)
       invalid_statement!(token) if match.nil?
 
-      block_class = BlockRegister.for_name(match["keyword"])
-      block = block_class.new(token.value)
+      block_class = BlockRegister.for_name(match["tag"])
+      block = block_class.new(match["markup"].strip)
       block.rstrip = token.rstrip?
       block.lstrip = token.lstrip?
 
