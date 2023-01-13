@@ -6,7 +6,7 @@ module Liquid
   # This is used by `Context` to evaluate expressions like `variable.attribute[0]`
   struct StackMachine
     getter expression : String
-    @opcodes : Array(StackMachineOpCode)
+    @opcodes : Array(ExpressionOpCode)
 
     private enum Operator
       Equals

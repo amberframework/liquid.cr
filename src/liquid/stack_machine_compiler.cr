@@ -1,35 +1,10 @@
 require "string_scanner"
 
 require "./stack_machine"
+require "./expression_opcode"
 require "./exceptions"
 
 module Liquid
-  struct StackMachineOpCode
-    enum Action
-      PushVar     # Like in var
-      PushLiteral # Like in "var" or 'var'
-      Call        # Like in var.call
-      IndexCall   # Like in var[index]
-      Operator    # ==, >=, <=, <, >, !=, contains, or, and
-      Filter
-    end
-
-    getter action : Action
-    getter value : Any
-
-    def initialize(@action, value : Any::Type = nil)
-      @value = Any.new(value)
-    end
-
-    def inspect(io : IO)
-      io << action
-      unless @value.raw.nil?
-        io << ' ' << (action.push_literal? ? @value.inspect : @value)
-      end
-      io << ';'
-    end
-  end
-
   class StackMachineCompiler
     private OPERATOR        = /(?:==|!=|<>|<=?|>=?|contains|or|and)(?=\s)/
     private IDENTIFIER      = /[a-zA-Z_][\w-]*\??/
@@ -38,8 +13,8 @@ module Liquid
     private BOOLEAN_LITERAL = /(true|false)\b/
     private FILTER          = /\|\s*([a-zA-Z_][\w-]+):?/
 
-    def self.compile(expr : String) : Array(StackMachineOpCode)
-      opcodes = [] of StackMachineOpCode
+    def self.compile(expr : String) : Array(ExpressionOpCode)
+      opcodes = [] of ExpressionOpCode
       scanner = StringScanner.new(expr)
       calling_method = false
 
@@ -48,22 +23,22 @@ module Liquid
         break if scanner.eos?
 
         if value = scanner.scan(FLOAT_LITERAL)
-          opcodes << StackMachineOpCode.new(:push_literal, value.to_f)
+          opcodes << ExpressionOpCode.new(:push_literal, value.to_f)
         elsif value = scanner.scan(INTEGER_LITERAL)
-          opcodes << StackMachineOpCode.new(:push_literal, value.to_i)
+          opcodes << ExpressionOpCode.new(:push_literal, value.to_i)
         elsif value = scanner.scan(BOOLEAN_LITERAL)
-          opcodes << StackMachineOpCode.new(:push_literal, value == "true")
+          opcodes << ExpressionOpCode.new(:push_literal, value == "true")
         elsif value = scanner.scan(OPERATOR)
-          opcodes << StackMachineOpCode.new(:operator, value)
+          opcodes << ExpressionOpCode.new(:operator, value)
         elsif value = scanner.scan(IDENTIFIER)
           if calling_method
             calling_method = false
-            opcodes << StackMachineOpCode.new(:call, value)
+            opcodes << ExpressionOpCode.new(:call, value)
           else
-            opcodes << StackMachineOpCode.new(:push_var, value)
+            opcodes << ExpressionOpCode.new(:push_var, value)
           end
         elsif scanner.scan(FILTER)
-          opcodes << StackMachineOpCode.new(:filter, scanner[1])
+          opcodes << ExpressionOpCode.new(:filter, scanner[1])
         else
           next_char = expr[scanner.offset]
           case next_char
@@ -74,10 +49,10 @@ module Liquid
             scanner.offset += 1
           when ']'
             scanner.offset += 1
-            opcodes << StackMachineOpCode.new(:index_call)
+            opcodes << ExpressionOpCode.new(:index_call)
           when '"', '\''
             value = parse_string(scanner, next_char)
-            opcodes << StackMachineOpCode.new(:push_literal, value)
+            opcodes << ExpressionOpCode.new(:push_literal, value)
           when ','
             # TODO: Do some syntax check using the current opcodes array
             scanner.offset += 1
@@ -89,11 +64,11 @@ module Liquid
       opcodes
     end
 
-    private def self.parse_number(scanner : StringScanner) : StackMachineOpCode?
+    private def self.parse_number(scanner : StringScanner) : ExpressionOpCode?
       value = scanner.scan(/-?\d+(\.\d+)?/)
       return if value.nil?
 
-      StackMachineOpCode.new(:push_literal, value.index('.') ? value.to_f : value.to_i)
+      ExpressionOpCode.new(:push_literal, value.index('.') ? value.to_f : value.to_i)
     end
 
     private def self.parse_string(scanner : StringScanner, limit : Char) : String
