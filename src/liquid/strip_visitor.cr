@@ -1,6 +1,6 @@
 module Liquid
   class StripVisitor < Visitor
-    @last_raw_node : Block::Raw?
+    @last_raw_node : Block::RawNode?
     @lstrip_next_raw_node = false
 
     private def check_strip(node : Node)
@@ -30,7 +30,7 @@ module Liquid
       node.else.try(&.accept(self))
     end
 
-    def visit(node : Block::Raw)
+    def visit(node : Block::RawNode)
       if @lstrip_next_raw_node
         node.lstrip!
         @lstrip_next_raw_node = false

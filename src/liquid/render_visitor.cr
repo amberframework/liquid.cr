@@ -78,7 +78,7 @@ module Liquid
       @data.set node.varname, node.value.eval(@data)
     end
 
-    def visit(node : Block::Raw)
+    def visit(node : Block::RawNode)
       @io << node.content
     end
 

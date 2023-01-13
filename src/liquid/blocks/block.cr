@@ -59,8 +59,4 @@ module Liquid::Block
     def initialize
     end
   end
-
-  abstract class RawBlock < Node
-    extend Block
-  end
 end

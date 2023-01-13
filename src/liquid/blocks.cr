@@ -11,7 +11,7 @@ require "./blocks/for"
 require "./blocks/if"
 require "./blocks/include"
 require "./blocks/increment"
-require "./blocks/raw"
+require "./blocks/raw_node"
 require "./blocks/unless"
 require "./blocks/when"
 
@@ -30,6 +30,6 @@ module Liquid
   BlockRegister.register "increment", Liquid::Block::Increment, false
   BlockRegister.register "decrement", Liquid::Block::Decrement, false
   BlockRegister.register "include", Liquid::Block::Include, false
-  BlockRegister.register "raw", Liquid::Block::Raw
+  BlockRegister.register "raw", Liquid::Block::RawNode
   BlockRegister.register "comment", Liquid::Block::Comment
 end

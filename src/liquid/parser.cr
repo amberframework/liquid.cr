@@ -40,13 +40,13 @@ module Liquid
     def parse : Root
       Tokenizer.parse(@str) do |token|
         if token.kind.raw?
-          @nodes.last << Block::Raw.new(token.value)
+          @nodes.last << Block::RawNode.new(token.value)
           next
         elsif @under_raw_block # processing contents of {% raw %}
           if token.kind.statement? && token.value =~ ENDRAW_STATEMENT
             @under_raw_block = false
           else
-            @nodes.last << Block::Raw.new(token.raw_value)
+            @nodes.last << Block::RawNode.new(token.raw_value)
           end
         elsif token.kind.expression?
           block = ExpressionNode.new(token.value)
@@ -82,7 +82,7 @@ module Liquid
         @nodes << block
       when Block::InlineBlock
         @nodes.last << block
-      when Block::RawBlock
+      when Block::RawNode
         # If a Raw block appear here, is because Raw statement is a RawBlock instead of a BeginBlock.
         # To process {% raw %} we turn this flag on and start generating RawBlock for every token until we
         # find a statement token that matches with ENDRAW_STATEMENT regex.

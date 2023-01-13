@@ -1,7 +1,9 @@
 require "./block"
 
 module Liquid::Block
-  class Raw < RawBlock
+  class RawNode < Node
+    extend Block
+
     getter content
 
     @content : String

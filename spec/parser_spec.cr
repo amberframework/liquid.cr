@@ -4,7 +4,7 @@ describe Parser do
   it "parses raw text" do
     txt = "raw text"
     template = Parser.parse txt
-    expected = [Block::Raw.new("raw text")]
+    expected = [Block::RawNode.new("raw text")]
     template.root.children.should eq expected
   end
 
@@ -12,13 +12,13 @@ describe Parser do
     txt = "PRE {% raw %}test\nIn Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.{% endraw %} POST"
     template = Parser.parse txt
     expected = [
-      Block::Raw.new("PRE "),
-      Block::Raw.new("test\nIn Handlebars, "),
-      Block::Raw.new("{{ this }}"),
-      Block::Raw.new(" will be HTML-escaped, but "),
-      Block::Raw.new("{{{ that }}"),
-      Block::Raw.new("} will not."),
-      Block::Raw.new(" POST"),
+      Block::RawNode.new("PRE "),
+      Block::RawNode.new("test\nIn Handlebars, "),
+      Block::RawNode.new("{{ this }}"),
+      Block::RawNode.new(" will be HTML-escaped, but "),
+      Block::RawNode.new("{{{ that }}"),
+      Block::RawNode.new("} will not."),
+      Block::RawNode.new(" POST"),
     ]
     template.root.children.should eq expected
   end
@@ -48,7 +48,7 @@ describe Parser do
 
     expected = [] of Block::Node
     expected << Block::For.new("for x in 0..2")
-    expected.last << Block::Raw.new(" shown 2 times ")
+    expected.last << Block::RawNode.new(" shown 2 times ")
     expected << Block::EndBlock.new
 
     template.root.children.should eq expected
@@ -60,7 +60,7 @@ describe Parser do
 
     expected = [] of Block::Node
     expected << Block::If.new("if a == true ")
-    expected.last << Block::Raw.new(" shown ")
+    expected.last << Block::RawNode.new(" shown ")
     expected << Block::EndBlock.new
 
     template.root.children.should eq expected
@@ -72,9 +72,9 @@ describe Parser do
 
     expected = [] of Block::Node
     if_node = Block::If.new("if a == true ")
-    if_node << Block::Raw.new(" shown ")
+    if_node << Block::RawNode.new(" shown ")
     else_node = Block::Else.new("")
-    else_node << Block::Raw.new(" not shown ")
+    else_node << Block::RawNode.new(" not shown ")
     if_node << else_node
     expected << if_node
     expected << Block::EndBlock.new
@@ -97,21 +97,21 @@ describe Parser do
 
     expected = [] of Block::Node
     case_node = Block::Case.new("case desert")
-    case_node << Block::Raw.new("\n  ")
+    case_node << Block::RawNode.new("\n  ")
     when_node = Block::When.new("when \"cake\"")
-    when_node << Block::Raw.new(" This is a cake\n  ")
+    when_node << Block::RawNode.new(" This is a cake\n  ")
     case_node << when_node
     when_node = Block::When.new("when \"cookie\", \"biscuit\"")
-    when_node << Block::Raw.new(" This is a cookie\n  ")
+    when_node << Block::RawNode.new(" This is a cookie\n  ")
     case_node << when_node
     when_node = Block::When.new("when 'potato'")
-    when_node << Block::Raw.new(" This is a potato\n  ")
+    when_node << Block::RawNode.new(" This is a potato\n  ")
     case_node << when_node
     when_node = Block::When.new("when 'potato', 'tomato'")
-    when_node << Block::Raw.new(" This is a tomato\n  ")
+    when_node << Block::RawNode.new(" This is a tomato\n  ")
     case_node << when_node
     else_node = Block::Else.new("")
-    else_node << Block::Raw.new(" This is not a cake nor a cookie\n")
+    else_node << Block::RawNode.new(" This is not a cake nor a cookie\n")
     case_node << else_node
     expected << case_node
     expected << Block::EndBlock.new
@@ -124,9 +124,9 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    expected << Block::Raw.new(" PRE")
+    expected << Block::RawNode.new(" PRE")
     expected << Block::If.new("if a == true ")
-    expected.last << Block::Raw.new(" \t\nPOST ")
+    expected.last << Block::RawNode.new(" \t\nPOST ")
 
     template.root.children.should eq expected
   end
@@ -136,9 +136,9 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    expected << Block::Raw.new(" PRE \t\n")
+    expected << Block::RawNode.new(" PRE \t\n")
     expected << Block::If.new("if a == true ")
-    expected.last << Block::Raw.new("POST ")
+    expected.last << Block::RawNode.new("POST ")
 
     template.root.children.should eq expected
   end
@@ -148,9 +148,9 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    expected << Block::Raw.new(" PRE")
+    expected << Block::RawNode.new(" PRE")
     expected << Block::Assign.new("assign mavar = 12")
-    expected << Block::Raw.new(" \t\nPOST ")
+    expected << Block::RawNode.new(" \t\nPOST ")
 
     template.root.children.should eq expected
   end
@@ -160,9 +160,9 @@ describe Parser do
     template = Liquid::Parser.parse txt
 
     expected = [] of Block::Node
-    expected << Block::Raw.new(" PRE \t\n")
+    expected << Block::RawNode.new(" PRE \t\n")
     expected << Block::Assign.new("assign mavar = 12")
-    expected << Block::Raw.new("POST ")
+    expected << Block::RawNode.new("POST ")
 
     template.root.children.should eq expected
   end

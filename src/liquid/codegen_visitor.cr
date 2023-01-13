@@ -49,8 +49,8 @@ module Liquid
       node.children.each &.accept self
     end
 
-    def visit(node : Block::Raw)
-      to_io %(Liquid::Block::Raw.new("#{escape node.content}"))
+    def visit(node : Block::RawNode)
+      to_io %(Liquid::Block::RawNode.new("#{escape node.content}"))
     end
 
     def visit(node : Assign)
