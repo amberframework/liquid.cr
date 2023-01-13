@@ -16,8 +16,7 @@ class GoldenTest
     vars = @context.as_h?
     raise "Bad context: #{@context.to_s}" if vars.nil?
 
-    ctx = Context.new
-    ctx.strict = @strict
+    ctx = Context.new(@strict ? Context::ErrorMode::Strict : Context::ErrorMode::Lax)
     vars.each do |key, value|
       ctx.set(key.as_s, yaml_any_to_liquid_any(value))
     end
@@ -82,13 +81,14 @@ end
 # Tests here use the Golden Liquid tests (https://github.com/jg-rp/golden-liquid) described at golden_liquid.yaml file.
 describe "Golden Liquid Tests" do
   i = 1
+  skip_pending_tests = ENV["SKIP_PENDING"]?
   GoldenLiquid.from_yaml(File.read(File.join(__DIR__, "golden_liquid.yaml"))).test_groups.each do |test_group|
     describe test_group.name do
       test_group.tests.each do |test|
         if PendingGold.pending?(test_group.name, test.name)
-          pending test.name, file: __FILE__, line: i
+          pending(test.name, line: i) unless skip_pending_tests
         else
-          it test.name, file: __FILE__, line: i do
+          it test.name, line: i do
             test.test!
           end
         end
