@@ -21,7 +21,7 @@ module Liquid::Filters
   class Downcase
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if (raw = data.raw) && raw.responds_to? :downcase
         Any.new raw.downcase
       else

@@ -28,7 +28,7 @@ module Liquid::Filters
   class Date
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)?) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise FilterArgumentException.new "date filter require an argument" unless args && args.size == 1
 
       format = if (arg = args.first.as_s?)

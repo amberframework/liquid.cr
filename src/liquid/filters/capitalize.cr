@@ -19,7 +19,7 @@ module Liquid::Filters
   class Capitalize
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise LiquidException.new("Unexpected argument for capitalize filter") if args && args.any?
 
       raw = data.raw

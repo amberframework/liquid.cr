@@ -30,7 +30,7 @@ module Liquid::Filters
   class Ceil
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise LiquidException.new("Unexpected argument for ceil filter") if args && args.any?
 
       if (raw = data.raw) && raw.is_a? Number

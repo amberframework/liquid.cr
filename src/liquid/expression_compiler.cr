@@ -12,11 +12,13 @@ module Liquid
     private FLOAT_LITERAL   = /-?\d+\.\d+/
     private BOOLEAN_LITERAL = /(true|false)\b/
     private FILTER          = /\|\s*([a-zA-Z_][\w-]+):?/
+    private FILTER_OPTION   = /([a-zA-Z_][\w-]+):/
 
     def self.compile(expr : String) : Array(ExpressionOpCode)
       opcodes = [] of ExpressionOpCode
       scanner = StringScanner.new(expr)
       calling_method = false
+      got_filter = false
 
       loop do
         scanner.skip(/\s*/)
@@ -30,6 +32,13 @@ module Liquid
           opcodes << ExpressionOpCode.new(:push_literal, value == "true")
         elsif value = scanner.scan(OPERATOR)
           opcodes << ExpressionOpCode.new(:operator, value)
+        elsif scanner.scan(FILTER)
+          got_filter = true
+          opcodes << ExpressionOpCode.new(:filter, scanner[1])
+        elsif scanner.scan(FILTER_OPTION)
+          raise InvalidExpression.new("Unexpected filter option: #{scanner[0]}") unless got_filter
+
+          opcodes << ExpressionOpCode.new(:filter_option, scanner[1])
         elsif value = scanner.scan(IDENTIFIER)
           if calling_method
             calling_method = false
@@ -37,8 +46,6 @@ module Liquid
           else
             opcodes << ExpressionOpCode.new(:push_var, value)
           end
-        elsif scanner.scan(FILTER)
-          opcodes << ExpressionOpCode.new(:filter, scanner[1])
         else
           next_char = expr[scanner.offset]
           case next_char

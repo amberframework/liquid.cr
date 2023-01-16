@@ -4,7 +4,7 @@ module Liquid::Filters
   class Last
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if (d = data.as_a?) && !d.empty?
         d.last
       else

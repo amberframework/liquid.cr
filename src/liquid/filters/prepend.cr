@@ -23,7 +23,7 @@ module Liquid::Filters
   class Prepend
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       return data if args.nil? || args.empty?
 
       Any.new(args.first.to_s + data.to_s)

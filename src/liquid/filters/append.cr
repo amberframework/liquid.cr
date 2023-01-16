@@ -22,7 +22,7 @@ module Liquid::Filters
   class Append
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)?) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise LiquidException.new("Missing argument for append filter") if args.nil? || args.empty?
       raise LiquidException.new("Too many arguments for append filter") if args.size > 1
 

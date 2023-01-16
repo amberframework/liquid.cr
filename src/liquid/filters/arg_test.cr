@@ -4,7 +4,7 @@ module Liquid::Filters
   class ArgTest
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if (a = args)
         Any.new(a.map(&.to_s).join(", "))
       else

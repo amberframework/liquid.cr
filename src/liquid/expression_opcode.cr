@@ -7,6 +7,7 @@ module Liquid
       IndexCall   # Like in var[index]
       Operator    # ==, >=, <=, <, >, !=, contains, or, and
       Filter
+      FilterOption
     end
 
     getter action : Action

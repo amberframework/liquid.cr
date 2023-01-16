@@ -13,7 +13,7 @@ module Liquid::Filters
   class Floor
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise LiquidException.new("Unexpected argument for floor filter") if args && args.any?
 
       if (raw = data.raw) && raw.is_a? Number

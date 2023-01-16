@@ -23,6 +23,7 @@ module Liquid
       And
       Or
       Filter
+      FilterOption
 
       def self.from_string(str : String) : self
         case str
@@ -70,7 +71,11 @@ module Liquid
       value = ctx[@expression]?
       return value if value
 
-      stack = Stack.new
+      # Once a filter is detected, filter_stack is instantiated and we point the `stack` variable to it.
+      # Later we solve the code_stack, then apply the filters in filter_stack.
+      stack = code_stack = Stack.new
+      filter_stack = nil
+
       @opcodes.each do |opcode|
         case opcode.action
         in .push_var?
@@ -87,7 +92,13 @@ module Liquid
         in .operator?
           stack.push(Operator.from_string(opcode.value.as_s))
         in .filter?
+          stack = filter_stack = Stack.new if filter_stack.nil?
           stack.push(Operator::Filter)
+          stack.push(opcode.value)
+        in .filter_option?
+          return raise?(ctx) { "Unexpected filter option: #{opcode.value}." } if filter_stack.nil?
+
+          stack.push(Operator::FilterOption)
           stack.push(opcode.value)
         in .call?
           obj = stack.pop.as(Any)
@@ -106,80 +117,83 @@ module Liquid
           stack.push(retval)
         end
       end
-      case stack.size
-      when 0 then raise?(ctx) { "Empty expression." }
-      when 1 then stack.first.as(Any)
-      when 2 then raise?(ctx) { "Bad values left on stack." }
-      else
-        apply_operators(ctx, stack)
-      end
+
+      return raise?(ctx) { "Empty expression." } if code_stack.empty?
+      return raise?(ctx) { "Bad values left on stack." } if code_stack.size == 2 || !code_stack.first.is_a?(Any)
+
+      result = code_stack.size == 1 ? code_stack.first.as(Any) : apply_operators(ctx, code_stack)
+      apply_filters(ctx, result, filter_stack)
     end
 
     def apply_operators(ctx : Context, stack : Stack) : Any
-      filters_start = stack.index { |e| e.is_a?(Operator) && e.filter? }
-      filters = stack.pop(stack.size - filters_start) if filters_start
-
       while stack.size >= 3
-        result = apply_binary_operator(stack)
+        result = apply_binary_operator(ctx, stack)
         stack << result
       end
-      return raise?(ctx) { "Too many items left on stack." } if stack.size != 1
+      return raise?(ctx) { "Bad values left on stack." } if stack.size != 1
 
       result = stack.first.as?(Any)
       return raise?(ctx) { "Bad values left on stack." } if result.nil?
 
-      return result if filters.nil?
+      result
+    end
 
-      apply_filters(ctx, result, filters)
+    private def apply_binary_operator(ctx : Context, stack : Stack) : Any
+      right_operand = stack.pop
+      operator = stack.pop
+      left_operand = stack.pop
+      return raise?(ctx) { "Unexpected operator: #{operator}." } unless operator.is_a?(Operator)
+      return raise?(ctx) { "Unexpected left operand: #{left_operand}." } unless left_operand.is_a?(Any)
+      return raise?(ctx) { "Unexpected right operand: #{right_operand}." } unless right_operand.is_a?(Any)
+
+      result = operator.eval(left_operand, right_operand)
+      Any.new(result)
     rescue e : InvalidExpression
       raise?(ctx, e)
     end
 
-    private def apply_binary_operator(stack : Stack) : Any
-      right_operand = stack.pop
-      operator = stack.pop
-      left_operand = stack.pop
-      raise LiquidException.new("Unexpected operator: #{operator}.") unless operator.is_a?(Operator)
-      raise LiquidException.new("Unexpected left operand: #{left_operand}.") unless left_operand.is_a?(Any)
-      raise LiquidException.new("Unexpected right operand: #{right_operand}.") unless right_operand.is_a?(Any)
+    private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack?) : Any
+      return operand if filter_stack.nil?
 
-      result = operator.eval(left_operand, right_operand)
-      Any.new(result)
-    end
-
-    private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack) : Any
       while filter_stack.any?
-        filter_operator = filter_stack.shift
-        if !filter_operator.is_a?(Operator) || !filter_operator.filter?
-          raise LiquidException.new("Expected a filter, got #{filter_operator}.")
-        end
+        item = filter_stack.shift
+        return raise?(ctx) { "Expected a filter, got #{item}." } if !item.is_a?(Operator) || !item.filter?
 
-        filter_name = filter_stack.shift
-        if !filter_name.is_a?(Any) || !filter_name.raw.is_a?(String)
-          raise LiquidException.new("Expected a filter name, got #{filter_name}.")
-        end
+        item = filter_stack.shift?
+        return raise?(ctx) { "Expected a filter name, got #{item}." } unless item.is_a?(Any)
 
-        filter_args = shift_filter_args(filter_stack)
-
-        filter = Filters::FilterRegister.get(filter_name.as_s)
+        filter_name = item.as_s
+        filter = Filters::FilterRegister.get(filter_name)
         return raise?(ctx) { "Unknown filter: #{filter_name}." } if filter.nil?
 
-        filter_args ||= [] of Any # FIXME: Some filters doesn't compile if args is nil, probably because old
-        # expression implementation was always sending an array.
-        operand = filter.filter(operand, filter_args)
+        setup_context_filter_args_and_options(ctx, filter_stack)
+        operand = filter.filter(operand, ctx.filter_args, ctx.filter_options)
       end
 
       operand
     end
 
-    private def shift_filter_args(filter_stack : Stack) : Array(Any)?
-      return if filter_stack.empty? || filter_stack.first.is_a?(Operator)
+    private def setup_context_filter_args_and_options(ctx : Context, stack : Stack) : Nil
+      ctx.reset_filter_context
 
-      filter_args = Array(Any).new
-      while filter_stack.any? && filter_stack.first.is_a?(Any)
-        filter_args << filter_stack.shift.as(Any)
+      filter_args = ctx.filter_args
+      filter_options = ctx.filter_options
+
+      while stack.any?
+        item = stack.first
+        return if item.is_a?(Operator) && item.filter?
+
+        stack.shift
+        if item.is_a?(Any)
+          filter_args << item
+        elsif item.is_a?(Operator)
+          name = stack.shift?.as?(Any)
+          value = stack.shift?.as?(Any)
+          return raise?(ctx) { "Missing filter option name or value." } if name.nil? || value.nil?
+
+          filter_options[name.to_s] = value
+        end
       end
-      filter_args
     end
 
     private def call_index(ctx : Context, any : Any, index : Any) : Any

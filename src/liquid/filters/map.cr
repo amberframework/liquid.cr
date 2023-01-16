@@ -6,7 +6,7 @@ module Liquid::Filters
   class Map
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       # raise error if user doesn't provide an argument to divided by
       raise FilterArgumentException.new "map filter expects one argument" unless args && args.first?
 

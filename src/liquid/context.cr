@@ -10,6 +10,12 @@ module Liquid
     end
 
     @data = Hash(String, Any).new
+
+    # :nodoc:
+    # These values are used/reused when calling filters in a expression using this context.
+    protected getter filter_args = Array(Any).new
+    protected getter filter_options = Hash(String, Any).new(Any.new)
+
     property error_mode : ErrorMode
     getter errors = Array(String).new
 
@@ -30,6 +36,11 @@ module Liquid
     private def add_builtins
       self["empty"] = [] of Any
       self["blank"] = Blank.new
+    end
+
+    protected def reset_filter_context
+      @filter_args.clear
+      @filter_options.clear
     end
 
     @[Deprecated("Use `#error_mode` instead.")]

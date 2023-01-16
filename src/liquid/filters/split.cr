@@ -23,7 +23,7 @@ module Liquid::Filters
   class Split
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if (raw = data.raw) && raw.responds_to?(:split) &&
          args && (fa = args.first?) && (arg = fa.as_s?)
         Any.new(raw.split(arg).map { |s| Any.new(s) })

@@ -29,7 +29,7 @@ module Liquid::Filters
       '\'' => "&#39;",
     }
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if data.raw.responds_to? :to_s
         str = data.to_s
 

@@ -4,7 +4,7 @@ module Liquid::Filters
   class Plus
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       # raise error if user doesn't provide an argument to subtract by
       raise FilterArgumentException.new "plus filter expects one argument" unless args && args.first?
 
