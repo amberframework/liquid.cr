@@ -78,7 +78,6 @@ liquid.golden.divided_by_filter too many args
 liquid.golden.divided_by_filter undefined argument
 liquid.golden.divided_by_filter undefined left value
 liquid.golden.divided_by_filter zero divided by integer
-liquid.golden.downcase_filter unexpected argument
 liquid.golden.echo_tag access an array item by index
 liquid.golden.echo_tag access an array item by negative index
 liquid.golden.echo_tag access an undefined variable by index
