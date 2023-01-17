@@ -1,6 +1,18 @@
 require "./spec_helper"
 
 describe Template do
+  it_renders("{% assign i = 1 %}{% assign i = i | prepend: 0 %}{{ i }}", "01")
+  it_renders("{% assign i = 1 %}{% assign i = i | append: 0 %}{{ i }}", "10")
+
+  # blank literal
+  it_renders("{% if '' == blank %}blank{% endif %}", "blank")
+  it_renders("{% if '' != blank %}blank{% endif %}", "")
+  it_renders("{% if a == blank %}blank{% endif %}", "blank")
+  it_renders("{% if 'a' == blank %}blank{% endif %}", "")
+  it_renders("{% if 'a' != blank %}noblank{% endif %}", "noblank")
+  it_renders("{% if '' > blank %}blank{% endif %}", "")
+  it_renders("{% assign a = '' | split %}{% if a == blank %}blank{% endif %}", "blank")
+
   it "should render raw text" do
     tpl = Parser.parse("raw text")
     template_path = __DIR__
@@ -36,9 +48,9 @@ describe Template do
 
   it "should render for loop with loop variable" do
     tpl = Parser.parse("{% for x in 0..2 %}
-    Iteration n°{{ loop.index }}
+    Iteration n°{{ forloop.index }}
     {% endfor %}")
-    tpl.render(Context.new).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
+    tpl.render(Context.new(:strict)).should eq "\n    Iteration n°1\n    \n    Iteration n°2\n    \n    Iteration n°3\n    "
   end
 
   it "should render for loop when iterating over an array" do
@@ -62,18 +74,6 @@ describe Template do
     tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => ["val3a", "val3b"])
   end
 
-  # it "should render for loop when iterating over a hash by key, value" do
-  #   tpl = Parser.parse <<-EOT
-  #   {%- for k, v in myhash -%}
-  #     Got : {{k}} => {{v}}
-  #   {%- endfor -%}
-  #   EOT
-
-  #   ctx = Context.new
-  #   ctx.set("myhash", {"key1" => 1, "key2" => "val2", "key3" => ["val3a", "val3b"]})
-  #   tpl.render(ctx).should eq %(Got : key1 => 1Got : key2 => val2Got : key3 => [\"val3a\", \"val3b\"])
-  # end
-
   it "should render case statement without an else option" do
     tpl = Parser.parse("{% case var %}{% when \"here\" %}We are here{% when \"there\" %}We are there{% endcase %}")
     ctx = Context.new
@@ -94,6 +94,25 @@ describe Template do
     tpl.render(ctx).should eq "We are somewhere"
     ctx.set("var", "")
     tpl.render(ctx).should eq "We are somewhere"
+  end
+
+  it "should render case statement with strip" do
+    tpl = Parser.parse <<-EOT
+    Hey...
+    {%- case var %}
+    {% when "here" -%}
+    We are here
+    {%- else -%}
+    We are somewhere
+    {%- endcase %}
+    EOT
+    ctx = Context.new
+    ctx.set("var", "here")
+    tpl.render(ctx).should eq "Hey...We are here"
+    ctx.set("var", "there")
+    tpl.render(ctx).should eq "Hey...We are somewhere"
+    ctx.set("var", "")
+    tpl.render(ctx).should eq "Hey...We are somewhere"
   end
 
   it "should render if statement" do
@@ -144,9 +163,7 @@ describe Template do
     {% endif %}
     "
     ctx = Context.new
-    ctx.set "kenny.sick", false
-    ctx.set "kenny.dead", true
-    ctx.set "kenny.state", "dead"
+    ctx.set("kenny", Any{"sick" => false, "dead" => true})
 
     tpl = Parser.parse txt
     result = tpl.render ctx
@@ -165,36 +182,11 @@ describe Template do
     EOT
 
     ctx = Context.new
-    ctx.set "kenny.state", "dead"
+    ctx.set("kenny", Any{"state" => "dead"})
 
     tpl = Parser.parse txt
     result = tpl.render ctx
     result.should eq "You killed Kenny!  You bastard!!!"
-  end
-
-  it "should render if statement - variant 3" do
-    txt = <<-EOT
-    {%- if mykey? -%}
-      Key present
-    {%- else -%}
-      Key absent
-    {%- endif -%}
-    {%- if !mykey? -%}
-      Key absent
-    {%- else -%}
-      Key present
-    {%- endif -%}
-    EOT
-
-    ctx = Context.new(strict: true)
-
-    tpl = Parser.parse txt
-    result = tpl.render ctx
-    result.should eq "Key absentKey absent"
-
-    ctx["mykey"] = true
-    result = tpl.render ctx
-    result.should eq "Key presentKey present"
   end
 
   it "should render captured variables" do
@@ -226,6 +218,11 @@ describe Template do
 
     tpl = Parser.parse "{% assign var = 12.5%}{{var}}"
     tpl.render(Context.new).should eq "12.5"
+  end
+
+  it "should render assigned variable with filters" do
+    tpl = Parser.parse "{%   assign var  =  \"abc\" | upcase%}{{var}}"
+    tpl.render(Context.new).should eq "ABC"
   end
 
   it "should render abs filters" do
@@ -360,12 +357,12 @@ describe Template do
     tpl = Template.parse %({{ missing }}{{ obj.missing }})
     tpl.render(ctx).should eq ""
 
-    ctx.strict = true
-    expect_raises(KeyError) { tpl.render(ctx) }
+    ctx.error_mode = :strict
+    expect_raises(InvalidExpression) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = Any{"something" => "something"} # still didn't define "missing"
-    expect_raises(KeyError) { tpl.render(ctx) }
+    expect_raises(InvalidExpression) { tpl.render(ctx) }
 
     ctx["missing"] = "present"
     ctx["obj"] = Any{"something" => "something", "missing" => "present"}
@@ -374,7 +371,7 @@ describe Template do
 
   it "filter should receive all args, in order" do
     ctx = Context.new
-    tpl = Template.parse %({{ "" | arg_test: '1', "2", 3, 4.0, [5] }})
-    tpl.render(ctx).should eq "1, 2, 3, 4.0, [5]"
+    tpl = Template.parse %({{ "" | arg_test: '1', "2", 3, 4.0, 5 }})
+    tpl.render(ctx).should eq "1, 2, 3, 4.0, 5"
   end
 end

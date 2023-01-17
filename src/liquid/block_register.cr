@@ -6,7 +6,7 @@ class Liquid::BlockRegister
     @@inner["end#{name}"] = Liquid::Block::EndBlock if has_end
   end
 
-  def self.for_name(name : String)
-    @@inner[name]
+  def self.for_name(name : String) : Liquid::Block?
+    @@inner[name]?
   end
 end

@@ -2,24 +2,15 @@ require "./block"
 
 module Liquid::Block
   class ElsIf < InlineBlock
-    SIMPLE_EXP = /^\s*elsif (?<expr>.+)\s*$/
+    getter expression : Expression
 
-    getter if_expression
-    @if_expression : Expression
-
-    def initialize(@if_expression)
+    def initialize(@expression)
     end
 
     def initialize(content : String)
-      if match = content.match SIMPLE_EXP
-        @if_expression = Expression.new match["expr"]
-      else
-        raise InvalidNode.new "Invalid Elsif Node"
-      end
+      @expression = Expression.new(content)
     end
 
-    def eval(data)
-      @if_expression.eval data
-    end
+    delegate eval, to: @expression
   end
 end

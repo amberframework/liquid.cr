@@ -2,24 +2,29 @@ require "./block"
 
 module Liquid::Block
   class When < InlineBlock
-    SIMPLE_EXP = /^\s*when \s*(["'])(\\\1|[^\1]+)*\1/
-
-    getter when_values
-    @when_values : Array(String)
-
-    def initialize(@when_values)
-    end
+    @when_expressions : Array(Expression)
 
     def initialize(content : String)
-      if match = content.match(SIMPLE_EXP)
-        @when_values = match[2].gsub("\"", "").gsub("'", "").split(/\s*,\s*/).map { |value| value.strip }
-      else
-        raise InvalidNode.new("Invalid When Node")
+      @when_expressions = Array(Expression).new
+
+      scanner = StringScanner.new(content)
+      while expr = scanner.scan(/("[^"]*"|'[^']*'|(?:\w|\.)+)/)
+        @when_expressions << Expression.new(expr)
+        break unless scanner.scan(/\s*(?:,|or)\s*/)
+      end
+
+      raise SyntaxError.new("No expression for When tag") if @when_expressions.empty?
+    end
+
+    # Return the number of matches in when clause
+    def match?(ctx : Context, value : Any) : Int32
+      @when_expressions.count do |expr|
+        expr.eval(ctx) == value
       end
     end
 
-    def eval(data)
-      @when_values.includes?(data)
+    def inspect(io : IO)
+      inspect(io) { io << @when_expressions.map(&.inspect).join(", ") }
     end
   end
 end

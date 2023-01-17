@@ -21,7 +21,7 @@ module Liquid::Filters
   class Escape
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if data.raw.responds_to? :to_s
         Any.new HTML.escape data.to_s
       else

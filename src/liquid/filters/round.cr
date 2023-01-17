@@ -4,7 +4,7 @@ module Liquid::Filters
   class Round
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if (raw = data.raw) && raw.is_a?(Float)
         if args && (first = args.first?) && first.raw.is_a?(Number)
           Any.new self.round_to(raw, first)

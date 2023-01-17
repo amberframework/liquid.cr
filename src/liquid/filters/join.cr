@@ -16,7 +16,7 @@ module Liquid::Filters
   class Join
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if args && (tmp = args.first?) && (arg = tmp.as_s?) && (d = data.as_a?)
         Any.new d.join(arg)
       else

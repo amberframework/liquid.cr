@@ -1,20 +1,10 @@
 require "../visitor"
 
 module Liquid::Block
-  enum BlockType
-    Inline
-    Begin
-    End
-    Raw
-    RawHidden
-  end
-
-  abstract def type : BlockType
-
   abstract class Node
-    getter children
-    @children : Array(Node)
-    @children = Array(Node).new
+    getter children = Array(Node).new
+    property? rstrip = false
+    property? lstrip = false
 
     abstract def initialize(content : String)
 
@@ -27,6 +17,21 @@ module Liquid::Block
     end
 
     def_equals @children
+
+    def inspect(io : IO)
+      inspect(io) do
+      end
+    end
+
+    protected def inspect(io : IO)
+      io << '<'
+      io << '-' if lstrip?
+      io << ' '
+      io << self.class.name.gsub(/(\w*::)*/, "") << ' '
+      yield
+      io << '-' if rstrip?
+      io << '>'
+    end
   end
 
   class Root < Node
@@ -39,41 +44,19 @@ module Liquid::Block
 
   abstract class InlineBlock < Node
     extend Block
-
-    def self.type : BlockType
-      BlockType::Inline
-    end
   end
 
   abstract class BeginBlock < Node
     extend Block
-
-    def self.type : BlockType
-      BlockType::Begin
-    end
   end
 
-  abstract class EndBlock < Node
+  class EndBlock < Node
     extend Block
 
-    def self.type : BlockType
-      BlockType::End
+    def initialize(content)
     end
-  end
 
-  abstract class RawBlock < Node
-    extend Block
-
-    def self.type : BlockType
-      BlockType::Raw
-    end
-  end
-
-  abstract class RawHiddenBlock < Node
-    extend Block
-
-    def self.type : BlockType
-      BlockType::RawHidden
+    def initialize
     end
   end
 end

@@ -35,7 +35,7 @@ module Liquid::Block
           end
         end
       else
-        raise InvalidNode.new "Invalid assignment Node"
+        raise SyntaxError.new "Invalid include Node"
       end
     end
   end

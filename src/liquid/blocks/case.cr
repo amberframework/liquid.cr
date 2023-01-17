@@ -1,41 +1,33 @@
 require "./block"
 require "./else"
-require "./expression"
+require "../expression"
 require "./when"
 
 module Liquid::Block
   class Case < BeginBlock
-    SIMPLE_EXP = /^\s*case (?<expr>.+)\s*$/
-
     enum PutInto
       Case
       When
       Else
     end
 
-    getter :case, :case_expression, :else, :when
-
-    @case_expression : Expression?
-    @when : Array(When)?
-    @else : Else?
+    getter expression : Expression
+    getter when : Array(When)?
+    getter else : Else?
 
     @last = PutInto::Case
 
-    def initialize(@case_expression)
+    def initialize(@expression)
     end
 
     def initialize(content : String)
-      if match = content.strip.match SIMPLE_EXP
-        @case_expression = Expression.new match["expr"]
-      else
-        raise InvalidNode.new "Invalid case node"
-      end
+      @expression = Expression.new(content)
     end
 
     def <<(node : Node)
       case @last
       when PutInto::Case
-        @children << node
+        # Probbly white space between {% case %} and {% when %}
       when PutInto::When
         @when.not_nil!.last << node
       when PutInto::Else
@@ -44,17 +36,21 @@ module Liquid::Block
     end
 
     def <<(node : When)
-      raise InvalidNode.new "When statement must preceed Else!" if @else
+      raise SyntaxError.new("When statement must preceed Else!") if @else
       @when ||= Array(When).new
       @when.not_nil! << node
       @last = PutInto::When
     end
 
     def <<(node : Else)
-      raise InvalidNode.new "Multiple Else in Case statement!" if @else
-      raise InvalidNode.new "Else without When in Case statement!" unless @last == PutInto::When
+      raise SyntaxError.new("Multiple Else in Case statement!") if @else
+
       @else = node
       @last = PutInto::Else
+    end
+
+    def inspect(io : IO)
+      inspect(io) { io << @expression.expression.inspect }
     end
 
     def_equals @when, @else, @children

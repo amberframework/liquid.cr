@@ -22,10 +22,15 @@ module Liquid
     def initialize(@root : Block::Root, @template_path : String)
     end
 
-    def render(data, io = IO::Memory.new)
+    def render(data, io : IO) : Nil
       visitor = RenderVisitor.new data, io, @template_path
       visitor.visit @root
-      visitor.output
+    end
+
+    def render(ctx : Context) : String
+      io = IO::Memory.new
+      render(ctx, io)
+      io.to_s
     end
 
     def to_code(io_name : String, io : IO = IO::Memory.new, context : String? = nil)

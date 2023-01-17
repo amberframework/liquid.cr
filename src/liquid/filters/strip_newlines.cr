@@ -18,7 +18,7 @@ module Liquid::Filters
   class StripNewLines
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)?) : Any
       if data.raw.responds_to? :to_s
         Any.new data.raw.to_s.gsub /\r?\n/, ""
       else

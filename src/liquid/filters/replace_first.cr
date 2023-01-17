@@ -5,7 +5,7 @@ module Liquid::Filters
   class ReplaceFirst
     extend Filter
 
-    def self.filter(data : Any, args : Array(Any)? = nil) : Any
+    def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       if args && (first = args.first?) && (second = args[1]?) &&
          (from = first.as_s?) && (to = second.as_s?) && (d = data.as_s?)
         Any.new d.sub from, to
