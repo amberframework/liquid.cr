@@ -410,7 +410,6 @@ liquid.golden.uniq_filter left value is not an array
 liquid.golden.uniq_filter too many arguments
 liquid.golden.uniq_filter unhashable items
 liquid.golden.unless_tag blocks that contain only whitespace are not rendered
-liquid.golden.upcase_filter unexpected argument
 liquid.golden.url_decode_filter not a string
 liquid.golden.url_decode_filter some special URL characters
 liquid.golden.url_decode_filter unexpected argument
