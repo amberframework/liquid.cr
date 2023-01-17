@@ -31,6 +31,11 @@ module Liquid
     def call(method : String) : Liquid::Any
       raise Liquid::InvalidExpression.new("Method #{method} not found for #{self.class.name}.")
     end
+
+    # Alias to `#call`.
+    def [](method : String) : Liquid::Any
+      call(method)
+    end
   end
 end
 
