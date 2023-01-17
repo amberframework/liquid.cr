@@ -66,18 +66,6 @@ liquid.golden.date_filter well formed string
 liquid.golden.decrement_tag increment and decrement named counter
 liquid.golden.decrement_tag named counter
 liquid.golden.default_filter missing argument
-liquid.golden.divided_by_filter arg string not a number
-liquid.golden.divided_by_filter integer division
-liquid.golden.divided_by_filter integer value and integer arg
-liquid.golden.divided_by_filter issue
-liquid.golden.divided_by_filter left value is an empty string
-liquid.golden.divided_by_filter not a string, int or float
-liquid.golden.divided_by_filter string not a number
-liquid.golden.divided_by_filter string value and argument
-liquid.golden.divided_by_filter too many args
-liquid.golden.divided_by_filter undefined argument
-liquid.golden.divided_by_filter undefined left value
-liquid.golden.divided_by_filter zero divided by integer
 liquid.golden.downcase_filter unexpected argument
 liquid.golden.echo_tag access an array item by index
 liquid.golden.echo_tag access an array item by negative index
