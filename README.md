@@ -161,21 +161,19 @@ Or on an existing Context:
 ctx.error_mode = :strict
 ```
 
-Raises `Liquid::InvalidExpression` on missing keys or `IndexError` on array out of bounds errors instead of silently emitting `nil`.
+Raises `Liquid::InvalidExpression` on missing keys and silently emit `nil` on array out of bounds.
 
 Append `?` to emit nil in strict mode (very simplistic, just checks for `?` at the end of the identifier)
 
 ```crystal
-ctx = Liquid::Context.new(strict: true)
+ctx = Liquid::Context.new(:strict)
 ctx["obj"] = { something: "something" }
 ```
 
 ```liquid
-{{ missing }}          -> KeyError
-{{ missing? }}         -> nil
-{{ obj.missing }}      -> KeyError
-{{ obj.missing? }}     -> nil
-{{ missing.missing? }} -> nil
+{{ missing }}          -> nil, but generates a UndefinedVariable errors if not in Lax mode.
+{{ obj.missing }}      -> InvalidExpression
+{{ missing.missing? }} -> generates a UndefinedVariable error, evaluates `missing` to nil then raises a InvalidExpression due to `nil.missing` call.
 ```
 
 ## Contributing

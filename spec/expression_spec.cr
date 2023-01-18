@@ -51,8 +51,6 @@ private def it_raises(exception, message : String, expr : String, ctx : Context,
 end
 
 describe Expression do
-  it_raises(InvalidExpression, "Variable \"bar\" not found", "bar", Context.new(:strict))
-
   it_evaluates("foo", Context{"foo" => 42}, 42)
   it_evaluates("foo.blank?", Context{"foo" => ""}, true)
   it_evaluates("foo.size", Context{"foo" => Any.new("123")}, 3)

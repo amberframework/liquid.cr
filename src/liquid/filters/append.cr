@@ -23,8 +23,8 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      raise LiquidException.new("Missing argument for append filter") if args.nil? || args.empty?
-      raise LiquidException.new("Too many arguments for append filter") if args.size > 1
+      raise FilterArgumentException.new("Missing argument for append filter") if args.nil? || args.empty?
+      raise FilterArgumentException.new("Too many arguments for append filter") if args.size > 1
 
       Any.new(data.to_s + args.first.to_s)
     end
