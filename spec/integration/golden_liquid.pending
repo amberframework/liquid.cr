@@ -64,6 +64,7 @@ liquid.golden.date_filter well formed string
 liquid.golden.decrement_tag increment and decrement named counter
 liquid.golden.decrement_tag named counter
 liquid.golden.default_filter missing argument
+liquid.golden.downcase_filter unexpected argument
 liquid.golden.divided_by_filter arg string not a number
 liquid.golden.divided_by_filter integer division
 liquid.golden.divided_by_filter integer value and integer arg

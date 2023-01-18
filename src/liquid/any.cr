@@ -259,6 +259,23 @@ module Liquid
       Any.new(-raw)
     end
 
+    def as_number : Number
+      as_number? || 0
+    end
+
+    def as_number?
+      raw = @raw
+      if raw.is_a?(Number)
+        raw
+      elsif raw.is_a?(String)
+        raw.to_i? || raw.to_f? || nil
+      elsif raw.responds_to?(:to_number)
+        raw.to_number
+      else
+        nil
+      end
+    end
+
     def to_s(io : IO) : Nil
       @raw.to_s(io)
     end

@@ -106,7 +106,7 @@ describe Filters do
 
   describe DividedBy do
     it "should divide Number's by the appropriate value and not matching 0" do
-      DividedBy.filter(Any.new(10), Array{Any.new 4}).should eq 2.5
+      DividedBy.filter(Any.new(10), Array{Any.new 4}).should eq 2
       DividedBy.filter(Any.new(10), Array{Any.new 4.0}).should eq 2.5
       DividedBy.filter(Any.new(10.0), Array{Any.new 4}).should eq 2.5
       DividedBy.filter(Any.new(10.0), Array{Any.new 4.0}).should eq 2.5
