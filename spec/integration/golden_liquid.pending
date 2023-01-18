@@ -41,8 +41,6 @@ liquid.golden.base64_url_safe_encode_filter from string
 liquid.golden.base64_url_safe_encode_filter from string with URL unsafe
 liquid.golden.base64_url_safe_encode_filter not a string
 liquid.golden.base64_url_safe_encode_filter unexpected argument
-liquid.golden.compact_filter array of objects with key property
-liquid.golden.compact_filter too many arguments
 liquid.golden.concat_filter left value contains non string
 liquid.golden.concat_filter left value is not array-like
 liquid.golden.concat_filter missing argument is an error
