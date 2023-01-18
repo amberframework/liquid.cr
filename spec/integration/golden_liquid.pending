@@ -41,8 +41,6 @@ liquid.golden.base64_url_safe_encode_filter from string
 liquid.golden.base64_url_safe_encode_filter from string with URL unsafe
 liquid.golden.base64_url_safe_encode_filter not a string
 liquid.golden.base64_url_safe_encode_filter unexpected argument
-liquid.golden.compact_filter array of objects with key property
-liquid.golden.compact_filter too many arguments
 liquid.golden.concat_filter left value contains non string
 liquid.golden.concat_filter left value is not array-like
 liquid.golden.concat_filter missing argument is an error
@@ -67,6 +65,18 @@ liquid.golden.decrement_tag increment and decrement named counter
 liquid.golden.decrement_tag named counter
 liquid.golden.default_filter missing argument
 liquid.golden.downcase_filter unexpected argument
+liquid.golden.divided_by_filter arg string not a number
+liquid.golden.divided_by_filter integer division
+liquid.golden.divided_by_filter integer value and integer arg
+liquid.golden.divided_by_filter issue
+liquid.golden.divided_by_filter left value is an empty string
+liquid.golden.divided_by_filter not a string, int or float
+liquid.golden.divided_by_filter string not a number
+liquid.golden.divided_by_filter string value and argument
+liquid.golden.divided_by_filter too many args
+liquid.golden.divided_by_filter undefined argument
+liquid.golden.divided_by_filter undefined left value
+liquid.golden.divided_by_filter zero divided by integer
 liquid.golden.echo_tag access an array item by index
 liquid.golden.echo_tag access an array item by negative index
 liquid.golden.echo_tag access an undefined variable by index
@@ -398,7 +408,6 @@ liquid.golden.uniq_filter left value is not an array
 liquid.golden.uniq_filter too many arguments
 liquid.golden.uniq_filter unhashable items
 liquid.golden.unless_tag blocks that contain only whitespace are not rendered
-liquid.golden.upcase_filter unexpected argument
 liquid.golden.url_decode_filter not a string
 liquid.golden.url_decode_filter some special URL characters
 liquid.golden.url_decode_filter unexpected argument

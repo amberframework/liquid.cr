@@ -13,8 +13,11 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)?) : Any
-      if (raw = data.raw) && raw.is_a? String
-        Any.new raw.as(String).upcase
+      raise FilterArgumentException.new("upcase filter expects no arguments.") if args.any?
+
+      raw = data.raw
+      if raw.responds_to?(:upcase)
+        Any.new(raw.upcase)
       else
         data
       end
