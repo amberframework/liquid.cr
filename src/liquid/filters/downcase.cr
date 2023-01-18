@@ -22,7 +22,10 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      if (raw = data.raw) && raw.responds_to? :downcase
+      raise FilterArgumentException.new("downcase filter expects no arguments.") if args.any?
+
+      raw = data.raw
+      if raw.responds_to?(:downcase)
         Any.new raw.downcase
       else
         data
