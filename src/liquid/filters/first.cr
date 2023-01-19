@@ -5,11 +5,16 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      if (d = data.as_a?) && !d.empty?
-        d.first
-      else
-        data
-      end
+      raw_data = data.raw
+      value = if raw_data.is_a?(Hash)
+                tuple = raw_data.first?
+                Any{*tuple} if tuple
+              elsif raw_data.responds_to?(:first?)
+                raw_data.first?
+              else
+                Any.new(nil)
+              end
+      value.is_a?(Any) ? value : Any.new(value)
     end
   end
 
