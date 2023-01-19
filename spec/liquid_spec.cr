@@ -27,14 +27,14 @@ describe Liquid::Context do
   it "does not raise for undefined variables on strict mode" do
     ctx = Context.new(:strict)
     ctx.get("missing").raw.should eq(nil)
-    ctx.errors.map(&.message).should eq([%(Liquid error: Variable "missing" not found.)])
+    ctx.errors.map(&.message).should eq([%(Liquid error: Undefined variable: "missing".)])
     ctx.errors.map(&.class).should eq([Liquid::UndefinedVariable])
   end
 
   it "store errors for undefined variables in warn mode" do
     ctx = Context.new(:warn)
     ctx.get("missing").raw.should eq(nil)
-    ctx.errors.map(&.message).should eq([%(Liquid error: Variable "missing" not found.)])
+    ctx.errors.map(&.message).should eq([%(Liquid error: Undefined variable: "missing".)])
     ctx.errors.map(&.class).should eq([Liquid::UndefinedVariable])
   end
 end

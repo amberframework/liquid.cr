@@ -24,7 +24,7 @@ module Liquid
   # This exception is never raised whatever the context error mode, to access it check `Context#errors`.
   class UndefinedVariable < InvalidExpression
     def initialize(var_name : String)
-      super("Variable \"#{var_name}\" not found.")
+      super("Undefined variable: \"#{var_name}\".")
     end
   end
 
