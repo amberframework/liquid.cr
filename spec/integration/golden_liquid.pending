@@ -15,6 +15,7 @@ liquid.golden.base64_url_safe_encode_filter from string
 liquid.golden.base64_url_safe_encode_filter from string with URL unsafe
 liquid.golden.base64_url_safe_encode_filter not a string
 liquid.golden.base64_url_safe_encode_filter unexpected argument
+liquid.golden.compact_filter left value is not an array
 liquid.golden.concat_filter left value contains non string
 liquid.golden.concat_filter left value is not array-like
 liquid.golden.concat_filter missing argument is an error
@@ -56,10 +57,6 @@ liquid.golden.echo_tag render a variable from the local namespace
 liquid.golden.echo_tag traverse variables with bracketed identifiers
 liquid.golden.escape_filter unexpected argument
 liquid.golden.escape_once_filter unexpected argument
-liquid.golden.first_filter empty left value
-liquid.golden.first_filter first of a hash
-liquid.golden.first_filter first of a string
-liquid.golden.first_filter left value is not an array
 liquid.golden.first_filter range literal first filter left value
 liquid.golden.for_tag access parentloop
 liquid.golden.for_tag blank empty loops
@@ -311,6 +308,7 @@ liquid.golden.special last of an array
 liquid.golden.special size of an object with a size property
 liquid.golden.split_filter argument not a string
 liquid.golden.split_filter missing argument
+liquid.golden.split_filter not a string
 liquid.golden.split_filter too many arguments
 liquid.golden.split_filter undefined argument
 liquid.golden.strip_filter unexpected argument

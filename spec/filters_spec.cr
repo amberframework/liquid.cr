@@ -146,7 +146,7 @@ describe Filters do
       a = Any{false, 1, "two"}
       empty = Any.new([] of Any)
       First.filter(a).should eq false
-      First.filter(empty).should eq empty
+      First.filter(empty).should eq nil
     end
   end
 
