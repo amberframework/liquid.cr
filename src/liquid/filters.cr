@@ -1,5 +1,7 @@
 require "./filters/base"
 require "./filters/abs"
+require "./filters/at_least"
+require "./filters/at_most"
 require "./filters/append"
 require "./filters/arg_test"
 require "./filters/capitalize"
