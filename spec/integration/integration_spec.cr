@@ -16,7 +16,9 @@ class GoldenTest
     vars = @context.as_h?
     raise "Bad context: #{@context.to_s}" if vars.nil?
 
-    ctx = Context.new(@strict ? Context::ErrorMode::Strict : Context::ErrorMode::Lax)
+    # Golden liquid run ruby tests with `render!`, that raises an exception on first error, this is the strict behavior
+    # of liquid crystal.
+    ctx = Context.new(@strict || @error ? Context::ErrorMode::Strict : Context::ErrorMode::Lax)
     vars.each do |key, value|
       ctx.set(key.as_s, yaml_any_to_liquid_any(value))
     end

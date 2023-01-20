@@ -3,23 +3,29 @@ require "./blank"
 
 module Liquid
   class Context
+    # Context error mode.
     enum ErrorMode
+      # Raise exceptions on any error but `UndefinedVariable`, that can be accessed later by `Context#errors`.
       Strict
+      # Like `Lax` mode, but the errors can be accessed later by `Context#errors`.
       Warn
+      # Do the best to render something without raising any exceptions.
       Lax
     end
 
-    @data = Hash(String, Any).new
+    @data : Hash(String, Any)
 
     # :nodoc:
     # These values are used/reused when calling filters in a expression using this context.
     protected getter filter_args = Array(Any).new
+    # :nodoc:
     protected getter filter_options = Hash(String, Any).new(Any.new)
 
     property error_mode : ErrorMode
-    getter errors = Array(String).new
+    # List of errors found when rendering using this context.
+    getter errors = Array(LiquidException).new
 
-    def initialize(@error_mode = :lax)
+    def initialize(@error_mode = :lax, @data = Hash(String, Any).new)
       add_builtins
     end
 
@@ -29,6 +35,7 @@ module Liquid
 
     @[Deprecated("Use `initialize(ErrorMode)` instead.")]
     def initialize(strict : Bool)
+      @data = Hash(String, Any).new
       @error_mode = strict ? ErrorMode::Strict : ErrorMode::Lax
       add_builtins
     end
@@ -54,24 +61,35 @@ module Liquid
       value
     end
 
+    protected def add_error(error : LiquidException) : Any
+      raise error if @error_mode.strict?
+
+      @errors << error if @error_mode.warn?
+      Any.new(nil)
+    end
+
+    protected def add_error(error : UndefinedVariable) : Any
+      @errors << error if @error_mode.warn? || @error_mode.strict?
+      Any.new(nil)
+    end
+
+    # Fetch a variable from context, add `UndefinedVariable` error if the variable isn't found and behave according the
+    # error mode.
     def get(var : String) : Any
       value = @data[var]?
       return value if value
 
-      if !@error_mode.lax?
-        error_message = "Variable \"#{var}\" not found."
-        raise InvalidExpression.new(error_message) if @error_mode.strict?
-
-        @errors << error_message if @error_mode.warn?
-      end
-
-      Any.new(nil)
+      add_error(UndefinedVariable.new(var))
     end
 
+    # Alias for `#get`
     def [](var : String) : Any
       get(var)
     end
 
+    # Fetch a variable from context and return nil if the variable isn't found.
+    #
+    # This doesn't trigger any exceptions or store any errors if the variable doesn't exists.
     def []?(var : String) : Any?
       @data[var]?
     end

@@ -96,7 +96,7 @@ module Liquid
           stack.push(Operator::Filter)
           stack.push(opcode.value)
         in .filter_option?
-          return raise?(ctx) { "Unexpected filter option: #{opcode.value}." } if filter_stack.nil?
+          return expression_error(ctx, "Unexpected filter option: #{opcode.value}.") if filter_stack.nil?
 
           stack.push(Operator::FilterOption)
           stack.push(opcode.value)
@@ -108,9 +108,9 @@ module Liquid
           index = stack.pop
           var = stack.pop
           if index.is_a?(Operator)
-            return raise?(ctx) { "Unexpected operator: #{index}." }
+            return expression_error(ctx, "Unexpected operator: #{index}.")
           elsif var.is_a?(Operator)
-            return raise?(ctx) { "Unexpected operator: #{var}." }
+            return expression_error(ctx, "Unexpected operator: #{var}.")
           end
 
           retval = call_index(ctx, var, index.as(Any))
@@ -118,8 +118,8 @@ module Liquid
         end
       end
 
-      return raise?(ctx) { "Empty expression." } if code_stack.empty?
-      return raise?(ctx) { "Bad values left on stack." } if code_stack.size == 2 || !code_stack.first.is_a?(Any)
+      return expression_error(ctx, "Empty expression.") if code_stack.empty?
+      return expression_error(ctx, "Bad values left on stack.") if code_stack.size == 2 || !code_stack.first.is_a?(Any)
 
       result = code_stack.size == 1 ? code_stack.first.as(Any) : apply_operators(ctx, code_stack)
       apply_filters(ctx, result, filter_stack)
@@ -130,10 +130,10 @@ module Liquid
         result = apply_binary_operator(ctx, stack)
         stack << result
       end
-      return raise?(ctx) { "Bad values left on stack." } if stack.size != 1
+      return expression_error(ctx, "Bad values left on stack.") if stack.size != 1
 
       result = stack.first.as?(Any)
-      return raise?(ctx) { "Bad values left on stack." } if result.nil?
+      return expression_error(ctx, "Bad values left on stack.") if result.nil?
 
       result
     end
@@ -142,14 +142,14 @@ module Liquid
       right_operand = stack.pop
       operator = stack.pop
       left_operand = stack.pop
-      return raise?(ctx) { "Unexpected operator: #{operator}." } unless operator.is_a?(Operator)
-      return raise?(ctx) { "Unexpected left operand: #{left_operand}." } unless left_operand.is_a?(Any)
-      return raise?(ctx) { "Unexpected right operand: #{right_operand}." } unless right_operand.is_a?(Any)
+      return expression_error(ctx, "Unexpected operator: #{operator}.") unless operator.is_a?(Operator)
+      return expression_error(ctx, "Unexpected left operand: #{left_operand}.") unless left_operand.is_a?(Any)
+      return expression_error(ctx, "Unexpected right operand: #{right_operand}.") unless right_operand.is_a?(Any)
 
       result = operator.eval(left_operand, right_operand)
       Any.new(result)
     rescue e : InvalidExpression
-      raise?(ctx, e)
+      ctx.add_error(e)
     end
 
     private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack?) : Any
@@ -157,20 +157,25 @@ module Liquid
 
       while filter_stack.any?
         item = filter_stack.shift
-        return raise?(ctx) { "Expected a filter, got #{item}." } if !item.is_a?(Operator) || !item.filter?
+        return expression_error(ctx, "Expected a filter, got #{item}.") if !item.is_a?(Operator) || !item.filter?
 
         item = filter_stack.shift?
-        return raise?(ctx) { "Expected a filter name, got #{item}." } unless item.is_a?(Any)
+        return expression_error(ctx, "Expected a filter name, got #{item}.") unless item.is_a?(Any)
 
         filter_name = item.as_s
         filter = Filters::FilterRegister.get(filter_name)
-        return raise?(ctx) { "Unknown filter: #{filter_name}." } if filter.nil?
+        return ctx.add_error(UndefinedFilter.new(filter_name)) if filter.nil?
 
         setup_context_filter_args_and_options(ctx, filter_stack)
         operand = filter.filter(operand, ctx.filter_args, ctx.filter_options)
       end
 
       operand
+    rescue e : Liquid::FilterArgumentException
+      ctx.add_error(e)
+
+      # Shopify liquid returns the filter error message instead of nil, so do we.
+      Any.new(e.message)
     end
 
     private def setup_context_filter_args_and_options(ctx : Context, stack : Stack) : Nil
@@ -189,7 +194,7 @@ module Liquid
         elsif item.is_a?(Operator)
           name = stack.shift?.as?(Any)
           value = stack.shift?.as?(Any)
-          return raise?(ctx) { "Missing filter option name or value." } if name.nil? || value.nil?
+          return expression_error(ctx, "Missing filter option name or value.") if name.nil? || value.nil?
 
           filter_options[name.to_s] = value
         end
@@ -201,12 +206,12 @@ module Liquid
       return call_hash_method(ctx, raw, index.as_s) if raw.is_a?(Hash)
       return call_drop_method(ctx, raw, index.as_s) if raw.is_a?(Drop)
 
-      return raise?(ctx) { "Tried to index a non-array object with \"#{index}\"." } unless raw.is_a?(Array)
+      return expression_error(ctx, "Tried to index a non-array object with \"#{index}\".") unless raw.is_a?(Array)
 
       i = index.as_i?
-      return raise?(ctx) { "Tried to index an array object with a #{raw.class.name}." } if i.nil?
+      return expression_error(ctx, "Tried to index an array object with a #{raw.class.name}.") if i.nil?
 
-      raw[i]? || raise?(ctx) { "\"Index out of bounds: #{i}." }
+      raw[i]? || Any.new(nil)
     end
 
     private def call_method(ctx : Context, obj : Any, method : String) : Any
@@ -215,7 +220,7 @@ module Liquid
       return call_hash_method(ctx, raw, method) if raw.is_a?(Hash)
       return call_nil_method(ctx, method) if raw.is_a?(Nil)
 
-      return raise?(ctx) { "Tried to call ##{method} on a #{raw.class.name}." } if !raw.responds_to?(:size)
+      return expression_error(ctx, "Tried to call ##{method} on a #{raw.class.name}.") if !raw.responds_to?(:size)
 
       case method
       when "present", "present?"
@@ -225,14 +230,14 @@ module Liquid
       when "size"
         Any.new(raw.size)
       else
-        raise?(ctx) { "Tried to access property \"#{method}\" of a non-hash/non-drop object." }
+        expression_error(ctx, "Tried to access property \"#{method}\" of a non-hash/non-drop object.")
       end
     end
 
     private def call_drop_method(ctx : Context, drop : Drop, method : String) : Any
       drop.call(method)
     rescue e : Liquid::InvalidExpression
-      raise?(ctx, e)
+      ctx.add_error(e)
     end
 
     private def call_hash_method(ctx : Context, hash : Hash, method : String) : Any
@@ -245,7 +250,7 @@ module Liquid
         Any.new(hash.size)
       else
         value = hash[method]?
-        return raise?(ctx) { "Method \"#{method}\" not found." } if value.nil?
+        return expression_error(ctx, "Method \"#{method}\" not found.") if value.nil?
 
         value
       end
@@ -258,24 +263,12 @@ module Liquid
       when "blank", "blank?"
         Any.new(true)
       else
-        raise?(ctx) { "Method \"#{method}\" not found for Nil." }
+        expression_error(ctx, "Method \"#{method}\" not found for Nil.")
       end
     end
 
-    private def raise?(ctx : Context) : Any
-      case ctx.error_mode
-      when .strict? then raise InvalidExpression.new(yield)
-      when .warn?   then ctx.errors << yield
-      end
-      Any.new(nil)
-    end
-
-    private def raise?(ctx : Context, exception : LiquidException) : Any
-      case ctx.error_mode
-      when .strict? then raise exception
-      when .warn?   then ctx.errors << exception.message.to_s
-      end
-      Any.new(nil)
+    def expression_error(ctx : Context, message : String)
+      ctx.add_error(InvalidExpression.new(message))
     end
 
     def to_s(io : IO)

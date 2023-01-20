@@ -12,6 +12,7 @@ describe Template do
   it_renders("{% if 'a' != blank %}noblank{% endif %}", "noblank")
   it_renders("{% if '' > blank %}blank{% endif %}", "")
   it_renders("{% assign a = '' | split %}{% if a == blank %}blank{% endif %}", "blank")
+  it_renders("{{ a[100] }}", "", Context.new(:strict, {"a" => Any{1, 2}}))
 
   it "should render raw text" do
     tpl = Parser.parse("raw text")
