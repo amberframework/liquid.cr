@@ -1,3 +1,5 @@
+# This CI job installs Crystal and shard dependencies, then executes `crystal spec` to run the test suite
+# More configuration options are available at https://crystal-lang.github.io/install-crystal/configurator.html
 name: build
 on:
   push:
@@ -7,15 +9,23 @@ on:
     - cron: "20 16 * * 0"
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-latest
+          - os: windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Download source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Crystal
-        uses: oprypin/install-crystal@v1
+        uses: crystal-lang/install-crystal@v1
+      - name: Install shards
+        run: shards update
+      - name: Run tests
+        run: crystal spec --order=random
       - name: Check formatting
         run: crystal tool format --check
-      - name: Install shard dependencies
-        run: shards install
-      - name: Run tests
-        run: crystal spec
+        if: matrix.os == 'ubuntu-latest'
