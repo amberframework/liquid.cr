@@ -305,11 +305,6 @@ liquid.golden.special first of an array
 liquid.golden.special first of an object
 liquid.golden.special last of an array
 liquid.golden.special size of an object with a size property
-liquid.golden.split_filter argument not a string
-liquid.golden.split_filter missing argument
-liquid.golden.split_filter not a string
-liquid.golden.split_filter too many arguments
-liquid.golden.split_filter undefined argument
 liquid.golden.strip_filter unexpected argument
 liquid.golden.strip_html_filter unexpected argument
 liquid.golden.strip_newlines_filter unexpected argument

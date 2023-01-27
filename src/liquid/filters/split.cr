@@ -24,11 +24,18 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      if (raw = data.raw) && raw.responds_to?(:split) &&
-         args && (fa = args.first?) && (arg = fa.as_s?)
-        Any.new(raw.split(arg).map { |s| Any.new(s) })
+      raise FilterArgumentException.new("split filter expects one argument.") if args.size != 1
+
+      arg = args.first.to_s
+      raw_data = data.raw
+
+      return Any.new(nil) if raw_data.nil?
+
+      if raw_data.responds_to?(:split)
+        array = raw_data.split(arg).map { |s| Any.new(s) }
+        Any.new(array)
       else
-        data
+        Any{data}
       end
     end
   end
