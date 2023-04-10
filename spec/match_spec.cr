@@ -15,11 +15,19 @@ describe Template do
   end
 
   it "should match if statement" do
-    tpl = Parser.parse("t{% if var == true %}ru{% endif %}est")
+    tpl = Parser.parse("{% if var == true %}true{% endif %}")
 
-    tpl.matches?("truest").should eq true
-    tpl.matches?("test").should eq true
+    tpl.matches?("true").should eq true
+    tpl.matches?("").should eq true
     tpl.matches?("false").should eq false
+  end
+
+  it "should match unless statement", tags: "current" do
+    tpl = Parser.parse("{% unless var == true %}false{% endif %}")
+
+    tpl.matches?("false").should eq true
+    tpl.matches?("").should eq true
+    tpl.matches?("true").should eq false
   end
 
   it "should match if elsif else statement" do
