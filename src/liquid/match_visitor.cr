@@ -14,7 +14,7 @@ module Liquid
       return ".*"
     end
 
-    def visit(node : If) : String
+    def visit(node : Conditional) : String
       child_nodes = node.children.map { |e| self.visit e }
 
       if elsif_arr = node.elsif
