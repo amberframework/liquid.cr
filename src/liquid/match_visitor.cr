@@ -15,7 +15,7 @@ module Liquid
     end
 
     def visit(node : Conditional) : String
-      child_nodes = node.children.map { |e| self.visit e }
+      child_nodes = [node.children.map { |e| self.visit e }.join]
 
       if elsif_arr = node.elsif
         elsif_arr.each do |alt|
