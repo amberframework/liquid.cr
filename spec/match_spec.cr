@@ -22,7 +22,7 @@ describe Template do
     tpl.matches?("false").should eq false
   end
 
-  it "should match unless statement", tags: "current" do
+  it "should match unless statement" do
     tpl = Parser.parse("{% unless var == true %}false{% endif %}")
 
     tpl.matches?("false").should eq true
@@ -88,5 +88,13 @@ describe Template do
 
     tpl.matches?("even odd even ").should eq true
     tpl.matches?("even noteven even").should eq false
+  end
+
+  it "should match nested if statement", tags: "current" do
+    tpl = Parser.parse("{% if count %}Count: {% for x in 1..3 %}N{{ x }}{% endfor %}{% else %}Reverse Count: {% for x in 9..7 %}R{{ x }}{% endfor %}{% endif %}")
+
+    tpl.matches?("Count: N1N2N3").should eq true
+    tpl.matches?("Reverse Count: R9R8R7").should eq true
+    tpl.matches?("").should eq false
   end
 end
