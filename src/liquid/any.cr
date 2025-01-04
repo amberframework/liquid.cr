@@ -7,17 +7,21 @@ module Liquid
     # Returns the raw underlying value.
     getter raw : Type
 
+    # Creates an instance of `Liquid::Any` with a value of nil.
     def initialize
       @raw = nil
     end
 
+    # Creates an instance of `Liquid::Any` that wraps the given value.
     def initialize(@raw : Type)
     end
 
+    # Assumes the underlying value is an `Array` and adds *value* to the array.
     def <<(value : Type) : Array(Any)
       init_raw_to_array_if_nil << Any.new(value)
     end
 
+    # Assumes the underlying value is an `Array` and adds *value* to the array.
     def <<(value : Any) : Array(Any)
       init_raw_to_array_if_nil << value
     end
@@ -83,11 +87,15 @@ module Liquid
       end
     end
 
+    # Assumes the underlying value is a `Hash`and assigns a value at the given *key*.
+    # Raises if the underlying value is not a `Hash`.
     def []=(key : String | Symbol, value : Type) : Type
       init_raw_to_hash_if_nil[key.to_s] = Any.new(value)
       value
     end
 
+    # Assumes the underlying value is a `Hash`and assigns a value at the given *key*.
+    # Raises if the underlying value is not a `Hash`.
     def []=(key : String | Symbol, value : Any) : Any
       init_raw_to_hash_if_nil[key.to_s] = value
     end
@@ -252,6 +260,7 @@ module Liquid
       @raw.inspect(io)
     end
 
+    # Assumes the underlying value is a numerical value, and returns the value with the opposite sign.
     def -
       raw = @raw
       raise InvalidExpression.new("Can't apply '-' operator to #{raw.class.name}") unless raw.is_a?(Number)
@@ -259,10 +268,14 @@ module Liquid
       Any.new(-raw)
     end
 
+    # Checks that the underlying value is a numerical value, and returns its value.
+    # Returns 0 otherwise.
     def as_number : Number
       as_number? || 0
     end
 
+    # Checks that the underlying value is a numerical value, and returns its value.
+    # Returns `nil` otherwise.
     def as_number?
       raw = @raw
       if raw.is_a?(Number)
@@ -276,6 +289,7 @@ module Liquid
       end
     end
 
+    # Returns a string representation of the underlying value.
     def to_s(io : IO) : Nil
       @raw.to_s(io)
     end
@@ -303,6 +317,7 @@ module Liquid
       !!(@raw || other.raw)
     end
 
+    # Returns true if the underlying value is an `Array` or `String`, and contains *other*, false otherwise.
     def contains?(other : Any) : Bool
       raw = @raw
       return raw.includes?(other) if raw.is_a?(Array(Any))
