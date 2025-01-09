@@ -14,8 +14,8 @@ module Liquid::Filters
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise FilterArgumentException.new("at_most filter expects one argument.") if args.size != 1
 
-      max_value = args.first.as_number
-      result = data.as_number
+      max_value = args.first.as_number_or_zero
+      result = data.as_number_or_zero
       result = max_value if result > max_value
 
       Any.new(result)
