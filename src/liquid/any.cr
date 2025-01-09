@@ -262,7 +262,7 @@ module Liquid
     # Checks that the underlying value is a `Number`, and returns its value.
     # Raises otherwise.
     def as_number : Number
-      as_number? || raise TypeCastError.new("Cast from String to Number+ failed")
+      as_number? || raise TypeCastError.new("Cast to Number+ failed")
     end
 
     # Checks that the underlying value is a `Number`, and returns its value.

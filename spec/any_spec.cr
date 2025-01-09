@@ -16,7 +16,7 @@ describe Liquid::Any do
   end
 
   it "raises if underlying value is not a number" do
-    expect_raises(TypeCastError, "Cast from String to Number+ failed") do
+    expect_raises(TypeCastError, "Cast to Number+ failed") do
       any = Any.new("Hello, world!")
       any.as_number
     end
