@@ -17,5 +17,9 @@ module Liquid
     def ==(other : Any)
       self == other.raw
     end
+
+    def inspect(io : IO)
+      io << "Liquid::Blank.new"
+    end
   end
 end

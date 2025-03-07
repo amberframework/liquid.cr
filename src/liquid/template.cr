@@ -49,12 +49,12 @@ module Liquid
 
       unless context
         context = "context"
-        io.puts <<-EOF
-context = Liquid::Context.new
-{% for var in @type.instance_vars %}
-    context.set {{var.id.stringify}}, @{{var.id}}
-{% end %}
-EOF
+        io.puts <<-CRYSTAL
+        context = Liquid::Context.new
+        {% for var in @type.instance_vars %}
+            context.set({{var.id.stringify}}, @{{var.id}})
+        {% end %}
+        CRYSTAL
       end
 
       root.accept visitor

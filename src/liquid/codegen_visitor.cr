@@ -41,8 +41,21 @@ module Liquid
       @io << new_var << " = " << some << "\n"
     end
 
-    def escape(some : String)
-      some.gsub '"', "\\\""
+    def escape(text : String) : String
+      CodeGenVisitor.escape(text)
+    end
+
+    def self.escape(text : String) : String
+      text.gsub do |char|
+        case char
+        when '"'  then "\\\""
+        when '\n' then "\\n"
+        when '\r' then "\\r"
+        when '\t' then "\\t"
+        else
+          char
+        end
+      end
     end
 
     def visit(node : Node)
@@ -54,8 +67,7 @@ module Liquid
     end
 
     def visit(node : Assign)
-      to_io %(Liquid::Block::Assign.new("#{escape node.varname}",
-                    Liquid::Block::ExpressionNode.new("#{escape node.value.var}")))
+      to_io %(Liquid::Block::Assign.new("#{escape node.varname}", Liquid::Expression.new("#{escape node.value.expression}")))
     end
 
     def visit(node : Include)
@@ -70,9 +82,7 @@ module Liquid
     end
 
     def visit(node : Case)
-      def_to_io %(Liquid::Block::ExpressionNode.new(
-                   "#{escape node.expression.not_nil!.var}"))
-      def_to_io "Liquid::Block::Case.new(#{@last_var})"
+      def_to_io %(Liquid::Block::Case.new("#{escape node.expression.expression}"))
       push
       node.children.each &.accept self
       if arr = node.when
@@ -84,26 +94,42 @@ module Liquid
       pop
     end
 
-    def visit(node : For)
-      if node.begin && node.end
-        def_to_io %(Liquid::Block::For.new("#{node.loop_var}",
-                                          #{node.begin}, #{node.end}))
-      else
-        def_to_io "Liquid::Block::For.new(\"#{node.loop_var}\", \"#{node.loop_over}\")"
+    def visit(node : When)
+      expressions = node.when_expressions.map do |expression|
+        escape(expression.expression)
       end
+      def_to_io %(Liquid::Block::When.new("#{expressions.join(", ")}"))
+      push
+      node.children.each &.accept(self)
+      pop
+    end
+
+    def visit(node : For)
+      def_to_io %(Liquid::Block::For.new("#{node.loop_var}", #{node.loop_over.inspect}))
       push
       node.children.each &.accept(self)
       pop
     end
 
     def visit(node : ExpressionNode)
-      to_io %(Liquid::Block::ExpressionNode.new("#{escape node.var}"))
+      to_io %(Liquid::Block::ExpressionNode.new("#{escape node.expression}"))
     end
 
     def visit(node : If)
-      def_to_io %(Liquid::Block::ExpressionNode.new(
-                   "#{escape node.expression.not_nil!.var}"))
-      def_to_io "Liquid::Block::If.new(#{@last_var})"
+      def_to_io %(Liquid::Block::If.new("#{escape node.expression.expression}"))
+      push
+      node.children.each &.accept self
+      if arr = node.elsif
+        arr.each &.accept self
+      end
+      if e = node.else
+        e.accept self
+      end
+      pop
+    end
+
+    def visit(node : Unless)
+      def_to_io %(Liquid::Block::Unless.new("#{escape node.expression.expression}"))
       push
       node.children.each &.accept self
       if arr = node.elsif
@@ -116,7 +142,7 @@ module Liquid
     end
 
     def visit(node : ElsIf)
-      def_to_io "Liquid::Block::ElsIf.new( ExpressionNode.new(\"#{escape node.expression.var}\"))"
+      def_to_io %(Liquid::Block::ElsIf.new("#{escape node.expression.expression}"))
       push
       node.children.each &.accept self
       pop

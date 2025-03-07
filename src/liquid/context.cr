@@ -38,6 +38,7 @@ module Liquid
     delegate :strict?, to: @error_mode
     delegate :warn?, to: @error_mode
     delegate :lax?, to: @error_mode
+    delegate :each, to: @data
 
     @[Deprecated("Use `initialize(ErrorMode)` instead.")]
     def initialize(strict : Bool)
