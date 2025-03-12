@@ -38,7 +38,7 @@ module Liquid
     TemplateParser        = /(#{PartialTemplateParser}|#{AnyStartingTag})/m
     VariableParser        = /\[[^\]]+\]|#{VariableSegment}+\??/
 
-    def self.parse(string : String) : Nil
+    def self.parse(string : String, &) : Nil
       line_number = 1
 
       string.split(TemplateParser) do |value|

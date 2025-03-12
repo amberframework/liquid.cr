@@ -10,7 +10,7 @@ module Liquid
     end
 
     @[Ignore]
-    def each
+    def each(&)
       collection = @collection
       if collection.is_a?(Array) || collection.is_a?(Range)
         collection.each do |val|
