@@ -16,7 +16,7 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      raise FilterArgumentException.new("Unexpected argument for abs filter") if args && args.any?
+      raise FilterArgumentException.new("Unexpected argument for abs filter") unless args.empty?
 
       if data.raw.is_a? Number
         Any.new data.raw.as(Number).abs

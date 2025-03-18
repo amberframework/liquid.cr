@@ -25,7 +25,7 @@ class GoldenTest
 
   private def context : Liquid::Context
     vars = @context.as_h?
-    raise "Bad context: #{@context.to_s}" if vars.nil?
+    raise "Bad context: #{@context}" if vars.nil?
 
     # Golden liquid run ruby tests with `render!`, that raises an exception on first error, this is the strict behavior
     # of liquid crystal.

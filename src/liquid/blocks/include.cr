@@ -26,7 +26,7 @@ module Liquid::Block
           varname = File.basename(@template_name, File.extname(@template_name))
           @template_vars[varname] = Expression.new match["value"]
         elsif groups = content.scan INCLUDE_VARS
-          groups.each do |group|
+          groups.each do |_|
             next if groups.empty?
 
             groups.each do |group|

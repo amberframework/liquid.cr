@@ -2,15 +2,15 @@ require "./drop"
 
 module Liquid
   class Blank < Drop
-    def ==(str : String)
-      str.empty?
+    def ==(other : String)
+      other.empty?
     end
 
-    def ==(array : Array)
-      array.empty?
+    def ==(other : Array)
+      other.empty?
     end
 
-    def ==(_nil : Nil)
+    def ==(other : Nil)
       true
     end
 

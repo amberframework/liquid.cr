@@ -1,0 +1,9 @@
+Lint/NotNil:
+  Enabled: false
+Lint/MissingBlockArgument:
+  Enabled: true
+Documentation/DocumentationAdmonition:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+

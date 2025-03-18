@@ -155,7 +155,7 @@ module Liquid
     private def apply_filters(ctx : Context, operand : Any, filter_stack : Stack?) : Any
       return operand if filter_stack.nil?
 
-      while filter_stack.any?
+      while !filter_stack.empty?
         item = filter_stack.shift
         return expression_error(ctx, "Expected a filter, got #{item}.") if !item.is_a?(Operator) || !item.filter?
 
@@ -184,7 +184,7 @@ module Liquid
       filter_args = ctx.filter_args
       filter_options = ctx.filter_options
 
-      while stack.any?
+      while !stack.empty?
         item = stack.first
         return if item.is_a?(Operator) && item.filter?
 
@@ -218,7 +218,7 @@ module Liquid
       raw = obj.raw
       return call_drop_method(ctx, raw, method) if raw.is_a?(Drop)
       return call_hash_method(ctx, raw, method) if raw.is_a?(Hash)
-      return call_nil_method(ctx, method) if raw.is_a?(Nil)
+      return call_nil_method(ctx, method) if raw.nil?
 
       return expression_error(ctx, "Tried to call ##{method} on a #{raw.class.name}.") if !raw.responds_to?(:size)
 

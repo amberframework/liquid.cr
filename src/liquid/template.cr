@@ -29,7 +29,7 @@ module Liquid
       match_string = visitor.visit @root
       match_regex = /^#{match_string}$/
 
-      return match_regex.matches?(target_string)
+      match_regex.matches?(target_string)
     end
 
     def render(data, io : IO) : Nil
