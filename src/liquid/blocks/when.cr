@@ -2,7 +2,7 @@ require "./block"
 
 module Liquid::Block
   class When < InlineBlock
-    @when_expressions : Array(Expression)
+    getter when_expressions : Array(Expression)
 
     def initialize(content : String)
       @when_expressions = Array(Expression).new

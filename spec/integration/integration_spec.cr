@@ -1,6 +1,17 @@
 require "yaml"
 require "../spec_helper"
 
+# [golden-liquid](https://github.com/jg-rp/golden-liquid) is a test suite for
+# liquid template, tests are found in spec/integration/golden_liquid.yaml, a
+# list of tests that are expected to fail can be found at
+# spec/integration/golden_liquid.pending.
+#
+# All golden liquid tests are tagged with `golden`. Tests are run in two modes,
+# using the render visitor directly (tagged with `render`) and using the
+# codegen visitor (tagged with `codegen`), besides a numeric tag for each test.
+#
+# For code gen tests Crystal code is written in files like
+# `spec/integration/codegen-test-XXX.cr` where XXX is the test number.
 class GoldenTest
   include YAML::Serializable
 
@@ -25,6 +36,40 @@ class GoldenTest
     ctx
   end
 
+  private def context_to_code(context : Liquid::Context) : String
+    String.build do |str|
+      str << "Liquid::Context{"
+      context.each do |key, value|
+        key.inspect(str)
+        str << " => " << any_to_code(value)
+        str << ", "
+      end
+      str << "}"
+    end
+  end
+
+  private def any_to_code(any : Liquid::Any) : String
+    raw = any.raw
+    String.build do |str|
+      str << "Liquid::Any.new("
+
+      if raw.is_a?(Array)
+        str << "["
+        raw.each { |item| str << any_to_code(item) << ", " }
+        str << "] of Liquid::Any"
+      elsif raw.is_a?(Hash)
+        str << "{"
+        raw.each do |key, value|
+          str << key.inspect << "=>" << any_to_code(value) << ", "
+        end
+        str << "} of String => Liquid::Any"
+      else
+        raw.inspect(str)
+      end
+      str << ")"
+    end
+  end
+
   def test!
     if @error
       expect_raises(LiquidException) do
@@ -33,6 +78,55 @@ class GoldenTest
     else
       Parser.parse(@template).render(context).should eq(@want)
     end
+  end
+
+  def codegen_test!(test_group, test_number)
+    test_path = Path[__DIR__, "codegen-test-#{test_number}.cr"]
+    test = File.open(test_path, "w")
+    test.puts("# #{test_group.name}.#{@name}\n\n")
+    generate_codegen_test_source(test)
+    output = `crystal run #{Process.quote(test.path)} --error-trace`
+    $?.exit_code.should eq(0)
+    output.should eq(@want) unless @error
+  end
+
+  private def generate_codegen_test_source(io) : Nil
+    error_mode = @strict || @error ? Context::ErrorMode::Strict : Context::ErrorMode::Lax
+
+    io.puts(<<-CRYSTAL)
+    require "../../src/liquid"
+
+    TEMPLATE =<<-LIQUID
+    #{Liquid::CodeGenVisitor.escape(@template)}
+    LIQUID
+
+    WANT =<<-TEXT
+    #{Liquid::CodeGenVisitor.escape(@want)}
+    TEXT
+
+    #  CONTEXT
+    expects_error = #{@error}
+    context = #{context_to_code(context)}
+    context.error_mode = :#{error_mode}
+
+    #  CODEGEN OUTPUT
+    CRYSTAL
+
+    tpl = Liquid::Template.parse(@template)
+    visitor = CodeGenVisitor.new(io)
+    tpl.root.accept(visitor)
+    io.puts(<<-CRYSTAL)
+    begin
+      Liquid::Template.new(root).render(context, STDOUT)
+    rescue ex : Liquid::InvalidExpression
+      raise ex unless expects_error
+    end
+    CRYSTAL
+
+  rescue ex : Liquid::LiquidException
+    io << "abort(" << ex.message.inspect << ") unless expects_error\n"
+  ensure
+    io.close
   end
 end
 
@@ -68,7 +162,6 @@ private def yaml_any_to_liquid_any(yaml : YAML::Any) : Liquid::Any
   end
 end
 
-# FIXME: One all tests pass we must remove this class
 class PendingGold
   @@pending : Array(String)?
 
@@ -84,14 +177,21 @@ end
 describe "Golden Liquid Tests" do
   i = 1
   skip_pending_tests = ENV["SKIP_PENDING"]?
+
   GoldenLiquid.from_yaml(File.read(File.join(__DIR__, "golden_liquid.yaml"))).test_groups.each do |test_group|
-    describe test_group.name do
+    describe test_group.name, tags: "golden" do
       test_group.tests.each do |test|
         if PendingGold.pending?(test_group.name, test.name)
           pending(test.name, line: i) unless skip_pending_tests
         else
-          it test.name, line: i do
+          it "#{test.name} [test-#{i} render]", tags: ["test-#{i}", "render"] do
             test.test!
+          end
+
+          i += 1
+          dup_i = i
+          it "#{test.name} [test-#{i} codegen]", tags: ["test-#{i}", "codegen"] do
+            test.codegen_test!(test_group, dup_i)
           end
         end
         i += 1

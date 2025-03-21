@@ -23,7 +23,7 @@ module Liquid::Block
       end
     end
 
-    protected def inspect(io : IO)
+    protected def inspect(io : IO, &)
       io << '<'
       io << '-' if lstrip?
       io << ' '

@@ -21,10 +21,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
+      - name: Check formatting
+        run: crystal tool format --check
       - name: Install shards
         run: shards update
       - name: Run tests
         run: crystal spec --order=random
-      - name: Check formatting
-        run: crystal tool format --check
         if: matrix.os == 'ubuntu-latest'

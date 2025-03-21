@@ -38,6 +38,7 @@ module Liquid
     delegate :strict?, to: @error_mode
     delegate :warn?, to: @error_mode
     delegate :lax?, to: @error_mode
+    delegate :each, to: @data
 
     @[Deprecated("Use `initialize(ErrorMode)` instead.")]
     def initialize(strict : Bool)
@@ -103,6 +104,17 @@ module Liquid
     # Sets the value of *var* to the given *value*.
     def set(var : String, value : Any) : Any
       @data[var] = value
+    end
+
+    @[Deprecated("Use `set(String, ::Liquid::Any)`")]
+    def set(var : String, value : Hash(String, T)) : Any forall T
+      mapped_values = value.transform_values { |v| Any.new(v) }
+      set(var, mapped_values)
+    end
+
+    # Sets the value for *var* to the given *value*.
+    def set(var : String, value : Hash(String, Any)) : Any
+      set(var, Any.new(value))
     end
 
     # Sets the value for *var* to an instance of `Liquid::Any` generated from *value*.
