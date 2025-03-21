@@ -31,7 +31,7 @@ module Liquid::Block
         @loop_var = gmatch["var"]
         @loop_over = if rmatch = gmatch["range"].match(RANGE)
                        rmatch["start"].to_i..rmatch["end"].to_i
-                     elsif (rmatch = gmatch["range"].match VARNAME)
+                     elsif rmatch = gmatch["range"].match VARNAME
                        rmatch["varname"]
                      else
                        raise SyntaxError.new("Invalid for node: #{content}.")

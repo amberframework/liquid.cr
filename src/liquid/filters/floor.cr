@@ -14,7 +14,7 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      raise FilterArgumentException.new("Unexpected argument for floor filter") if args && args.any?
+      raise FilterArgumentException.new("Unexpected argument for floor filter") unless args.empty?
 
       if (raw = data.raw) && raw.is_a? Number
         Any.new(raw.floor.to_i)

@@ -20,7 +20,7 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
-      raise FilterArgumentException.new("Unexpected argument for capitalize filter") if args && args.any?
+      raise FilterArgumentException.new("Unexpected argument for capitalize filter") unless args.empty?
 
       raw = data.raw
       if raw.is_a?(String)

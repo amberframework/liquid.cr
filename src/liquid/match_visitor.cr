@@ -3,15 +3,15 @@ require "./blocks"
 module Liquid
   class MatchVisitor < Visitor
     def visit(node : Node) : String
-      return node.children.map { |e| self.visit e }.join
+      node.children.map { |e| self.visit e }.join
     end
 
     def visit(node : Block::RawNode) : String
-      return node.content
+      node.content
     end
 
     def visit(node : ExpressionNode)
-      return ".*"
+      ".*"
     end
 
     def visit(node : Conditional) : String
@@ -29,7 +29,7 @@ module Liquid
         child_nodes << ""
       end
 
-      return "(#{child_nodes.join("|")})"
+      "(#{child_nodes.join("|")})"
     end
 
     def visit(node : Case)
@@ -47,13 +47,13 @@ module Liquid
         child_nodes << ""
       end
 
-      return "(#{child_nodes.join("|")})"
+      "(#{child_nodes.join("|")})"
     end
 
     def visit(node : For)
       child_nodes = node.children.map { |e| self.visit e }
 
-      return "(#{child_nodes.join})*"
+      "(#{child_nodes.join})*"
     end
   end
 end

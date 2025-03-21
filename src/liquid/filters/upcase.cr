@@ -13,7 +13,7 @@ module Liquid::Filters
     extend Filter
 
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)?) : Any
-      raise FilterArgumentException.new("upcase filter expects no arguments.") if args.any?
+      raise FilterArgumentException.new("upcase filter expects no arguments.") unless args.empty?
 
       raw = data.raw
       if raw.responds_to?(:upcase)

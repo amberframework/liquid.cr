@@ -14,7 +14,7 @@ module Liquid::Filters
       raise FilterArgumentException.new "map filter expects argument to be a string" unless args.first.raw.is_a?(String)
 
       if (raw = data.raw) && raw.is_a?(Array) && (first = args.first?)
-        result = raw.compact_map { |r| self.responds_to(r, first.as_s) }
+        result = raw.compact_map { |obj| self.responds_to(obj, first.as_s) }
         if result.empty?
           data
         else

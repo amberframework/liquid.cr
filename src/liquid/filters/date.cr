@@ -31,13 +31,13 @@ module Liquid::Filters
     def self.filter(data : Any, args : Array(Any), options : Hash(String, Any)) : Any
       raise FilterArgumentException.new "date filter require an argument" unless args && args.size == 1
 
-      format = if (arg = args.first.as_s?)
+      format = if arg = args.first.as_s?
                  arg
                else
                  raise FilterArgumentException.new "First argument of date filter should be a string"
                end
 
-      if (time = data.as_t?)
+      if time = data.as_t?
         Any.new time.to_s format
       elsif (d = data.as_s?) && d == "now"
         Any.new Time.utc.to_s format

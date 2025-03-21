@@ -32,7 +32,7 @@ module Liquid::Filters
       return Any.new(nil) if raw_data.nil?
 
       if raw_data.responds_to?(:split)
-        array = raw_data.split(arg).map { |s| Any.new(s) }
+        array = raw_data.split(arg).map { |obj| Any.new(obj) }
         Any.new(array)
       else
         Any{data}

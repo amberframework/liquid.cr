@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
       - name: Check formatting
@@ -27,4 +27,14 @@ jobs:
         run: shards update
       - name: Run tests
         run: crystal spec --order=random
-        if: matrix.os == 'ubuntu-latest'
+  ameba:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+      - name: Run ameba linter
+        uses: crystal-ameba/github-action@v0.12.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
